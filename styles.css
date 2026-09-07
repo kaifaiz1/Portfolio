@@ -644,6 +644,12 @@ body.endrer-storrelse *::after {
    Ringen er der fordi plakatens ytterkant er nesten svart og kortet
    under er helt svart: uten den forsvinner hjørnene i bakgrunnen, og
    luften rundt blir umulig å se. */
+/* 18 px og ikke 9: plakaten har sine egne, slitte hjørner malt inn i
+   bildefila — tre av dem. Det fjerde, nederst til høyre, er helt
+   skarpt. Med en liten radius er det kunstverkets egen kurve som leser
+   som hjørnet på de tre gode, og da stakk det fjerde ut som spisst.
+   En radius som er større enn kunstverkets egen kurve tar over på alle
+   fire, og da er de like. */
 .card-cover {
   position: absolute;
   top: 50%;
@@ -652,7 +658,7 @@ body.endrer-storrelse *::after {
   width: 78%;
   aspect-ratio: 1;
   object-fit: cover;
-  border-radius: 9px;
+  border-radius: 18px;
   box-shadow:
     0 18px 40px -18px rgba(0,0,0,0.85),
     0 0 0 1px rgba(255,255,255,0.07);
@@ -2565,7 +2571,7 @@ body:not(.mode-deck) .deck-dots { opacity: 0; pointer-events: none; }
 
 .spot-cover {
   aspect-ratio: 1;
-  border-radius: 10px;
+  border-radius: 18px;   /* samme grunn som på .card-cover lenger oppe */
   overflow: hidden;
   background: #000;
   /* plakaten skal se ut som den ligger oppå flaten, ikke som en rute

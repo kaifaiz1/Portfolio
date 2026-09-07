@@ -623,13 +623,17 @@
       fart = Math.max(-0.055, Math.min(0.055, fart + d * 0.00016));
     }, { passive: false });
 
-    // sveip gjør det samme på touch
+    // Sveip gjør det samme på touch, men motsatt vei av hjulet — og det
+    // er med vilje. Med en finger tar man i selve ringen, og da må den
+    // følge fingeren: drar du mot venstre, skal det som står fremst gå
+    // mot venstre. Hjulet er ikke det samme — der tar man ikke i noe, og
+    // retningen der er som den var.
     let sveipX = null;
     orbit.addEventListener('touchstart', (e) => { sveipX = e.touches[0].clientX; }, { passive: true });
     orbit.addEventListener('touchmove', (e) => {
       if (sveipX === null || !ringInteraktiv()) return;
       const x = e.touches[0].clientX;
-      fart = Math.max(-0.055, Math.min(0.055, fart + (sveipX - x) * 0.0004));
+      fart = Math.max(-0.055, Math.min(0.055, fart + (x - sveipX) * 0.0004));
       sveipX = x;
     }, { passive: true });
     orbit.addEventListener('touchend', () => { sveipX = null; }, { passive: true });
