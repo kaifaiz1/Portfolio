@@ -580,10 +580,23 @@
   // laster ned et arkiv de aldri åpner.
   // ============================================================
 
-  // Ikke med en gang. Forsiden skal bli ferdig først; ellers slåss
-  // nabokortet med det man faktisk ser om den samme båndbredden.
-  let forhandsPaa = false;
-  setTimeout(() => { forhandsPaa = true; updateReel(); }, 3000);
+  // I to trinn, og ikke med en gang. Forsiden skal bli ferdig først;
+  // ellers slåss forhåndslastingen med det man faktisk ser om den samme
+  // båndbredden.
+  //
+  // Trinn 1 er naboene, som er der man havner hvis man blar. Trinn 2 er
+  // resten av stokken, for den som hopper rett til et kort med prikkene
+  // — uten det trinnet venter man 2,3 sekunder på svak 4G. Til sammen er
+  // det 21 MB nå som opptakene er komprimert, og det skjer i bakgrunnen
+  // mens man ser på noe annet.
+  let forhandsNivaa = 0;   // 0 = av · 1 = naboene · 2 = hele stokken
+
+  // Den som har bedt om å spare data, skal ikke få hentet ned kort de
+  // kanskje aldri åpner. Da gjelder bare naboen.
+  const sparData = !!(navigator.connection && navigator.connection.saveData);
+
+  setTimeout(() => { forhandsNivaa = 1; updateReel(); }, 3000);
+  if (!sparData) setTimeout(() => { forhandsNivaa = 2; updateReel(); }, 9000);
 
   function forhandslast(video) {
     if (!video || video.preload !== 'none') return;
@@ -625,10 +638,12 @@
         }
 
         // det du sannsynligvis ser på om et øyeblikk
-        if (forhandsPaa && !skalSpille) {
-          const nesteIStokken = nabo && mode === 'deck' && i === 0;
+        if (forhandsNivaa && !skalSpille) {
+          const iStokken = mode === 'deck' && i === 0;
+          const naboKort = nabo && iStokken;
+          const restenAvStokken = forhandsNivaa >= 2 && iStokken;
           const nesteSide = aktiv && apen && Math.abs(i - r.aktiv) === 1;
-          if (nesteIStokken || nesteSide) forhandslast(video);
+          if (naboKort || restenAvStokken || nesteSide) forhandslast(video);
         }
 
         // bokser med stillbilder blar bare mens de står i midten, etter
