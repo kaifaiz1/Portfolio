@@ -788,6 +788,51 @@
 
   setInterval(henteTikk, 900);
 
+  // ============================================================
+  // Vaktbikkje på avspillingen
+  //
+  // Nettleserne på mobil kan nekte å starte et opptak selv om det er
+  // dempet. Strømsparing på iOS slår av all autoplay, Samsung Internet
+  // har en egen bryter for det, og Android Chrome gjør det samme i
+  // datasparemodus. Da blir play() avvist, kortet blir stående på
+  // plakatbildet, og det ser ut som om videoen ikke finnes.
+  //
+  // Regelen kan vi ikke overstyre, men vi kan spørre igjen. Et trykk på
+  // skjermen er den håndsopprekningen nettleseren venter på, og et
+  // play() som skjer inne i det trykket slipper gjennom der et på egen
+  // hånd blir avvist. Vi spør ved hvert trykk, ikke bare det første:
+  // har svaret vært nei én gang, kan neste trykk likevel være ja.
+  //
+  // Vaktbikkja følger i tillegg med på at det som spiller faktisk
+  // beveger seg. Står tiden stille mens opptaket påstår at det går, har
+  // det satt seg fast, og da ber vi om et nytt forsøk.
+  // ============================================================
+
+  let sistTid = -1;
+  let stille = 0;
+
+  function purrAvspilling() {
+    const v = spillerNa;
+    if (!v) { sistTid = -1; stille = 0; return; }
+    if (v.paused) { start(v); return; }
+    if (v.readyState < 3) { sistTid = v.currentTime; return; }   // laster — ikke vår sak
+    if (v.currentTime === sistTid) {
+      if (++stille >= 3) { stille = 0; start(v); }
+    } else {
+      stille = 0;
+    }
+    sistTid = v.currentTime;
+  }
+
+  setInterval(purrAvspilling, 1000);
+
+  // Capture, så vi kommer til før noen stopper hendelsen på veien opp.
+  ['pointerdown', 'touchstart', 'keydown'].forEach((navn) => {
+    window.addEventListener(navn, () => {
+      if (spillerNa && spillerNa.paused) start(spillerNa);
+    }, { passive: true, capture: true });
+  });
+
   function updateReel() {
     spillerNa = null;   // settes under, av den som skal spille nå
 
