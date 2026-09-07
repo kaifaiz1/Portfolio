@@ -2075,6 +2075,7 @@ html.port .inngang {
   /* litt over midten: en flate som er nøyaktig midtstilt ser lav ut */
   padding: 0 var(--pad) 10vh;
   background: var(--bg);
+  text-align: center;
   transition: opacity 0.55s var(--ease);
 }
 
@@ -2107,7 +2108,6 @@ html.port.apnet .inngang {
 .bryter {
   display: inline-flex;
   align-items: center;
-  gap: 0.9rem;
   margin-top: 2.8rem;
   padding: 0;
   border: 0;
@@ -2139,12 +2139,6 @@ html.port.apnet .inngang {
   transition: transform 0.42s var(--ease), background 0.4s var(--ease);
 }
 
-.bryter-tekst {
-  font-size: 0.95rem;
-  color: var(--grey);
-  transition: color 0.35s var(--ease);
-}
-
 .bryter.er-pa .bryter-spor {
   background: var(--ink);
   box-shadow: none;
@@ -2154,8 +2148,6 @@ html.port.apnet .inngang {
   transform: translateX(28px);
   background: var(--on-ink);
 }
-
-.bryter.er-pa .bryter-tekst { color: var(--ink); }
 
 .bryter:focus-visible {
   outline: 2px solid var(--ink);
@@ -2209,7 +2201,7 @@ html.port:not(.apnet) .deck-intro { animation-play-state: paused; }
   /* bildekarusellen bytter uten krysstoning, og blar ikke av seg selv */
   .gal-slide, .gal-dot { transition: none; }
   /* bryteren vipper uten glidning, men sier fortsatt fra at den er på */
-  .inngang, .bryter-spor, .bryter-knott, .bryter-tekst { transition: none; }
+  .inngang, .bryter-spor, .bryter-knott { transition: none; }
 }
 
 /* ============ RESPONSIVT ============ */
