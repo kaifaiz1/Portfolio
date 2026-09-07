@@ -64,7 +64,93 @@
   clearIntro(navWidgets, 'intro-fade', 2000);
   clearIntro(deck, 'deck-intro', 2000);
 
+  // ============================================================
+  // Frys driften mens noe er i bevegelse
+  //
+  // Den dyreste jobben nettleseren gjør her, er å male et kort på nytt
+  // for hver frame det flytter seg — og det må den så lenge noe inne i
+  // kortet endrer seg. Står innholdet stille, kan det samme kortet
+  // skyves som et ferdig bilde. Målt på et kortbytte: 28 ms per frame
+  // mot 10.
+  //
+  // «animation-play-state: paused» løser det ikke. Så lenge en
+  // animasjon er festet til elementet, blir laget stående på
+  // animasjonssporet, og omtegningen kommer likevel — pause målte
+  // 28,7 ms, altså ingenting. Animasjonen må faktisk vekk.
+  //
+  // Derfor: les av hvor flekken står, skriv det inn som en fast verdi,
+  // og ta animasjonen bort. Tidspunktet i animasjonen huskes, så den
+  // fortsetter nøyaktig der den slapp når kortet har landet. Ingen
+  // hopp — bare et sekunds forsinkelse i en drift som bruker 13–29
+  // sekunder på én runde, og som ingen kan se står stille så lenge
+  // kortet selv er i fart.
+  // ============================================================
+
+  const frosset = [];
+
+  function frysDriften() {
+    if (frosset.length) return;
+    const flekker = Array.from(document.querySelectorAll('.card-art span, .laste-fyll'));
+    // Alle avlesningene først. Leser og skriver vi om hverandre, tvinger
+    // hver eneste lesning fram en ny stilberegning — og da koster
+    // frysingen mer enn den sparer.
+    const stillinger = flekker.map((el) => getComputedStyle(el).transform);
+    flekker.forEach((el, i) => {
+      let anims = [];
+      try { anims = el.getAnimations(); } catch (e) { return; }
+      if (!anims.length) return;
+      frosset.push({ el, anims, tid: anims.map((a) => a.currentTime) });
+      anims.forEach((a) => a.cancel());
+      el.style.transform = stillinger[i];
+    });
+  }
+
+  function slippDriften() {
+    frosset.forEach(({ el, anims, tid }) => {
+      el.style.removeProperty('transform');
+      anims.forEach((a, k) => {
+        try {
+          a.play();
+          a.currentTime = tid[k];
+        } catch (e) { /* da begynner den bare på nytt — knapt synlig */ }
+      });
+    });
+    frosset.length = 0;
+  }
+
+  // To ting kan kreve frys samtidig: en kortovergang og en
+  // vindusendring. Da må begge ha sluppet før driften får gå igjen.
+  let flytter = false;
+  let endrerStorrelse = false;
+
+  function oppdaterFrys() {
+    if (flytter || endrerStorrelse) frysDriften();
+    else slippDriften();
+  }
+
+  // 0,95 s er kortovergangen (0,9 s) med litt slark, så frysen ikke
+  // slipper taket rett før siste frame.
+  let flytteTimer = null;
+
+  function markerFlytting() {
+    flytter = true;
+    oppdaterFrys();
+    clearTimeout(flytteTimer);
+    flytteTimer = setTimeout(() => {
+      flytter = false;
+      oppdaterFrys();
+    }, 950);
+  }
+
+  // Er noe løftet ut i fullskjerm akkurat nå? Da hører sveip, hjul og
+  // piltaster til fullskjermbildet, ikke til kortstokken bak.
+  function iFullskjerm() {
+    return !!(document.fullscreenElement || document.webkitFullscreenElement);
+  }
+
   function render() {
+    markerFlytting();
+
     document.body.classList.remove('mode-deck', 'mode-expanded', 'mode-text', 'mode-about');
     document.body.classList.add(`mode-${mode}`);
 
@@ -276,6 +362,38 @@
       const v = midt && midt.querySelector('video');
       if (v && v.paused) start(v);
     });
+  });
+
+  // ============================================================
+  // Fullskjerm
+  // Vi tilbyr den ikke selv — opptakene er pyntestykker uten
+  // kontroller — men nettleserne på Android legger en fullskjermknapp
+  // oppå alt som spiller, og Samsung Internet tegner den rett på siden.
+  // Havner man først der, står man i et bilde uten en eneste knapp, og
+  // det leser som at fullskjerm har hengt seg opp.
+  //
+  // Her får opptaket kontroller så lenge det ER i fullskjerm, og bare
+  // da. Det er den veien ut. Når man kommer tilbake stiller vi opp
+  // opptakene på nytt, slik at det som skal spille på siden gjør det.
+  // ============================================================
+
+  function fullskjermByttet() {
+    const el = document.fullscreenElement || document.webkitFullscreenElement || null;
+    document.querySelectorAll('video').forEach((v) => {
+      if (v === el) v.setAttribute('controls', '');
+      else v.removeAttribute('controls');
+    });
+    if (!el) updateReel();
+  }
+
+  ['fullscreenchange', 'webkitfullscreenchange'].forEach((navn) => {
+    document.addEventListener(navn, fullskjermByttet);
+  });
+
+  // iOS åpner ikke fullskjerm i siden, men i sin egen spiller, og melder
+  // fra på selve elementet i stedet for på dokumentet.
+  document.querySelectorAll('video').forEach((v) => {
+    v.addEventListener('webkitendfullscreen', () => updateReel());
   });
 
   // ============================================================
@@ -809,6 +927,7 @@
   let wheelHvile = null;
 
   window.addEventListener('wheel', (e) => {
+    if (iFullskjerm()) return;
     const sidestokk = iSidestokk();
     if (mode !== 'deck' && !sidestokk) return; // tekstark og om-siden scroller selv
     if (sidestokk) e.preventDefault();
@@ -843,13 +962,13 @@
   }
 
   window.addEventListener('touchstart', (e) => {
-    if (mode !== 'deck') return;
+    if (mode !== 'deck' || iFullskjerm()) return;
     touchX = e.touches[0].clientX;
     touchY = e.touches[0].clientY;
   }, { passive: true });
 
   window.addEventListener('touchend', (e) => {
-    if (mode !== 'deck' || touchX === null) return;
+    if (mode !== 'deck' || touchX === null || iFullskjerm()) return;
     const dx = touchX - e.changedTouches[0].clientX;
     const dy = touchY - e.changedTouches[0].clientY;
     const d = Math.abs(dx) >= Math.abs(dy) ? dx : dy;
@@ -864,6 +983,8 @@
 
     // et nabokort tar deg til seg selv; det aktive åpner seg
     function activate() {
+      // et trykk mens noe er i fullskjerm hører til fullskjermbildet
+      if (iFullskjerm()) return;
       if (i !== active) {
         if (mode === 'deck') goTo(i);
         return;
@@ -941,6 +1062,9 @@
   }
 
   window.addEventListener('keydown', (e) => {
+    // fullskjerm er sitt eget lag: Esc der hører til nettleseren, som
+    // lukker fullskjermbildet — vi skal ikke i tillegg lukke kortet bak
+    if (iFullskjerm()) return;
     if (e.key === 'Escape') {
       // en åpen meny er det nærmeste laget — Esc lukker den først
       if (navWidgets && navWidgets.classList.contains('is-open')) { lukkMeny(); return; }
@@ -1175,6 +1299,34 @@
 
     requestAnimationFrame(tick);
   }
+
+  // ============================================================
+  // Vindusendring
+  // Alle målene her er regnet ut fra vw og vh, så hver piksel vinduet
+  // endrer seg flytter kortene. Med overgangene på ble hver av de
+  // pikslene starten på en ny 0,9-sekunders animasjon av top, left,
+  // width og height — og de fire krever ny layout. Å dra i
+  // vindushjørnet ble en kø av overganger som aldri rakk i mål.
+  //
+  // Under dragingen følger alt med med en gang. 180 ms etter siste
+  // endring er overgangene tilbake, i god tid før neste klikk.
+  // ============================================================
+
+  let storrelseTimer = null;
+
+  window.addEventListener('resize', () => {
+    if (!endrerStorrelse) {
+      endrerStorrelse = true;
+      document.body.classList.add('endrer-storrelse');
+      oppdaterFrys();
+    }
+    clearTimeout(storrelseTimer);
+    storrelseTimer = setTimeout(() => {
+      endrerStorrelse = false;
+      document.body.classList.remove('endrer-storrelse');
+      oppdaterFrys();
+    }, 180);
+  }, { passive: true });
 
   render();
   requestAnimationFrame(tick);

@@ -584,6 +584,26 @@ button { font: inherit; color: inherit; background: none; border: none; cursor: 
 .mode-text .panel:not(.is-active) .card-art span,
 .mode-about .card-art span { animation-play-state: paused; }
 
+/* Mens et kort er i bevegelse fryses flekkene også — men det gjøres i
+   script.js, ikke her. «animation-play-state: paused» holder nemlig
+   ikke: så lenge en animasjon er festet til elementet, blir laget
+   stående på animasjonssporet, og kortet males på nytt hver frame
+   likevel. Målt ga pause ingenting (p90 28,7 mot 28,3 ms), mens en
+   ekte frys tok p90 ned til 9,6. Se «frysDriften» i script.js.
+
+   ---- vindusendring ----
+   Kortets plassering er regnet ut fra vw/vh, så hver eneste piksel
+   vinduet endrer seg starter en ny 0,9-sekunders overgang på top,
+   left, width og height — fire egenskaper som krever ny layout. Å dra
+   i vindushjørnet ble derfor en kø av overganger som aldri rakk i mål.
+   Under selve dragingen skal alt følge med med en gang; overgangene
+   kommer tilbake straks man slipper. */
+body.endrer-storrelse *,
+body.endrer-storrelse *::before,
+body.endrer-storrelse *::after {
+  transition-duration: 0s !important;
+}
+
 /* --- OsloLut: svart, med så vidt et stål- og fiolettløft --- */
 .art--oslolut { --art-bg: #08090c; }
 .art--oslolut span:nth-child(1) { background: radial-gradient(circle closest-side, rgba(58,72,98,0.95) 0%, rgba(58,72,98,0.475) 48%, rgba(58,72,98,0) 100%); }
@@ -1320,6 +1340,45 @@ button { font: inherit; color: inherit; background: none; border: none; cursor: 
   object-fit: cover;
   border-radius: 0;
   box-shadow: none;
+}
+
+/* ---- fullskjerm ----
+   Nettleserne på Android tilbyr av seg selv en fullskjermknapp oppå
+   opptak som spiller — Samsung Internet legger den rett på siden. Da
+   løftes videoen ut i sitt eget lag, men reglene våre over følger med:
+   «position: absolute» og «object-fit: cover» er skrevet for en
+   telefonskjerm på 200 piksler, og de har høyere spesifisitet enn
+   nettleserens egen fullskjermregel. Resultatet var et fullskjermbilde
+   som ikke satt der det skulle, og som så ut til å henge igjen.
+
+   De to variantene må stå som hver sin regel: kjenner ikke nettleseren
+   igjen den ene velgeren, forkaster den hele lista. */
+video:fullscreen {
+  position: fixed;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  max-width: none;
+  max-height: none;
+  aspect-ratio: auto;
+  object-fit: contain;
+  border-radius: 0;
+  box-shadow: none;
+  background: #000;
+}
+
+video:-webkit-full-screen {
+  position: fixed;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  max-width: none;
+  max-height: none;
+  aspect-ratio: auto;
+  object-fit: contain;
+  border-radius: 0;
+  box-shadow: none;
+  background: #000;
 }
 
 /* ---- side 2: bildet er bakgrunnen, videoen ligger oppå ---- */
