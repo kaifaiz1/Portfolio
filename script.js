@@ -720,6 +720,15 @@
 
     // etter render(), slik at inngangsforsinkelsene i CSS får virke
     if (mode === 'about') {
+      // Figuren scrubbes av scrollen og spilles aldri av, så den får
+      // aldri det play() som ellers starter nedlastingen. Den ligger med
+      // preload="none" for at de tolv megabytene ikke skal hentes for
+      // alle som aldri åpner om-siden — her, når noen faktisk gjør det,
+      // ber vi om hele fila. Scrubbing trenger den uansett hel.
+      if (aboutVideo && aboutVideo.preload === 'none') {
+        aboutVideo.preload = 'auto';
+        aboutVideo.load();
+      }
       aboutView.scrollTop = 0;
       updateAboutScroll();
     }
