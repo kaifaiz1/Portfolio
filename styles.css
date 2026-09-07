@@ -331,6 +331,17 @@ button { font: inherit; color: inherit; background: none; border: none; cursor: 
   transition: opacity 0.6s var(--ease);
 }
 
+/* Kortet som kommer inn skal være på med en gang. Naboene ligger dempet
+   til 0,82, og med 0,6 s begge veier brukte fargen et halvt sekund på å
+   ta seg opp etter at kortet hadde landet — tydeligst på det lyse blå,
+   der dempingen leser som at gradienten «slår seg på» for sent.
+
+   Ned tar fortsatt sin tid: det kortet som forlater midten skal gli
+   rolig ut, ikke slukke. */
+.panel.is-active > .card > .card-art,
+.panel.is-active > .card > .card-cover,
+.panel.is-active > .card > .type-face { transition-duration: 0.18s; }
+
 .card-label {
   position: absolute;
   left: 1.3rem;
