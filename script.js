@@ -72,8 +72,14 @@
     setTimeout(done, fallback);
   }
 
-  clearIntro(navWidgets, 'intro-fade', 2000);
-  clearIntro(deck, 'deck-intro', 2000);
+  // Bak porten står intro-animasjonene på pause (CSS), og da kommer
+  // «animationend» aldri. Ryddingen må derfor vente til man er inne,
+  // ellers river tidsavbruddet klassene bort mens animasjonen fortsatt
+  // har til gode å spille.
+  function startIntro() {
+    clearIntro(navWidgets, 'intro-fade', 2000);
+    clearIntro(deck, 'deck-intro', 2000);
+  }
 
   // ============================================================
   // Frys driften mens noe er i bevegelse
@@ -1460,6 +1466,39 @@
       oppdaterFrys();
     }, 180);
   }, { passive: true });
+
+  // ============================================================
+  // Inngangen
+  //
+  // Nettleserne på telefon lar ikke et opptak begynne før brukeren har
+  // rørt skjermen. Porten gjør den regelen om til et trykk vi vet om:
+  // ett vipp på bryteren, og siden er på.
+  //
+  // Det som skjer inne i selve klikket er poenget. Et play() der
+  // slipper gjennom, og etterpå regner nettleseren siden som noe
+  // brukeren har tatt i — resten av kortene får spille uten å spørre.
+  // ============================================================
+
+  const bryter = document.querySelector('.bryter');
+  const bakPort = document.documentElement.classList.contains('port');
+
+  function apneSiden() {
+    if (!document.documentElement.classList.contains('port')) return;
+    if (bryter) bryter.classList.add('er-pa');
+
+    // Her, inne i trykket — det er hele grunnen til at porten finnes.
+    if (spillerNa && spillerNa.paused) start(spillerNa);
+
+    // Bryteren får vippe ferdig før teppet går opp. Uten pausen skjer
+    // begge deler samtidig, og da rekker man ikke å se at man traff.
+    setTimeout(() => {
+      document.documentElement.classList.add('apnet');
+      startIntro();
+    }, 300);
+  }
+
+  if (bryter) bryter.addEventListener('click', apneSiden);
+  if (!bakPort) startIntro();
 
   render();
   requestAnimationFrame(tick);

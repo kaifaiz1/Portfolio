@@ -19,10 +19,34 @@
           : matchMedia('(prefers-color-scheme: dark)').matches;
         if (mork) document.documentElement.dataset.theme = 'dark';
       } catch (e) { /* privat modus: da blir det lyst */ }
+
+      // Inngangsporten gjelder bare smal skjerm, og settes her — før
+      // noe males — så kortstokken aldri rekker å blinke forbi bak
+      // den. Settes den ikke, finnes det ingen port å bli stående
+      // fast i; da virker siden som før.
+      if (matchMedia('(max-width: 860px)').matches) {
+        document.documentElement.classList.add('port');
+      }
     })();
   </script>
 </head>
 <body class="mode-deck">
+
+  <!-- ======== INNGANGEN ========
+       Bare på mobil, og bare fordi nettleserne der ikke lar et opptak
+       begynne før brukeren har rørt skjermen. Vi kan ikke overstyre
+       den regelen, men vi kan gjøre den til noe: ett trykk på en
+       bryter, og siden er på. Etterpå spiller alt som det skal. -->
+  <div class="inngang">
+    <div class="inngang-inner">
+      <p class="inngang-navn">Kai Faiz<span class="logo-dot">.</span></p>
+      <p class="inngang-rolle">Digital markedsfører × kreativ</p>
+      <button class="bryter" type="button" aria-label="Åpne porteføljen">
+        <span class="bryter-spor" aria-hidden="true"><span class="bryter-knott"></span></span>
+        <span class="bryter-tekst">Vipp for å åpne</span>
+      </button>
+    </div>
+  </div>
 
   <nav class="sr-only" aria-label="Innhold">
     <ul>
