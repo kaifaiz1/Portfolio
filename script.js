@@ -38,7 +38,18 @@
   const bunnTeller = document.querySelector('.bunn-teller');
   const n = panels.length;
 
-  let active = 0;
+  // Verktøykortet møter deg først. Det er det eneste kortet i stokken
+  // uten opptak, så det virker uansett hva nettleseren mener om
+  // autoplay — ringen går, og kortet ser levende ut fra første sekund.
+  //
+  // Og for å komme videre må du sveipe. Det sveipet er nettopp den
+  // håndsopprekningen de andre kortene trenger: et play() som skjer
+  // inne i en berøring slipper gjennom der et på egen hånd blir
+  // avvist. Så når du kommer til OsloLut, spiller det.
+  //
+  // Slås opp på id og ikke som et tall, så rekkefølgen i stokken kan
+  // endres uten at dette går i stykker.
+  let active = Math.max(0, panels.findIndex((p) => p.id === 'verktoy'));
   let lydPa = false;   // opptakene starter dempet; knappen slår på lyden
   let mode = 'deck'; // 'deck' | 'expanded' | 'text' | 'about'
   let wheelAcc = 0;
