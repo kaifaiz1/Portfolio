@@ -617,8 +617,11 @@ body.endrer-storrelse *::after {
    Nettbutikk er den eneste som fortsatt har gradient. Der er silken
    selve poenget: kortet har ingenting annet å vise. */
 
-/* --- OsloLut: kjølig stålblått --- */
-.art--oslolut { --art-bg: #4f546f; }
+/* --- OsloLut: svart. #08090c og ikke rent #000 — det er den samme
+       nesten-svarte bunnen kortet ble bygget på, og den holder et
+       hint av kjølighet som rent svart ikke har. Til øyet er den
+       svart. --- */
+.art--oslolut { --art-bg: #08090c; }
 
 /* --- Norges Badstulaug: varm terrakotta --- */
 .art--badstulaug { --art-bg: #a5765c; }
@@ -626,12 +629,14 @@ body.endrer-storrelse *::after {
 /* --- Knytt: den lyse blå --- */
 .art--knytt { --art-bg: #79aed9; }
 
-/* --- Kommer snart: helt svart. Kortet har ingen flekker i det hele
-       tatt — ikke bare usynlige, men fjernet fra markupen, så det ikke
-       ligger fem elementer og animerer noe man uansett ikke ser. Det
-       svarte er nå bare underlaget plakaten legger seg på, og det som
-       står igjen de første millisekundene før den er lastet. --- */
-.art--snart { --art-bg: #000; }
+/* --- Kryp: dyp burgunder. Kortet har ingen flekker i det hele tatt —
+       ikke bare usynlige, men fjernet fra markupen, så det ikke ligger
+       fem elementer og animerer noe man uansett ikke ser. Fargen er
+       bare underlaget plakaten legger seg på, og det som står igjen de
+       første millisekundene før den er lastet. Den plukker opp rødt
+       fra tittelen i plakaten, og er mørk nok til at den mørke kanten
+       på plakaten fortsatt har noe å hvile mot. --- */
+.art--snart { --art-bg: #4a1522; }
 
 /* Plakaten som kortforside. Den fyller ikke kortet, men ligger som en
    egen flate midt i det — 78 % er nøyaktig samme bredde som opptakene
