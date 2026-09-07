@@ -568,9 +568,35 @@
     return reels.find((r) => r.panel && r.panel.classList.contains('is-active')) || null;
   }
 
+  // ============================================================
+  // Forhåndslasting av det du er på vei til
+  // Opptakene ligger med preload="none" og hentes normalt først når de
+  // skal spilles. Det gir en liten venting hver gang man kommer til noe
+  // nytt. Her hentes naboen mens du ser på det som står fremme: neste
+  // kort i stokken, og siden foran og bak den du leser i et åpnet kort.
+  //
+  // Bare det ene opptaket naboen faktisk viser — ikke hele sidestokken
+  // bak den. Da er det som regel klart før du kommer dit, uten at noen
+  // laster ned et arkiv de aldri åpner.
+  // ============================================================
+
+  // Ikke med en gang. Forsiden skal bli ferdig først; ellers slåss
+  // nabokortet med det man faktisk ser om den samme båndbredden.
+  let forhandsPaa = false;
+  setTimeout(() => { forhandsPaa = true; updateReel(); }, 3000);
+
+  function forhandslast(video) {
+    if (!video || video.preload !== 'none') return;
+    video.preload = 'auto';
+    // load() nullstiller et element som spiller, så den er bare for dem
+    // som ikke har rørt seg ennå
+    if (video.readyState === 0 && video.paused) video.load();
+  }
+
   function updateReel() {
     reels.forEach((r) => {
       const aktiv = r.panel.classList.contains('is-active');
+      const nabo = r.panel.classList.contains('is-left') || r.panel.classList.contains('is-right');
       const apen = mode === 'expanded';
 
       r.items.forEach((item, i) => {
@@ -596,6 +622,13 @@
             item.dataset.sett = '';
             if (!video.paused) video.pause();
           }
+        }
+
+        // det du sannsynligvis ser på om et øyeblikk
+        if (forhandsPaa && !skalSpille) {
+          const nesteIStokken = nabo && mode === 'deck' && i === 0;
+          const nesteSide = aktiv && apen && Math.abs(i - r.aktiv) === 1;
+          if (nesteIStokken || nesteSide) forhandslast(video);
         }
 
         // bokser med stillbilder blar bare mens de står i midten, etter
