@@ -128,8 +128,17 @@
     else slippDriften();
   }
 
-  // 0,95 s er kortovergangen (0,9 s) med litt slark, så frysen ikke
-  // slipper taket rett før siste frame.
+  // Kortovergangen varer 0,9 s, men kurven er en kraftig ease-out: etter
+  // 0,42 s har kortet gjort 94 % av veien, og resten er en landing så
+  // rolig at øyet ikke har noe å følge. Frysen slipper der.
+  //
+  // Med hele overgangen frosset kom gradienten først i gang et halvt
+  // sekund etter at man var framme ved kortet, og da leste den som at
+  // den hang etter. De siste 480 millisekundene koster oss noen
+  // omtegninger, men på et kort som knapt flytter seg er det ingenting
+  // å se — mens en gradient som står død når man kommer fram, ser man.
+  const FRYS_MS = 420;
+
   let flytteTimer = null;
 
   function markerFlytting() {
@@ -139,7 +148,7 @@
     flytteTimer = setTimeout(() => {
       flytter = false;
       oppdaterFrys();
-    }, 950);
+    }, FRYS_MS);
   }
 
   // Er noe løftet ut i fullskjerm akkurat nå? Da hører sveip, hjul og
@@ -149,8 +158,6 @@
   }
 
   function render() {
-    markerFlytting();
-
     document.body.classList.remove('mode-deck', 'mode-expanded', 'mode-text', 'mode-about');
     document.body.classList.add(`mode-${mode}`);
 
@@ -864,7 +871,13 @@
     parTarget.x = 0; parTarget.y = 0; parTarget.s = 1;
   }
 
+  // Frysen henger på de to som faktisk flytter kort, ikke på render().
+  // render() kjøres også én gang ved sideåpning, og da står kortene
+  // allerede der de skal — det er bare opasiteten som toner inn. En
+  // frys der ga ingen gevinst, men lot gradienten stå død de første
+  // 660 millisekundene man så på siden.
   function goTo(i) {
+    markerFlytting();
     resetParallax();
     active = ((i % n) + n) % n; // looper begge veier
     render();
@@ -875,6 +888,7 @@
     const prev = mode;
     mode = next;
 
+    markerFlytting();
     resetParallax();
     lukkMeny();
 
