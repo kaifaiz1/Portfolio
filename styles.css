@@ -1,0 +1,2460 @@
+/* ============================================================
+   Kai Faiz — portefølje
+   Horisontalt oppsett: navbar på toppen (logo venstre, widgets
+   høyre), kortstokken ligger vannrett midt på skjermen.
+   Fire moduser (på <body>):
+     .mode-deck     — kortstokk, skroll blar (looper begge veier)
+     .mode-expanded — aktivt kort forstørret (visuelt)
+     .mode-text     — beskrivelse i tekstform
+     .mode-about    — om meg-side (tekst scroller, figur er sticky)
+   ============================================================ */
+
+:root {
+  --bg: #f6f6f6;
+  --ink: #1a1a1a;
+  --grey: #9f9f9f;
+  --grey-soft: #c7c7c7;
+  --card: #e9e9e9;
+  --line: #e2e2e2;
+  --sheet: #fafafa;
+  --surface: #fff;      /* knapper og chips som ligger på bakgrunnen */
+  --on-ink: #fff;       /* tekst oppå en ink-farget flate */
+  --radius: 26px;
+  --radius-big: 32px;
+  --ease: cubic-bezier(0.22, 1, 0.36, 1);
+  --font: "Schibsted Grotesk", "Helvetica Neue", Helvetica, Arial, sans-serif;
+
+  /* sidemarg + navbar */
+  --pad: clamp(1.4rem, 5vw, 4rem);
+  --nav-top: clamp(1.6rem, 3.4vh, 2.4rem);
+  --nav-h: clamp(6.4rem, 13vh, 8.2rem);
+
+  /* kortstokken ligger vannrett og er sentrert i viewporten */
+  --deck-size: min(440px, 38vw, 54vh);
+  --deck-left: calc(50% - var(--deck-size) / 2);
+  --deck-top: calc(50% - var(--deck-size) / 2 + var(--nav-h) / 4);
+
+  /* --- coverflow: nabokortene står igjen som kort, ikke som ark ---
+     Perspektivet ligger på .deck, så alle kortene deler ett felles
+     forsvinningspunkt. Hvert kort får bare translateX + rotateY + scale. */
+  --cf-x1: calc(var(--deck-size) * 0.88);   /* forskyvning, naboene */
+  --cf-s1: 0.86;                            /* skala, naboene */
+  --cf-s2: 0.72;                            /* skala, kortet som venter bak */
+  --cf-o1: 0.82;                            /* opasitet, naboene */
+  --cf-rot: 41deg;                          /* dreining inn mot midten */
+  --cf-persp: calc(var(--deck-size) * 3);
+
+  /* forstørret kort */
+  --exp-w: min(1080px, 92vw);
+}
+
+/* Nattmodus. Samme tokens, andre verdier — bakgrunnen og blekket bytter
+   plass, så alt som allerede bruker variablene følger med av seg selv.
+   --on-ink må snu sammen med --ink: den flaten er lys nå. */
+:root[data-theme="dark"] {
+  --bg: #0e0f12;
+  --ink: #f1f1f3;
+  --grey: #82838a;
+  --grey-soft: #45464d;
+  --card: #1b1c21;
+  --line: #2a2b31;
+  --sheet: #141518;
+  --surface: #1e1f25;
+  --on-ink: #0e0f12;
+}
+
+/* fargene glir over i stedet for å hoppe når man bytter tema */
+body,
+.widget,
+.close-btn,
+.edge-chip,
+.tool-chips li {
+  transition: background-color 0.45s var(--ease), color 0.45s var(--ease);
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+html, body { height: 100%; }
+
+body {
+  background: var(--bg);
+  color: var(--ink);
+  font-family: var(--font);
+  font-size: 17px;
+  line-height: 1.6;
+  letter-spacing: -0.01em;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+  overflow: hidden; /* siden skroller aldri — kortstokken blar */
+}
+
+img { display: block; max-width: 100%; }
+
+a { color: inherit; text-decoration: none; }
+
+button { font: inherit; color: inherit; background: none; border: none; cursor: pointer; }
+
+.sr-only {
+  position: absolute; width: 1px; height: 1px;
+  clip: rect(0 0 0 0); overflow: hidden; white-space: nowrap;
+}
+
+.stage {
+  position: fixed;
+  inset: 0;
+}
+
+/* ============ NAVBAR ============ */
+
+.navbar {
+  position: absolute;
+  top: var(--nav-top);
+  left: var(--pad);
+  right: var(--pad);
+  z-index: 40;
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 1.5rem;
+  transition: opacity 0.38s var(--ease), transform 0.38s var(--ease);
+}
+
+/* om-siden har sin egen identitetsblokk — navbaren løftes ut av veien */
+.mode-about .navbar {
+  opacity: 0;
+  transform: translateY(-14px);
+  pointer-events: none;
+}
+
+/* på vei tilbake venter navbaren til om-siden har sluppet taket */
+.mode-deck .navbar {
+  transition: opacity 0.55s var(--ease) 0.2s, transform 0.6s var(--ease) 0.2s;
+}
+
+/* venstre side: logo-blokk og aktiv casetittel deler samme plass */
+.nav-left {
+  position: relative;
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+.brand {
+  cursor: pointer;
+  transition: opacity 0.55s var(--ease), transform 0.55s var(--ease);
+}
+
+.brand:focus-visible { outline: 2px solid var(--ink); outline-offset: 6px; border-radius: 6px; }
+
+.logo {
+  font-size: clamp(1.35rem, 2.1vw, 1.7rem);
+  font-weight: 600;
+  letter-spacing: -0.035em;
+  line-height: 1.15;
+}
+
+.logo-dot { color: var(--grey-soft); }
+
+.brand-role {
+  font-size: clamp(1.05rem, 1.6vw, 1.28rem);
+  font-weight: 400;
+  color: var(--grey);
+  letter-spacing: -0.015em;
+  line-height: 1.3;
+}
+
+.mode-expanded .brand,
+.mode-text .brand {
+  opacity: 0;
+  transform: translateY(-12px);
+  pointer-events: none;
+}
+
+.case-heading {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: min(100%, 34rem);
+  opacity: 0;
+  pointer-events: none;
+  transform: translateY(12px);
+  transition: opacity 0.55s var(--ease), transform 0.55s var(--ease);
+  transition-delay: 0s;
+}
+
+.case-heading h2 {
+  font-size: clamp(1.35rem, 2.1vw, 1.7rem);
+  font-weight: 600;
+  letter-spacing: -0.03em;
+  line-height: 1.15;
+}
+
+.case-heading p {
+  margin-top: 0.25rem;
+  font-size: clamp(1.05rem, 1.6vw, 1.28rem);
+  color: var(--grey);
+  line-height: 1.3;
+  letter-spacing: -0.015em;
+}
+
+.mode-expanded .case-heading.is-current,
+.mode-text .case-heading.is-current {
+  opacity: 1;
+  transform: none;
+  transition-delay: 0.25s;
+}
+
+/* ============ WIDGETS ØVERST TIL HØYRE ============ */
+
+.nav-widgets {
+  display: flex;
+  align-items: center;
+  gap: 0.55rem;
+  flex: none;
+  transition: opacity 0.4s var(--ease), transform 0.4s var(--ease);
+}
+
+.widget {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  height: 42px;
+  padding: 0 1rem;
+  border-radius: 14px;
+  background: var(--surface);
+  color: var(--ink);
+  font-size: 0.92rem;
+  font-weight: 500;
+  white-space: nowrap;
+  box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+  transition: transform 0.4s var(--ease), box-shadow 0.4s var(--ease),
+              background 0.3s var(--ease), color 0.3s var(--ease),
+              border-radius 0.4s var(--ease);
+}
+
+.widget svg { flex: none; color: currentColor; }
+
+/* svart ved hover */
+.widget:hover,
+.widget:focus-visible {
+  background: var(--ink);
+  color: var(--on-ink);
+  transform: translateY(-2px);
+  box-shadow: 0 8px 20px rgba(0,0,0,0.14);
+  outline: none;
+}
+
+/* nattmodus-knappen viser månen i lys modus og sola i mørk */
+:root:not([data-theme="dark"]) .icon-sun,
+:root:not([data-theme="dark"]) .label-sun,
+:root[data-theme="dark"] .icon-moon,
+:root[data-theme="dark"] .label-moon { display: none; }
+
+/* mørk variant — tilbake-knappen på om-siden */
+.widget--dark {
+  background: var(--ink);
+  color: var(--on-ink);
+}
+
+.widget--dark:hover,
+.widget--dark:focus-visible { background: #000; }
+
+/* i forstørret/tekst-modus viker widgetene for lukkeknappen */
+.mode-expanded .nav-widgets,
+.mode-text .nav-widgets {
+  opacity: 0;
+  transform: translateY(-8px);
+  pointer-events: none;
+}
+
+/* ============ KORTSTOKKEN (horisontal) ============ */
+
+.deck {
+  position: absolute;
+  inset: 0;
+  perspective: var(--cf-persp);
+  perspective-origin: 50% 50%;
+  transition: opacity 0.6s var(--ease), transform 0.6s var(--ease);
+}
+
+.mode-about .deck {
+  opacity: 0;
+  transform: translateY(5vh) scale(0.985);
+  pointer-events: none;
+}
+
+.mode-deck .deck {
+  transition: opacity 0.6s var(--ease) 0.22s, transform 0.75s var(--ease) 0.22s;
+}
+
+.panel { display: contents; }
+
+.card {
+  position: absolute;
+  top: var(--deck-top);
+  left: var(--deck-left);
+  width: var(--deck-size);
+  height: var(--deck-size);
+  border-radius: var(--radius);
+  background: var(--card);
+  overflow: hidden;
+  cursor: pointer;
+  /* Én felles skygge for alle kortene. Liten negativ spread, så den
+     griper rundt sidene og leser også mot et mørkt foto — med stor
+     negativ spread la den seg bare under kortet, og da så bare det
+     lyse morro-kortet ut til å ha skygge. */
+  box-shadow:
+    0 20px 45px -8px rgba(0,0,0,0.26),
+    0 8px 18px -6px rgba(0,0,0,0.12);
+  transform-origin: 50% 50%;
+  backface-visibility: hidden;
+  will-change: transform, opacity;
+  transition:
+    top 0.9s var(--ease),
+    bottom 0.9s var(--ease),
+    left 0.9s var(--ease),
+    width 0.9s var(--ease),
+    height 0.9s var(--ease),
+    transform 0.9s var(--ease),
+    border-radius 0.9s var(--ease),
+    opacity 0.9s var(--ease),
+    background 0.9s var(--ease),
+    box-shadow 0.9s var(--ease);
+}
+
+.card:focus-visible {
+  outline: 2px solid var(--ink);
+  outline-offset: 4px;
+}
+
+.card-art,
+.type-face {
+  transition: opacity 0.6s var(--ease);
+}
+
+.card-label {
+  position: absolute;
+  left: 1.3rem;
+  bottom: 1.05rem;
+  font-size: 0.92rem;
+  font-weight: 500;
+  color: #fff;
+  text-shadow: 0 1px 8px rgba(0,0,0,0.35);
+  transition: opacity 0.5s var(--ease);
+  pointer-events: none;
+}
+
+.card-label--ink { color: #16232f; text-shadow: none; }
+
+/* --- coverflow: alle kortene ligger i samme boks og skiller seg bare
+       med transform, opasitet og z-index. Naboene beholder innholdet
+       sitt og er klikkbare — de tar deg til det kortet.
+
+       Med fire prosjekter blir det ett kort på hver side. Det fjerde
+       parkerer bak midtkortet (--is-back) med opasitet 0, og siden det
+       ligger nøyaktig bak midten glir det naturlig ut til begge sider
+       når du blar — begge veier. --- */
+
+.panel.is-active .card {
+  transform: translateX(0) rotateY(0deg) scale(1);
+  z-index: 10;
+}
+
+.panel.is-left .card,
+.panel.is-right .card { z-index: 8; }
+
+/* Naboene dempes på INNHOLDET, ikke på kortet. Dimmer vi hele kortet
+   med opacity, dempes også dets egen skygge, og da blir skyggene
+   ulike. Bildet toner i stedet mot kortets egen lyse bakgrunn.
+   Barnvelgeren er viktig: sidene i en sidestokk har sitt eget
+   gradientlag, og med etterkommervelger traff regelen dem også. De
+   skal være helt usynlige i kortstokken, men 0,82 gjorde dem synlige
+   som en lysere rute inni kortet — tydeligst på Knytt, der siden er
+   gjennomsiktig og bare har en telefon oppå. */
+.panel.is-left > .card > .card-art,
+.panel.is-right > .card > .card-art,
+.panel.is-left > .card > .card-cover,
+.panel.is-right > .card > .card-cover,
+.panel.is-left > .card > .type-face,
+.panel.is-right > .card > .type-face { opacity: var(--cf-o1); }
+
+/* Naboene vender inn mot midten: den indre kanten kommer fram, den ytre
+   viker bakover. rotateY(+θ) skyver høyre kant vekk, så venstre nabo må
+   ha negativ vinkel og høyre nabo positiv for at begge skal vende inn. */
+.panel.is-left .card {
+  transform: translateX(calc(var(--cf-x1) * -1)) rotateY(calc(var(--cf-rot) * -1)) scale(var(--cf-s1));
+}
+
+.panel.is-right .card {
+  transform: translateX(var(--cf-x1)) rotateY(var(--cf-rot)) scale(var(--cf-s1));
+}
+
+/* parkert bak midtkortet — usynlig, men klar til å gli ut til siden */
+.panel.is-back .card {
+  transform: translateX(0) rotateY(0deg) scale(var(--cf-s2));
+  opacity: 0;
+  z-index: 1;
+  pointer-events: none;
+  box-shadow: none;
+}
+
+/* bare det aktive kortet er navngitt — naboene er dreid for mye
+   til at etiketten er lesbar, og blir bare støy */
+.panel:not(.is-active) .card-label { opacity: 0; }
+
+/* --- forstørret modus: aktivt kort vokser under navbaren --- */
+
+.mode-expanded .panel.is-active .card,
+.mode-text .panel.is-active .card {
+  top: var(--nav-h);
+  height: calc(100% - var(--nav-h) - 3vh);
+  left: calc(50% - var(--exp-w) / 2);
+  width: var(--exp-w);
+  border-radius: var(--radius-big);
+  box-shadow: 0 18px 60px rgba(0,0,0,0.10);
+  transform: none;
+}
+
+.mode-expanded .panel:not(.is-active) .card,
+.mode-text .panel:not(.is-active) .card,
+.mode-about .panel:not(.is-active) .card {
+  opacity: 0;
+  pointer-events: none;
+}
+
+.mode-expanded .panel.is-active .card-label,
+.mode-text .panel.is-active .card-label { opacity: 0; }
+
+.mode-text .panel.is-active .card { cursor: default; }
+
+/* ============ TEKSTARKET (klikk nr. 2) ============ */
+
+.card-text {
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  background: var(--sheet);
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 0.6s var(--ease), visibility 0s linear 0.6s;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  -webkit-overflow-scrolling: touch;
+}
+
+.mode-text .panel.is-active .card-text {
+  opacity: 1;
+  visibility: visible;
+  transition: opacity 0.6s var(--ease);
+}
+
+.card-text-inner {
+  max-width: 36rem;
+  margin: 0 auto;
+  padding: clamp(2.2rem, 7vh, 5rem) clamp(1.4rem, 4vw, 3rem) 4.5rem;
+}
+
+.text-kicker {
+  font-size: 0.75rem;
+  font-weight: 500;
+  letter-spacing: 0.09em;
+  text-transform: uppercase;
+  color: var(--grey);
+  margin-bottom: 1.6rem;
+}
+
+.text-head h2 {
+  font-size: 1.7rem;
+  font-weight: 500;
+  letter-spacing: -0.015em;
+  line-height: 1.25;
+}
+
+.text-sub {
+  margin-top: 0.5rem;
+  font-size: 1.1rem;
+  color: var(--grey);
+  line-height: 1.45;
+}
+
+.text-block { margin-top: 2.6rem; }
+
+.text-block h3 {
+  font-size: 0.95rem;
+  font-weight: 500;
+  color: var(--grey);
+  margin-bottom: 0.7rem;
+}
+
+.text-block p + p { margin-top: 0.9rem; }
+
+.text-role {
+  padding-top: 0.9rem;
+  border-top: 1px solid var(--line);
+}
+
+.tool-chips {
+  list-style: none;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.55rem;
+}
+
+.tool-chips li {
+  padding: 0.5rem 1.05rem;
+  background: var(--surface);
+  border-radius: 999px;
+  font-size: 0.95rem;
+  box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+}
+
+/* ============ ANIMERTE GRADIENTER PÅ KORTENE ============ */
+
+/* Hvert kort har fem myke fargeflekker forankret på hvert sitt sted, som
+   driver sakte forbi hverandre. De er mindre enn kortet og har tett
+   avtoning, ellers dekker de hele flaten og vasker hverandre ut til én
+   flat farge. Flekkene blandes som lys (screen på de mørke kortene,
+   multiply på det lyse), så de legger seg oppå hverandre i stedet for
+   bare å overmale. Bevegelsen ligger på transform og komposatteres på
+   GPU — ingen oppmaling per bilde. */
+
+.card-art {
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;   /* klipper seg selv, så kortet slipper å gjøre det */
+  overflow: hidden;
+  isolation: isolate;   /* flekkene skal bare blande seg innenfor kortet */
+  background: var(--art-bg);
+}
+
+.card-art span {
+  position: absolute;
+  left: var(--l);
+  top: var(--t);
+  /* Målet settes av kortets HØYDE, ikke bredden. Bredden endrer seg mye
+     når kortet forstørres, og da ville flekkene vokst og overlappet så
+     mye at fargen vasket seg lys. aspect-ratio holder dem kvadratiske,
+     ellers blir sirkelgradienten en ellipse og kanten synlig. */
+  height: var(--w);
+  width: auto;
+  aspect-ratio: 1;
+  border-radius: 50%;
+  mix-blend-mode: var(--art-blend, screen);
+  /* Mild kurve, ikke en hard ease-in-out: med korte varigheter ville
+     flekkene nesten stoppet ved hvert vendepunkt og bevegelsen lest
+     som pulsing. Litt mykhet holder likevel retningsskiftet rundt. */
+  animation: art-drift var(--dur) cubic-bezier(0.4, 0.2, 0.6, 0.8) infinite alternate;
+  animation-delay: var(--delay);
+}
+
+@keyframes art-drift {
+  from { transform: translate3d(var(--ax), var(--ay), 0) scale(var(--as)); }
+  to   { transform: translate3d(var(--bx), var(--by), 0) scale(var(--bs)); }
+}
+
+/* Forankring og baner. Ulik lengde og negativ forsinkelse, så flekkene
+   aldri står i takt og mønsteret ikke gjentar seg synlig. */
+.card-art span:nth-child(1) { --l:-28%; --t:-32%; --w:112%; --ax:-12%; --ay: -8%; --as:1.00; --bx: 22%; --by: 28%; --bs:1.30; --dur:13s; --delay:  0s; }
+.card-art span:nth-child(2) { --l: 42%; --t:-24%; --w:104%; --ax: 14%; --ay: 10%; --as:1.20; --bx:-24%; --by: 30%; --bs:0.92; --dur:17s; --delay: -7s; }
+.card-art span:nth-child(3) { --l:-20%; --t: 38%; --w:120%; --ax:-10%; --ay: 12%; --as:1.04; --bx: 30%; --by:-22%; --bs:1.32; --dur:15s; --delay:-13s; }
+.card-art span:nth-child(4) { --l: 46%; --t: 42%; --w:108%; --ax: 12%; --ay:-12%; --as:1.26; --bx:-28%; --by:-24%; --bs:0.98; --dur:19s; --delay:-17s; }
+.card-art span:nth-child(5) { --l: 12%; --t:  6%; --w: 94%; --ax:-20%; --ay: 16%; --as:1.08; --bx: 26%; --by:-20%; --bs:1.36; --dur:22s; --delay:-23s; }
+
+/* Driften koster bare noe når den vises. Kortet som venter bak midten,
+   de skjulte kortene i forstørret/tekst-modus og hele stokken på
+   om-siden settes derfor på pause. */
+.panel.is-back .card-art span,
+.mode-expanded .panel:not(.is-active) .card-art span,
+.mode-text .panel:not(.is-active) .card-art span,
+.mode-about .card-art span { animation-play-state: paused; }
+
+/* --- OsloLut: svart, med så vidt et stål- og fiolettløft --- */
+.art--oslolut { --art-bg: #08090c; }
+.art--oslolut span:nth-child(1) { background: radial-gradient(circle closest-side, rgba(58,72,98,0.95) 0%, rgba(58,72,98,0.475) 48%, rgba(58,72,98,0) 100%); }
+.art--oslolut span:nth-child(2) { background: radial-gradient(circle closest-side, rgba(30,32,44,1) 0%, rgba(30,32,44,0.5) 48%, rgba(30,32,44,0) 100%); }
+.art--oslolut span:nth-child(3) { background: radial-gradient(circle closest-side, rgba(78,62,96,0.9) 0%, rgba(78,62,96,0.45) 48%, rgba(78,62,96,0) 100%); }
+.art--oslolut span:nth-child(4) { background: radial-gradient(circle closest-side, rgba(20,24,32,1) 0%, rgba(20,24,32,0.5) 48%, rgba(20,24,32,0) 100%); }
+.art--oslolut span:nth-child(5) { background: radial-gradient(circle closest-side, rgba(44,58,78,0.85) 0%, rgba(44,58,78,0.425) 48%, rgba(44,58,78,0) 100%); }
+
+/* --- Norges Badstulaug: varm solnedgang --- */
+.art--badstulaug { --art-bg: #241320; }
+.art--badstulaug span:nth-child(1) { background: radial-gradient(circle closest-side, rgba(226,120,42,0.95) 0%, rgba(226,120,42,0.475) 48%, rgba(226,120,42,0) 100%); }
+.art--badstulaug span:nth-child(2) { background: radial-gradient(circle closest-side, rgba(232,170,62,0.92) 0%, rgba(232,170,62,0.46) 48%, rgba(232,170,62,0) 100%); }
+.art--badstulaug span:nth-child(3) { background: radial-gradient(circle closest-side, rgba(180,58,34,0.92) 0%, rgba(180,58,34,0.46) 48%, rgba(180,58,34,0) 100%); }
+.art--badstulaug span:nth-child(4) { background: radial-gradient(circle closest-side, rgba(70,30,66,0.9) 0%, rgba(70,30,66,0.45) 48%, rgba(70,30,66,0) 100%); }
+.art--badstulaug span:nth-child(5) { background: radial-gradient(circle closest-side, rgba(36,102,116,0.85) 0%, rgba(36,102,116,0.425) 48%, rgba(36,102,116,0) 100%); }
+
+/* --- Knytt: lys og luftig blå. Multiply, så flekkene fordyper
+       i stedet for å blåse ut mot hvitt. --- */
+.art--knytt { --art-bg: #e6f2fa; --art-blend: multiply; }
+.art--knytt span:nth-child(1) { background: radial-gradient(circle closest-side, rgba(126,186,226,0.95) 0%, rgba(126,186,226,0.475) 48%, rgba(126,186,226,0) 100%); }
+.art--knytt span:nth-child(2) { background: radial-gradient(circle closest-side, rgba(228,242,250,1) 0%, rgba(228,242,250,0.5) 48%, rgba(228,242,250,0) 100%); }
+.art--knytt span:nth-child(3) { background: radial-gradient(circle closest-side, rgba(84,150,204,0.9) 0%, rgba(84,150,204,0.45) 48%, rgba(84,150,204,0) 100%); }
+.art--knytt span:nth-child(4) { background: radial-gradient(circle closest-side, rgba(168,214,238,0.95) 0%, rgba(168,214,238,0.475) 48%, rgba(168,214,238,0) 100%); }
+.art--knytt span:nth-child(5) { background: radial-gradient(circle closest-side, rgba(206,232,246,1) 0%, rgba(206,232,246,0.5) 48%, rgba(206,232,246,0) 100%); }
+
+/* --- Kommer snart: helt svart. Kortet har ingen flekker i det hele
+       tatt — ikke bare usynlige, men fjernet fra markupen, så det ikke
+       ligger fem elementer og animerer noe man uansett ikke ser. Det
+       svarte er nå bare underlaget plakaten legger seg på, og det som
+       står igjen de første millisekundene før den er lastet. --- */
+.art--snart { --art-bg: #000; }
+
+/* Plakaten som kortforside. Den fyller ikke kortet, men ligger som en
+   egen flate midt i det — 78 % er nøyaktig samme bredde som opptakene
+   i OsloLut- og Badstulaug-kortene får av «padding: 0 11%» i
+   sidestokken, så luften rundt er den samme på tvers av stokken.
+
+   Ringen er der fordi plakatens ytterkant er nesten svart og kortet
+   under er helt svart: uten den forsvinner hjørnene i bakgrunnen, og
+   luften rundt blir umulig å se. */
+.card-cover {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  translate: -50% -50%;
+  width: 78%;
+  aspect-ratio: 1;
+  object-fit: cover;
+  border-radius: 9px;
+  box-shadow:
+    0 18px 40px -18px rgba(0,0,0,0.85),
+    0 0 0 1px rgba(255,255,255,0.07);
+  transition: opacity 0.6s var(--ease);
+}
+
+/* Dette kortet har ingen etikett. Plakaten sier selv hva den er, og
+   alt annet ville lagt seg oppå enten tittelen eller rulleteksten. */
+
+/* --- Nettbutikk: brun og beige silke. De andre kortene har runde
+       flekker; her er de samme fem elementene strukket til brede, lave
+       bånd og lagt på hver sin vinkel. Screen-blandingen gjør
+       krysningene lysere, og det er de lysningene som leser som folder
+       i stoffet — de mørke båndene lar bunnfargen bli stående som
+       skygge, slik at det blir dybde og ikke bare en jevn beige flate.
+
+       Bevegelsen er nesten bare på tvers. Bånd som glir over hverandre
+       ser ut som stoff som faller; flekker som spretter rundt gjør det
+       ikke. --- */
+.art--silke { --art-bg: #4a3222; }
+
+.art--silke span {
+  width: 185%;
+  height: 46%;
+  aspect-ratio: auto;
+}
+
+.art--silke span:nth-child(1) {
+  --l:-44%; --t:-16%; --ax:-5%; --ay:-16%; --as:1.00; --bx: 6%; --by: 14%; --bs:1.10; --dur:16s; --delay:  0s;
+  rotate: -15deg;
+  background: radial-gradient(ellipse closest-side, rgba(238,213,177,0.95) 0%, rgba(238,213,177,0.44) 52%, rgba(238,213,177,0) 100%);
+}
+
+.art--silke span:nth-child(2) {
+  --l:-38%; --t: 10%; --ax: 6%; --ay: 14%; --as:1.08; --bx:-6%; --by:-12%; --bs:0.96; --dur:21s; --delay: -9s;
+  rotate: -6deg;
+  background: radial-gradient(ellipse closest-side, rgba(96,64,42,0.95) 0%, rgba(96,64,42,0.45) 52%, rgba(96,64,42,0) 100%);
+}
+
+.art--silke span:nth-child(3) {
+  --l:-46%; --t: 30%; --ax:-7%; --ay: 12%; --as:1.04; --bx: 5%; --by:-15%; --bs:1.14; --dur:18s; --delay:-14s;
+  rotate: -21deg;
+  background: radial-gradient(ellipse closest-side, rgba(246,232,208,0.9) 0%, rgba(246,232,208,0.4) 52%, rgba(246,232,208,0) 100%);
+}
+
+.art--silke span:nth-child(4) {
+  --l:-36%; --t: 52%; --ax: 5%; --ay:-13%; --as:1.12; --bx:-7%; --by: 15%; --bs:0.98; --dur:25s; --delay:-19s;
+  rotate: -9deg;
+  background: radial-gradient(ellipse closest-side, rgba(205,163,118,0.92) 0%, rgba(205,163,118,0.43) 52%, rgba(205,163,118,0) 100%);
+}
+
+.art--silke span:nth-child(5) {
+  --l:-42%; --t: 70%; --ax:-6%; --ay: 15%; --as:1.06; --bx: 7%; --by:-14%; --bs:1.16; --dur:29s; --delay:-25s;
+  rotate: -17deg;
+  background: radial-gradient(ellipse closest-side, rgba(120,80,52,0.95) 0%, rgba(120,80,52,0.45) 52%, rgba(120,80,52,0) 100%);
+}
+
+
+/* ============ SKJERMOPPTAK I OSLOLUT-KORTET ============ */
+
+/* I kortstokken vises bare det første opptaket, som en flytende skjerm
+   oppå gradienten. Når kortet åpnes blir den samme beholderen en
+   vertikal scroller der hvert opptak ER sin egen boks — ingen ramme
+   rundt, bare selve videoen med god avstand til den neste. Videoen
+   starter når boksen er skrollet fram. */
+
+.case-reel {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  display: grid;
+  place-content: center;
+  padding: 0 11%;
+  pointer-events: none;      /* i kortstokken skal klikk treffe kortet */
+  scrollbar-width: none;
+}
+
+.case-reel::-webkit-scrollbar { width: 0; height: 0; }
+
+.reel-item {
+  position: relative;
+  width: 100%;
+  border-radius: 9px;
+  overflow: hidden;
+  background: #000;
+  box-shadow: 0 16px 36px -16px rgba(0,0,0,0.6);
+}
+
+.reel-item video {
+  display: block;
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  object-fit: cover;
+}
+
+.reel-item figcaption { display: none; }  /* først synlig i åpnet visning */
+
+/* kortstokken: bare det første opptaket */
+.case-reel .reel-item + .reel-item { display: none; }
+
+/* --- åpnet: tre hele kort, stilt opp akkurat som på forsiden ---
+       Hver side er sitt eget kort med samme gradient, sin egen skygge
+       og sitt eget navn. De looper som kortstokken på forsiden, så det
+       alltid står ett kort på hver side av det du ser på. --- */
+
+/* Selve kortet trekker seg tilbake og blir bare scene for de tre sidene.
+   Bakgrunn, skygge og gradient forsvinner raskt — ellers ser man den
+   gamle kortflaten vokse bak sidene som allerede står ferdig plassert,
+   og det er den som leser som et hakk i animasjonen. */
+/* Fokusringen hører til den boksen man faktisk ser. I sidestokken er
+   kortet en usynlig scene på nesten hele viewporten, og da tegnet
+   nettleseren en tynn ramme rundt tom luft så snart tastaturet var i
+   bruk — det er den ramma som dukket opp under scrolling. */
+.mode-expanded .panel--pages.is-active .card:focus-visible { outline: none; }
+
+.mode-expanded .panel--pages.is-active .card:focus-visible .reel-item[data-pos="0"] {
+  outline: 2px solid var(--ink);
+  outline-offset: 6px;
+}
+
+.mode-expanded .panel--pages.is-active .card {
+  overflow: visible;
+  background: transparent;
+  box-shadow: none;
+  cursor: default;
+  /* Kortet hopper rett til full størrelse i stedet for å vokse i 0.9 s.
+     Det er usynlig uansett, og sidene ligger plassert i forhold til det:
+     så lenge det vokser, må nettleseren regne ut layouten for alle tre
+     sidene på nytt hver eneste frame. Det er den tyngste jobben i hele
+     overgangen, og den forsvinner helt her. */
+  transition: box-shadow 0.18s var(--ease);
+}
+
+.mode-expanded .panel--pages.is-active > .card > .card-art {
+  opacity: 0;
+  transition: opacity 0s;   /* kortet er ute i det øyeblikket sidene vokser fram */
+}
+
+/* Sidene vokser fram fra midten i stedet for å poppe opp ferdige.
+   Animasjonen ligger på hvert kort og rører bare scale-egenskapen, som
+   er en ren komposittjobb. Legger man den på beholderen med opacity i
+   stedet, må nettleseren tegne hele gruppa til et eget lag hver frame —
+   og det er akkurat der rykningen kom. */
+.mode-expanded .panel--pages.is-active .reel-item {
+  animation: sider-inn 0.7s cubic-bezier(0.32, 0.78, 0.22, 1) both;
+}
+
+@keyframes sider-inn {
+  from { scale: 0.58; }
+  to   { scale: 1; }
+}
+
+/* Gradienten males som ett statisk lag i bunnen av hvert sidekort.
+   Flekkene med blandingsmodus er det dyreste vi har: de tvinger
+   nettleseren til å tegne kortet på nytt for hver frame så lenge noe
+   beveger seg. Derfor er de borte mens sidene animerer. */
+.mode-expanded .panel--pages.is-active .reel-item .art--oslolut {
+  background:
+    radial-gradient(60% 55% at 22% 28%, rgba(58,72,98,0.85) 0%, rgba(58,72,98,0) 100%),
+    radial-gradient(58% 52% at 78% 72%, rgba(78,62,96,0.7) 0%, rgba(78,62,96,0) 100%),
+    radial-gradient(70% 60% at 62% 18%, rgba(44,58,78,0.6) 0%, rgba(44,58,78,0) 100%),
+    #08090c;
+}
+
+/* Samme oppskrift i varmt: solnedgangen fra kortstokken, men senket
+   et par hakk. Sidekortene er mye større enn kortet på forsiden, og
+   full styrke gjør flatene til lyskilder som stjeler oppmerksomheten
+   fra bildene de er ramme rundt. */
+.mode-expanded .panel--pages.is-active .reel-item .art--badstulaug {
+  background:
+    radial-gradient(60% 55% at 22% 28%, rgba(198,96,32,0.55) 0%, rgba(198,96,32,0) 100%),
+    radial-gradient(58% 52% at 78% 72%, rgba(126,40,58,0.62) 0%, rgba(126,40,58,0) 100%),
+    radial-gradient(70% 60% at 62% 18%, rgba(206,142,52,0.26) 0%, rgba(206,142,52,0) 100%),
+    #1b0d16;
+}
+
+/* sidekortene: bare det statiske laget, ingen flekker i det hele tatt */
+.mode-expanded .panel--pages.is-active .reel-item:not([data-pos="0"]) .card-art {
+  isolation: auto;
+}
+
+.mode-expanded .panel--pages.is-active .reel-item:not([data-pos="0"]) .card-art span {
+  display: none;
+}
+
+/* midtkortet: flekkene kommer tilbake først når kortet har landet */
+.mode-expanded .panel--pages.is-active .reel-item[data-pos="0"] .card-art span {
+  animation:
+    art-drift var(--dur) cubic-bezier(0.4, 0.2, 0.6, 0.8) infinite alternate,
+    flekk-inn 0.5s var(--ease) both;
+  animation-delay: var(--delay), 0.72s;
+}
+
+@keyframes flekk-inn {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+/* Sidene ligger rett under hverandre og scrolles gjennom. Ingen vifte,
+   ingen dreining: hver side er en hel side, og avstanden mellom dem er
+   det eneste som skiller dem. Toppen og bunnen får en luft som er
+   nøyaktig halve overskuddet, slik at første og siste side lander midt
+   i kortet i stedet for å klistre seg til kanten. */
+.mode-expanded .panel--pages.is-active .case-reel {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  /* Må nullstilles: grunnregelen over har «place-content: center», og i en
+     flex-kolonne sentrerer den hovedaksen. Med innhold høyere enn boksen
+     dyttes da toppen opp utenfor, dit scrollen ikke rekker — den første
+     siden ble bokstavelig talt uleselig. */
+  justify-content: flex-start;
+  align-content: normal;
+  gap: 1.5rem;
+  overflow-x: hidden;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  /* Mandatory: man skal aldri bli stående mellom to sider. Hjulet fanges
+     i JS-en og ruller én hel side om gangen, så snappingen er her for
+     berøring og for å låse landingen — ikke for å redde en fri scroll. */
+  scroll-snap-type: y mandatory;
+  pointer-events: auto;
+  padding: max(0px, calc((100vh - var(--nav-h) - 3vh - var(--rbox) * var(--rbox-h)) / 2)) 0;
+  perspective: none;
+
+  /* 940 og ikke 1000: telleren står i margen mellom siden og kortkanten,
+     og trenger rundt 64 px der. Med 1000 ble det 40, og tallet la seg
+     oppå siden. */
+  --rbox: min(940px, 68vw, 110vh);  /* bredden på en side */
+  --rbox-h: 0.70;                   /* høyde i forhold til bredden */
+}
+
+.mode-expanded .panel--pages.is-active .reel-item {
+  display: grid;
+  place-content: center;
+  position: relative;
+  flex: none;
+  scroll-snap-align: center;
+  width: var(--rbox);
+  height: calc(var(--rbox) * var(--rbox-h));
+  padding: 0 6.5%;           /* smal marg, så opptaket får mest mulig plass */
+  translate: none;
+  border-radius: var(--radius);
+  overflow: hidden;
+  background: var(--card);
+  /* Skyggen er skalert etter kortet. Verdiene fra kortstokken er satt
+     for et kort på 440 px, og på et kort som er dobbelt så stort
+     forsvinner de helt — derfor så de store boksene ut til å sveve
+     uten skygge i det hele tatt. */
+  box-shadow:
+    0 42px 80px -24px rgba(0,0,0,0.42),
+    0 16px 32px -14px rgba(0,0,0,0.20);
+  cursor: pointer;
+}
+
+/* gradienten hører til den åpne visningen — i kortstokken er det
+   kortets egen gradient som ligger under opptaket */
+.reel-item > .card-art { opacity: 0; transition: opacity 0.6s var(--ease); }
+.mode-expanded .panel--pages.is-active .reel-item > .card-art { opacity: 1; }
+
+.mode-expanded .panel--pages.is-active .reel-item video {
+  position: relative;
+  z-index: 1;
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  object-fit: cover;
+  border-radius: 9px;
+  box-shadow: 0 16px 36px -16px rgba(0,0,0,0.6);
+}
+
+/* ---- Badstulaug, side 2: bildekarusell i samme ramme som opptakene ----
+   Boksen ser ut som en video, men blar mellom forarbeidet. Bildene har
+   svært ulike format — storyboardet står høyt, tidslinja ligger bred —
+   så de legges inn med «contain» og får en uskarp kopi av seg selv som
+   bakgrunn. Da fyller rammen seg med bildets egen farge i stedet for en
+   svart kant, og formatet får være som det er. */
+
+/* Sidene ligger absolutt plassert og bidrar derfor ikke med noen bredde.
+   Uten en egen kolonne ville sporet i place-content-rutenettet blitt
+   null bredt, og hele karusellen kollapset. */
+.mode-expanded .panel--pages.is-active .reel-item--galleri,
+.mode-expanded .panel--pages.is-active .reel-item--fyll {
+  grid-template-columns: minmax(0, 1fr);
+}
+
+/* Rammen er glass, ikke en svart boks: kortets egen solnedgang skinner
+   gjennom der bildet ikke rekker ut i kanten. Vi bruker med vilje ikke
+   backdrop-filter — det som ligger bak ER en myk gradient, så en blur
+   av den ville sett helt lik ut og bare kostet bilder per sekund.
+   Uskarpheten kommer fra kopien av bildet like under. */
+.reel-gallery {
+  position: relative;
+  z-index: 1;
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  border-radius: 9px;
+  overflow: hidden;
+  background: rgba(255,255,255,0.06);
+  box-shadow:
+    0 16px 36px -16px rgba(0,0,0,0.5),
+    inset 0 1px 0 rgba(255,255,255,0.14);
+}
+
+.gal-slide {
+  position: absolute;
+  inset: 0;
+  /* flex, ikke grid: en auto-rad i et rutenett måler seg etter
+     innholdet, og da ble bildets egen «max-height: 100%» regnet mot
+     bildet selv og sluttet å begrense noe. Flexboksen har høyden fra
+     rammen, som er den vi vil måle mot. */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 0.65s var(--ease), visibility 0s linear 0.65s;
+}
+
+.gal-slide.is-on {
+  opacity: 1;
+  visibility: visible;
+  transition: opacity 0.65s var(--ease);
+}
+
+/* Uskarp kopi av bildet, males én gang og koster ingenting i drift.
+   Den ligger tynt: nok til at glasset tar farge av bildet det holder,
+   men ikke så tett at den dekker gradienten bak. Tidligere ble den
+   tonet kraftig ned, og da forsvant det varme — storyboardet og
+   skuddlisten er nesten hvite, og resultatet ble en grå plate. */
+.gal-bak {
+  position: absolute;
+  left: -8%;
+  top: -8%;
+  width: 116%;
+  height: 116%;
+  object-fit: cover;
+  filter: blur(40px) saturate(1.25);
+  opacity: 0.3;
+}
+
+/* Bildet får akkurat den plassen det trenger, i stedet for å fylle hele
+   boksen og bli passet inn med «contain». Forskjellen betyr noe her:
+   med contain er elementet like bredt som rammen mens selve bildet står
+   smalere inni, og da klipper border-radius i tom luft utenfor bildet.
+   Nå følger elementkanten bildekanten, og hjørnene klippes der de er.
+   Det er også dét som fjerner det hvite: kanalkartet er en skjermdump
+   av et avrundet kort, så hjørnene har hvitt utenfor buen sin. Buen der
+   måler 12 px på skjermen når rammen er på sitt største, og radiusen
+   her ligger med vilje et par hakk over — treffer man den på millimeteren,
+   blir den ytterste, halvgjennomsiktige kantpikselen igjen som en tynn
+   lys strek langs hjørnet. */
+.gal-bilde {
+  position: relative;
+  max-width: 100%;
+  max-height: 100%;
+  border-radius: 16px;
+}
+
+/* --- kontrollene. De hører til boksen i midten: naboene er små og
+       dreid bort, og knapper der ville bare vært støy. --- */
+
+.gal-arrow {
+  position: absolute;
+  top: 50%;
+  z-index: 3;
+  translate: 0 -50%;
+  width: 38px;
+  height: 38px;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  color: #fff;
+  background: rgba(0,0,0,0.6);
+  backdrop-filter: blur(8px);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.3s var(--ease), background 0.3s var(--ease);
+}
+
+.gal-arrow--prev { left: 0.85rem; }
+.gal-arrow--next { right: 0.85rem; }
+
+.gal-arrow:hover { background: rgba(0,0,0,0.74); }
+
+/* pilene kommer fram når pekeren er på bildet, eller når tastaturet
+   finner dem — ellers står bildet alene */
+.reel-gallery:hover .gal-arrow,
+.gal-arrow:focus-visible {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.gal-bar {
+  position: absolute;
+  left: 50%;
+  bottom: 0.85rem;
+  z-index: 3;
+  translate: -50% 0;
+  display: flex;
+  align-items: center;
+  gap: 0.7rem;
+  padding: 0.34rem 0.75rem;
+  border-radius: 999px;
+  font-size: 0.76rem;
+  font-weight: 500;
+  letter-spacing: 0.02em;
+  white-space: nowrap;
+  color: #fff;
+  text-shadow: 0 1px 6px rgba(0,0,0,0.4);
+  background: rgba(0,0,0,0.7);
+  backdrop-filter: blur(8px);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.45s var(--ease);
+}
+
+.reel-item .gal-bar {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.gal-dots { display: flex; align-items: center; gap: 0.3rem; }
+
+.gal-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 999px;
+  background: rgba(255,255,255,0.36);
+  transition: width 0.35s var(--ease), background 0.35s var(--ease);
+}
+
+.gal-dot:hover { background: rgba(255,255,255,0.7); }
+
+.gal-dot.is-on {
+  width: 16px;
+  background: #fff;
+}
+
+/* smal skjerm: pilene tar for mye av bildet, prikkene sier det samme */
+@media (max-width: 1040px) {
+  .gal-arrow { display: none; }
+
+  .gal-bar {
+    top: 0.6rem;
+    bottom: auto;
+    font-size: 0.72rem;
+  }
+}
+
+/* data-pos sier fortsatt hvilken side som er den man ser på — det styrer
+   hvilket opptak som spiller og hvilken flekkanimasjon som får lov til å
+   gå — men det flytter ikke lenger noe. Alle sidene ser like ut. */
+
+/* Bunnlinja i kortet: beskrivelsen til venstre, hintet om at kortet kan
+   klikkes til høyre. Begge hører til kortet i midten — de to andre er
+   bare noe du blar til. */
+.mode-expanded .panel--pages.is-active .reel-item figcaption {
+  display: block;
+  position: absolute;
+  z-index: 2;
+  left: 1.5rem;
+  right: 12.5rem;            /* gir plass til hintet på samme linje */
+  bottom: 1.15rem;
+  font-size: 0.88rem;
+  font-weight: 400;
+  line-height: 1.45;
+  /* to linjer er taket: på smale skjermer er det bare 60 px luft under
+     opptaket, og en tredje linje ville lagt seg oppå videoen */
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  color: rgba(255,255,255,0.74);
+  text-shadow: 0 1px 10px rgba(0,0,0,0.45);
+  opacity: 0;
+  transition: opacity 0.5s var(--ease);
+  pointer-events: none;
+}
+
+.reel-hint { display: none; }
+
+.mode-expanded .panel--pages.is-active .reel-item .reel-hint {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  position: absolute;
+  z-index: 2;
+  right: 1.5rem;
+  bottom: 1.15rem;
+  font-size: 0.82rem;
+  font-weight: 500;
+  letter-spacing: 0.01em;
+  white-space: nowrap;
+  color: rgba(255,255,255,0.62);
+  text-shadow: 0 1px 10px rgba(0,0,0,0.45);
+  opacity: 0;
+  transition: opacity 0.5s var(--ease), color 0.35s var(--ease);
+  pointer-events: none;
+}
+
+.mode-expanded .panel--pages.is-active .reel-item .reel-hint svg {
+  transition: transform 0.35s var(--ease);
+}
+
+/* smal skjerm: pila alene sier det samme, og beskrivelsen får bredden */
+@media (max-width: 1040px) {
+  .mode-expanded .panel--pages.is-active .reel-item .reel-hint-label { display: none; }
+
+  .mode-expanded .panel--pages.is-active .reel-item figcaption {
+    right: 3.6rem;
+    font-size: 0.8rem;
+  }
+}
+
+/* hånden trykker til når pekeren er på kortet — samme bevegelse som
+   det klikket den ber om */
+.mode-expanded .panel--pages.is-active .reel-item:hover .reel-hint {
+  color: rgba(255,255,255,0.95);
+}
+
+.mode-expanded .panel--pages.is-active .reel-item:hover .reel-hint svg {
+  transform: scale(0.9);
+}
+
+.mode-expanded .panel--pages.is-active .reel-item figcaption,
+.mode-expanded .panel--pages.is-active .reel-item .reel-hint { opacity: 1; }
+
+/* på vei inn i tekstvisningen skal sidestokken tone ut, ikke sprette
+   tilbake til kortstokk-oppsettet bak arket */
+.mode-text .panel.is-active .case-reel {
+  opacity: 0;
+  transition: opacity 0.3s var(--ease);
+}
+
+/* teller nede til høyre, så det er tydelig at det finnes mer */
+.reel-count {
+  position: absolute;
+  right: 1.4rem;
+  bottom: 1.2rem;
+  z-index: 3;
+  padding: 0.35rem 0.75rem;
+  border-radius: 999px;
+  font-size: 0.78rem;
+  font-weight: 500;
+  letter-spacing: 0.02em;
+  color: rgba(255,255,255,0.75);
+  background: rgba(0,0,0,0.42);
+  backdrop-filter: blur(8px);
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 0.4s var(--ease), visibility 0s linear 0.4s;
+  pointer-events: none;
+}
+
+.reel-count b { color: #fff; font-weight: 600; }
+
+/* I sidestokken flyttet telleren ut på siden. Under kortene ville den
+   ligget i veien for den nederste siden nå som stokken går loddrett —
+   og på høyre kant leser den uansett bedre som «hvor er jeg i en
+   loddrett rekke». */
+.mode-expanded .panel--pages.is-active .reel-count {
+  left: auto;
+  right: 1rem;
+  top: 50%;
+  bottom: auto;
+  transform: translateY(-50%);
+  color: var(--grey);
+  background: transparent;
+  backdrop-filter: none;
+}
+
+.mode-expanded .panel--pages.is-active .reel-count b { color: var(--ink); }
+
+.mode-expanded .panel.is-active .reel-count {
+  opacity: 1;
+  visibility: visible;
+  transition: opacity 0.45s var(--ease) 0.35s;
+}
+
+/* ============ KNYTT-KORTETS FIRE SIDER ============ */
+
+/* Knytt er det lyse kortet i stokken, og sidene arver den lysheten.
+   Da må bildeteksten og hintet snu: hvit tekst med skygge er lagt for
+   de mørke kortene og forsvinner rett inn i den lyseblå flaten. */
+
+.mode-expanded .panel--pages.is-active .reel-item .art--knytt {
+  background:
+    radial-gradient(62% 56% at 20% 26%, rgba(255,255,255,0.85) 0%, rgba(255,255,255,0) 100%),
+    radial-gradient(58% 54% at 80% 74%, rgba(84,150,204,0.45) 0%, rgba(84,150,204,0) 100%),
+    radial-gradient(70% 62% at 64% 16%, rgba(126,186,226,0.5) 0%, rgba(126,186,226,0) 100%),
+    #dcebf7;
+}
+
+.mode-expanded .panel--pages.is-active .reel-item--lys figcaption {
+  color: rgba(16,32,46,0.74);
+  text-shadow: none;
+}
+
+.mode-expanded .panel--pages.is-active .reel-item--lys .reel-hint {
+  color: rgba(16,32,46,0.55);
+  text-shadow: none;
+}
+
+.mode-expanded .panel--pages.is-active .reel-item--lys:hover .reel-hint {
+  color: rgba(16,32,46,0.92);
+}
+
+/* Felles flate for alle fire sidene: samme fotavtrykk som opptakene har
+   i de andre kortene, så stokken holder takten. Flex og ikke grid, fordi
+   barna måler høyden sin i prosent — en auto-rad ville målt seg etter
+   dem i stedet for motsatt. */
+.knytt-flate {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  /* i kortstokken er det kortets egen størrelse som gjelder */
+  width: calc(var(--deck-size) * 0.78);
+  height: calc(var(--deck-size) * 0.78);
+}
+
+.mode-expanded .panel--pages.is-active .knytt-flate {
+  width: 100%;
+  height: auto;
+  aspect-ratio: 16 / 9;
+}
+
+/* I kortstokken skal telefonen stå fritt på kortets gradient, ikke i en
+   svart boks slik opptakene gjør. */
+.mode-deck .reel-item--fri {
+  background: transparent;
+  box-shadow: none;
+}
+
+/* ---- iPhone ----
+   Rammen er bygget av to bokser: selve telefonen med en børstet kant, og
+   skjermen som ligger inne i den. Kantens tykkelse må oppgis hver vei for
+   seg: prosent på «inset» regnes mot bredden vannrett og mot høyden
+   loddrett, og på en boks som er dobbelt så høy som bred blir samme tall
+   dobbelt så tykt oppe og nede. 3 % × 9/19.5 = 1,38 % gjør den jevn. */
+.tlf {
+  position: relative;
+  height: 100%;
+  aspect-ratio: 9 / 19.5;
+  border-radius: 13% / 6%;
+  background: linear-gradient(148deg, #4a4e57 0%, #191b20 22%, #0c0d10 58%, #383c44 100%);
+  box-shadow:
+    0 26px 58px -22px rgba(12,22,36,0.5),
+    0 5px 16px -8px rgba(12,22,36,0.34);
+}
+
+.tlf-skjerm {
+  position: absolute;
+  inset: 1.38% 3%;
+  border-radius: 11% / 5%;
+  overflow: hidden;
+  background: #000;
+}
+
+/* Dynamic Island. På skjermbildene ligger klokka og batteriet allerede
+   der, og øya faller på plass mellom dem — akkurat som på en ekte
+   telefon, der statuslinja er delt av nettopp denne. */
+.tlf-oy {
+  position: absolute;
+  top: 2.6%;
+  left: 50%;
+  z-index: 4;
+  translate: -50% 0;
+  width: 29%;
+  height: 3.6%;
+  border-radius: 999px;
+  background: #000;
+}
+
+/* Opptaket fyller skjermen. Regelen må ha samme vekt som den som gir
+   opptakene i de andre kortene 16:9 og runde hjørner, ellers vinner den. */
+.mode-expanded .panel--pages.is-active .tlf-skjerm video,
+.tlf-skjerm video {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  aspect-ratio: auto;
+  object-fit: cover;
+  border-radius: 0;
+  box-shadow: none;
+}
+
+/* ---- side 2: bildet er bakgrunnen, videoen ligger oppå ---- */
+
+/* Bildet er kulisse, ikke motiv. Uskarpt og nedtonet legger det seg bak
+   telefonen i stedet for å slåss med den om oppmerksomheten.
+   Oppskaleringen er ikke pynt: en uskarphet henter farge fra utsiden av
+   elementet, og uten den ville det ligget en lys søm langs kantene. */
+.reel-bg {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  filter: blur(1.5px) brightness(0.5) saturate(0.92);
+  transform: scale(1.02);
+}
+
+/* ---- lyd ----
+   Opptakene starter dempet, slik nettleserne krever for at de skal få
+   spille av seg selv i det hele tatt. Knappen er den ene håndsopprekningen
+   som gjør lyd lovlig, og valget gjelder resten av besøket: neste boks du
+   blar til spiller med lyd uten at du må trykke på nytt.
+   Som temaknappen i navbaren viser den hva et klikk gir deg, ikke hva som
+   er på nå. */
+
+.lyd-knapp {
+  position: absolute;
+  z-index: 3;
+  top: 1.15rem;
+  right: 1.5rem;
+  display: inline-flex;
+  align-items: center;
+  padding: 0.34rem 0.78rem;
+  border-radius: 999px;
+  font-size: 0.76rem;
+  font-weight: 500;
+  letter-spacing: 0.01em;
+  white-space: nowrap;
+  color: #fff;
+  text-shadow: 0 1px 6px rgba(0,0,0,0.4);
+  background: rgba(0,0,0,0.6);
+  backdrop-filter: blur(8px);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.45s var(--ease), background 0.3s var(--ease);
+}
+
+.lyd-knapp:hover { background: rgba(0,0,0,0.76); }
+
+.lyd-knapp span { display: inline-flex; align-items: center; gap: 0.4rem; }
+
+/* hver side har sin egen knapp, men valget gjelder alle */
+.mode-expanded .panel--pages.is-active .reel-item .lyd-knapp {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+/* Klassenavnet alene taper mot «.lyd-knapp span» over, som setter
+   display på begge tilstandene. Derfor må knappen nevnes her også,
+   ellers står «Lyd på» og «Lyd av» ved siden av hverandre. */
+.lyd-knapp .lyd-fra { display: none; }
+body.lyd-pa .lyd-knapp .lyd-til { display: none; }
+body.lyd-pa .lyd-knapp .lyd-fra { display: inline-flex; }
+
+/* ---- side 3: plakatene side om side ---- */
+
+.par {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: clamp(0.5rem, 2%, 1.3rem);
+  width: 100%;
+  height: 100%;
+}
+
+.par-staaende {
+  flex: 0 0 auto;
+  height: 100%;
+  width: auto;
+  border-radius: 14px;
+  box-shadow: 0 20px 46px -20px rgba(12,22,36,0.55);
+}
+
+.par-liggende {
+  flex: 1 1 auto;
+  min-width: 0;
+  max-height: 100%;
+  object-fit: contain;
+  border-radius: 14px;
+  box-shadow: 0 20px 46px -20px rgba(12,22,36,0.55);
+}
+
+/* ---- side 4: to telefoner og tallene de viser ---- */
+
+.maling {
+  display: grid;
+  grid-template-columns: auto auto minmax(0, 17rem);
+  justify-content: center;
+  align-items: center;
+  gap: clamp(0.7rem, 3%, 2.4rem);
+  width: 100%;
+  height: 100%;
+}
+
+/* én telefon med merket over, prikkene og navnet på skjermbildet under */
+.gal-boks {
+  display: grid;
+  grid-template-rows: auto minmax(0, 1fr) auto auto;
+  justify-items: center;
+  gap: 0.45rem;
+  height: 100%;
+}
+
+.tlf-merke {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.38rem;
+  font-size: clamp(0.64rem, 1.5vw, 0.82rem);
+  font-weight: 500;
+  color: rgba(16,32,46,0.72);
+}
+
+.tlf-merke svg { width: 1.1em; height: 1.1em; flex: none; }
+
+.gal-boks .gal-label {
+  font-size: clamp(0.58rem, 1.35vw, 0.74rem);
+  color: rgba(16,32,46,0.5);
+}
+
+/* prikkene står på lys flate her, ikke oppå et bilde */
+.gal-boks .gal-dot { background: rgba(16,32,46,0.22); }
+.gal-boks .gal-dot:hover { background: rgba(16,32,46,0.45); }
+.gal-boks .gal-dot.is-on { background: #16232f; }
+
+.tall {
+  align-self: center;
+  display: grid;
+  gap: clamp(0.5rem, 3.4%, 1.5rem);
+}
+
+.tall dt {
+  font-size: clamp(1.1rem, 3vw, 2.3rem);
+  font-weight: 600;
+  letter-spacing: -0.03em;
+  line-height: 1;
+  color: #16232f;
+}
+
+.tall dd {
+  margin-top: 0.22rem;
+  font-size: clamp(0.6rem, 1.5vw, 0.84rem);
+  line-height: 1.35;
+  color: rgba(16,32,46,0.6);
+}
+
+/* naken karusell: den ligger inne i en telefonskjerm og skal ikke ha
+   glassflate, egen form eller skygge — skjermen er rammen */
+.reel-gallery--naken {
+  position: absolute;
+  inset: 0;
+  width: auto;
+  aspect-ratio: auto;
+  border-radius: 0;
+  background: none;
+  box-shadow: none;
+}
+
+.reel-gallery--naken .gal-bilde {
+  width: 100%;
+  height: 100%;
+  max-width: none;
+  max-height: none;
+  object-fit: contain;
+  border-radius: 0;
+}
+
+.reel-gallery--tap { cursor: pointer; }
+
+/* ============ TYPOGRAFISKE KORTFORSIDER ============ */
+
+.type-face {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-content: center;
+  text-align: center;
+  gap: 0.4rem;
+  background: transparent;  /* gradienten ligger under */
+  color: rgba(255,255,255,0.94);
+}
+
+/* En firedel av det den var. Sporingen måtte følge med ned: -0.04em er
+   satt for display-grader, der bokstavene ellers driver fra hverandre.
+   På 28 px strammer den samme verdien ordet til en klump, så den er
+   lettet til nesten nøytralt. */
+.type-big {
+  font-size: clamp(0.85rem, 2vw, 1.75rem);
+  font-weight: 600;
+  letter-spacing: -0.015em;
+  line-height: 1;
+}
+
+.type-small {
+  font-size: 0.95rem;
+  color: var(--grey);
+}
+
+/* ============ UTSTYRSRINGEN I VERKTØYKORTET ============
+
+   Kortet sier «verktøy.» i stokken. Åpner du det, kommer det fysiske
+   utstyret opp og går rundt i ring. Ringen ligger flatt og er vippet mot
+   deg, så det du ser av den er en halvsirkel: det som er nærmest ligger
+   lavt og stort, det som er bak ligger høyt, lite og nesten borte.
+
+   Ingen 3D-transformer. Bildene er flate utklipp, og med rotateY ville de
+   stått på kant og forsvunnet i sidene. I stedet regnes hver plass ut på
+   sirkelen og settes som translate + scale, så motivet alltid vender rett
+   mot deg. Regnestykket ligger i script.js.
+
+   Flaten under er lys i begge temaer. Utstyret er svart på svart — kamera,
+   objektiver, filtre — og på det mørke kortet ble alt sammen silhuetter.
+   Dette er et fotobord, ikke en UI-flate, og da er lyst det eneste som
+   virker. I nattmodus er den dempet et hakk så den ikke blender. */
+
+.orbit {
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  overflow: hidden;
+  /* Gjenstandene får z-index fra JS for å ligge riktig i forhold til
+     hverandre. Uten en egen stablekontekst her gjelder de tallene hele
+     kortet, og utstyret la seg oppå tekstarket — programvarelista fikk
+     kameraer og objektiver tvers gjennom seg. Isolasjonen holder
+     rekkefølgen innenfor ringen, der den hører hjemme. */
+  isolation: isolate;
+}
+
+/* Naboene i stokken dempes på innholdet, ikke på kortet — samme regel
+   som gradientene og plakaten får lenger oppe. */
+.panel.is-left > .card > .orbit,
+.panel.is-right > .card > .orbit { opacity: var(--cf-o1); }
+
+.orbit-flate {
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(115% 85% at 50% 34%, #fcfcfd 0%, #ededf0 52%, #dedee3 100%);
+}
+
+:root[data-theme="dark"] .orbit-flate {
+  background: radial-gradient(115% 85% at 50% 34%, #e4e4e9 0%, #d2d2d8 52%, #bebec6 100%);
+}
+
+.orbit-ring {
+  position: absolute;
+  left: 0;
+  right: 0;
+  /* Buen sitter litt over midten og teksten rett under, så de to leser
+     som én gruppe. Står ringen i midten blir det en tom halvdel under. */
+  top: 3%;
+  height: 78%;
+}
+
+.orbit-ting {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  /* Fast boks. Kortet er lite i stokken og stort når det er åpnet, så
+     den virkelige størrelsen ganges inn i skalaen fra JS. Boksen er satt
+     større enn den noen gang tegnes, slik at transformen bare krymper —
+     forstørring av et ferdig opptegnet bilde blir uskarpt. */
+  width: 230px;
+  height: 230px;
+  cursor: default;
+  /* i stokken er kortet én stor klikkflate; ringen tar først imot
+     pekeren når kortet er åpnet */
+  pointer-events: none;
+  /* transform settes hvert bilde fra JS; her står bare utgangspunktet,
+     så ingenting blinker i toppstilling før første runde i løkka */
+  transform: translate(-50%, -50%) scale(0.4);
+  opacity: 0;
+  will-change: transform, opacity;
+}
+
+.orbit-ting img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  /* skyggen gir gjenstandene noe å hvile på; uten den svever de */
+  filter: drop-shadow(0 14px 18px rgba(24,20,16,0.28));
+}
+
+/* --- teksten under ringen --- */
+
+.mode-expanded .panel.is-active .orbit-ting { pointer-events: auto; }
+
+/* Navn og hjelpetekst hører til den åpne visningen. I stokken er kortet
+   for lite til å lese dem, og de ville uansett ikke hatt noe å si — der
+   kan man ikke holde pekeren over noe. */
+.orbit-tekst {
+  opacity: 0;
+  visibility: hidden;   /* knappen skal ikke kunne tabbes til fra stokken */
+  transition: opacity 0.5s var(--ease), visibility 0s linear 0.5s;
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 74%;
+  text-align: center;
+  padding: 0 1.5rem;
+  /* To rader. Navn og modell ligger oppå hverandre i den øverste, som
+     har fast høyde — da flytter ingenting seg når du går fra én
+     gjenstand til en annen, eller når raden står tom. Knappen under blir
+     stående i ro uansett. */
+  display: grid;
+  grid-template-rows: 3.4rem auto;
+  row-gap: 0.7rem;
+  justify-items: center;
+}
+
+.mode-expanded .panel.is-active .orbit-tekst {
+  opacity: 1;
+  visibility: visible;
+  transition: opacity 0.5s var(--ease) 0.15s;
+}
+
+.orbit-navn,
+.orbit-modell { grid-area: 1 / 1; transition: opacity 0.3s var(--ease); }
+
+.orbit-navn {
+  align-self: start;
+  font-size: 0.72rem;
+  font-weight: 500;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: #8b8b93;
+}
+
+.orbit-modell {
+  align-self: end;
+  margin-top: 1.5rem;
+  font-size: clamp(1.05rem, 2vw, 1.5rem);
+  font-weight: 500;
+  letter-spacing: -0.02em;
+  color: #1a1a1a;
+}
+
+/* navn og modell står tomme til noe er valgt */
+.orbit-navn,
+.orbit-modell { opacity: 0; }
+
+.orbit.har-valg .orbit-navn,
+.orbit.har-valg .orbit-modell { opacity: 1; }
+
+/* Veien videre til programvaren. Uten den er det ingenting som røper at
+   kortet har en side til — utstyret ser ut som hele historien.
+   Klikket får boble til kortet, som allerede vet hva neste steg er.
+   Fargene er faste og ikke temastyrte: flaten under er lys i begge
+   temaer, så knappen må være mørk i begge. */
+.orbit-mer {
+  grid-row: 2;
+  display: inline-flex;
+  align-items: center;
+  padding: 0.5rem 1.05rem;
+  border: 1px solid rgba(26,26,26,0.18);
+  border-radius: 99px;
+  background: transparent;
+  color: #3a3a40;
+  font: inherit;
+  font-size: 0.82rem;
+  cursor: pointer;
+  transition: color 0.25s var(--ease), border-color 0.25s var(--ease), background 0.25s var(--ease);
+}
+
+.orbit-mer:hover {
+  color: #111;
+  border-color: rgba(26,26,26,0.42);
+  background: rgba(255,255,255,0.72);
+}
+
+.orbit-mer:focus-visible {
+  outline: 2px solid #1a1a1a;
+  outline-offset: 3px;
+}
+
+@media (max-width: 860px) {
+  .orbit-ring { top: 8%; height: 72%; }
+  .orbit-hint { font-size: 0.78rem; }
+}
+
+/* ============ KORT UNDER ARBEID ============
+
+   Nettbutikk-kortet er med i stokken, men har ingenting å åpne. Det
+   har derfor ingen pekerhånd når det står fremme — bare naboene, der
+   klikket fortsatt betyr «ta meg hit». Lastelinjen sier resten. */
+
+.panel.is-active .card--laast { cursor: default; }
+
+/* De andre typografiske kortene står på en jevn mørk flate. Silken er
+   lys noen steder og mørk andre, og flytter seg, så hvit tekst kan ikke
+   regne med underlaget sitt — skyggen er det som holder den lesbar når
+   en lys fold glir forbi bak den. */
+.card--laast .type-big { text-shadow: 0 1px 16px rgba(48,29,15,0.6); }
+
+/* Sporet er mørkt, ikke lyst. Silken bak driver mellom nesten hvitt og
+   mørk brun, så et lyst spor forsvant hver gang en lys fold gled forbi.
+   Med et mørkt spor har fyllet alltid sin egen bakgrunn å lyse mot,
+   uansett hvor i bølgen linjen befinner seg. */
+.laste {
+  position: relative;
+  width: clamp(6.5rem, 13vw, 11rem);
+  height: 4px;
+  margin: 0.9rem auto 0;
+  border-radius: 99px;
+  background: rgba(46,28,16,0.45);
+  overflow: hidden;
+}
+
+/* Ubestemt framdrift: linjen sier «det jobbes», ikke «det er 62 %
+   ferdig». Et tall ville vært et løfte kortet ikke kan holde. */
+.laste-fyll {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  width: 40%;
+  border-radius: inherit;
+  background: linear-gradient(90deg,
+    rgba(255,255,255,0) 0%,
+    rgba(255,255,255,0.95) 50%,
+    rgba(255,255,255,0) 100%);
+  animation: laste-sveip 2.4s ease-in-out infinite;
+}
+
+/* Fyllet er 40 % av sporet, så 250 % av sin egen bredde tar det fra
+   helt utenfor venstre kant til helt utenfor høyre. Men da står sporet
+   tomt i begge endene, og et tomt spor ser ut som en strek som ikke gjør
+   noe. Reisen er derfor kortet inn i begge ender, så det alltid er litt
+   lys i linjen. Det som vises ved vendepunktene er den gjennomsiktige
+   halen av gradienten, så hoppet ved omstart går mellom to svake
+   tilstander og knapt merkes. */
+@keyframes laste-sveip {
+  from { transform: translateX(-70%); }
+  to   { transform: translateX(200%); }
+}
+
+/* samme regnestykke som for flekkene: ingenting animerer i et kort du
+   ikke ser */
+.panel.is-back .laste-fyll,
+.mode-expanded .panel:not(.is-active) .laste-fyll,
+.mode-text .panel:not(.is-active) .laste-fyll,
+.mode-about .laste-fyll { animation-play-state: paused; }
+
+@media (prefers-reduced-motion: reduce) {
+  /* står stille, men skal fortsatt lese som en linje som ikke er
+     kommet i mål */
+  .laste-fyll {
+    animation: none;
+    transform: none;
+    width: 42%;
+    background: rgba(255,255,255,0.9);
+  }
+}
+
+/* ============ OM MEG-SIDEN ============ */
+
+.about-view {
+  position: absolute;
+  inset: 0;
+  z-index: 30;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  -webkit-overflow-scrolling: touch;
+  opacity: 0;
+  visibility: hidden;
+  transform: translateY(3vh);
+  transition: opacity 0.65s var(--ease), transform 0.65s var(--ease), visibility 0s linear 0.65s;
+}
+
+.mode-about .about-view {
+  opacity: 1;
+  visibility: visible;
+  transform: none;
+  transition: opacity 0.65s var(--ease) 0.15s, transform 0.65s var(--ease) 0.15s;
+}
+
+.about-inner {
+  display: grid;
+  grid-template-columns: minmax(0, 38rem) 1fr;
+  gap: 4rem;
+  padding: 0 var(--pad);
+}
+
+.about-copy {
+  padding-top: 88vh;
+  padding-bottom: 26vh;
+}
+
+.about-p {
+  font-size: 1.45rem;
+  line-height: 1.5;
+  letter-spacing: -0.015em;
+  color: var(--grey);
+  font-weight: 400;
+}
+
+.about-p + .about-p { margin-top: 8vh; }
+
+.about-p strong {
+  color: var(--ink);
+  font-weight: 500;
+}
+
+.about-side { position: relative; }
+
+/* --- identiteten på om-siden: samme plassering som før navbaren, med
+       staggeret inngang etter at navbaren har trukket seg unna --- */
+
+.about-id {
+  position: absolute;
+  left: var(--pad);
+  top: 50%;
+  transform: translateY(-50%);
+  z-index: 40;
+  width: max-content;
+  max-width: calc(100% - var(--pad) * 2); /* «Digital markedsfører × kreativ» på én linje */
+  pointer-events: none; /* scroll går rett gjennom til om-siden */
+  visibility: hidden;
+  /* opasiteten her styres av scrollen (JS) og har derfor ingen overgang —
+     inn- og utgangen ligger på barna under */
+  transition: visibility 0s linear 0.45s;
+}
+
+.mode-about .about-id {
+  visibility: visible;
+  transition: visibility 0s;
+}
+
+.about-id > * {
+  opacity: 0;
+  transform: translateY(16px);
+  transition: opacity 0.45s var(--ease), transform 0.45s var(--ease);
+}
+
+.mode-about .about-id > * {
+  opacity: 1;
+  transform: none;
+  transition: opacity 0.55s var(--ease) var(--in, 0.26s), transform 0.65s var(--ease) var(--in, 0.26s);
+}
+
+.mode-about .about-id-name { --in: 0.26s; }
+.mode-about .about-id-role { --in: 0.32s; }
+.mode-about .about-id-actions { --in: 0.38s; }
+
+.about-id-name {
+  font-size: 1.85rem;
+  font-weight: 500;
+  letter-spacing: -0.015em;
+  line-height: 1.2;
+}
+
+.about-id-role {
+  font-size: 1.85rem;
+  font-weight: 400;
+  color: var(--grey);
+  letter-spacing: -0.015em;
+  line-height: 1.25;
+}
+
+.about-id-actions {
+  margin-top: 2.2rem;
+  display: flex;
+  gap: 0.55rem;
+}
+
+.about-id-actions .widget { pointer-events: auto; }
+
+/* når navnet er scrollet bort skal knappene heller ikke kunne treffes */
+.about-id.is-faded .widget { pointer-events: none; }
+
+/* samme dimensjoner og radius som kortene i kortstokken */
+.about-media {
+  position: sticky;
+  top: calc(50vh - var(--deck-size) / 2);
+  width: var(--deck-size);
+  margin-left: auto;
+}
+
+.about-media video {
+  width: 100%;
+  aspect-ratio: 1 / 1;
+  object-fit: cover;
+  border-radius: var(--radius);
+  display: block;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.03);
+  opacity: 0;
+  transform: scale(0.94);
+  transition: opacity 0.6s var(--ease), transform 0.7s var(--ease);
+}
+
+.mode-about .about-media video {
+  opacity: 1;
+  transform: none;
+  transition: opacity 0.75s var(--ease) 0.22s, transform 0.9s var(--ease) 0.22s;
+}
+
+/* ============ PRIKKER OG LUKK ============ */
+
+.deck-dots {
+  position: absolute;
+  left: 50%;
+  bottom: clamp(1.6rem, 4vh, 2.8rem);
+  transform: translateX(-50%);
+  display: flex;
+  flex-direction: row;
+  gap: 10px;
+  z-index: 40;
+  transition: opacity 0.5s var(--ease);
+}
+
+body:not(.mode-deck) .deck-dots { opacity: 0; pointer-events: none; }
+
+.dot {
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  padding: 0;
+  background: var(--grey-soft);
+  transition: background 0.4s, transform 0.4s var(--ease);
+}
+
+.dot.is-active {
+  background: var(--ink);
+  transform: scale(1.4);
+}
+
+.close-btn {
+  position: absolute;
+  top: var(--nav-top);
+  right: var(--pad);
+  z-index: 60;
+  width: 42px;
+  height: 42px;
+  border-radius: 14px;
+  background: var(--surface);
+  color: var(--ink);
+  display: grid;
+  place-items: center;
+  box-shadow: 0 1px 2px rgba(0,0,0,0.06);
+  opacity: 0;
+  visibility: hidden;
+  transform: translateY(-6px);
+  transition: opacity 0.45s var(--ease), transform 0.45s var(--ease),
+              background 0.3s var(--ease), color 0.3s var(--ease),
+              box-shadow 0.4s var(--ease), visibility 0s linear 0.45s;
+}
+
+.mode-expanded .close-btn,
+.mode-text .close-btn {
+  opacity: 1;
+  visibility: visible;
+  transform: none;
+  transition: opacity 0.45s var(--ease) 0.2s, transform 0.45s var(--ease) 0.2s,
+              background 0.3s var(--ease), color 0.3s var(--ease),
+              box-shadow 0.4s var(--ease);
+}
+
+.close-btn:hover {
+  background: var(--ink);
+  color: var(--on-ink);
+  box-shadow: 0 8px 20px rgba(0,0,0,0.14);
+}
+
+/* ============ MINIMER-KNAPP SOM FØLGER PEKEREN LANGS KANTEN ============ */
+
+.edge-chip {
+  position: fixed;
+  left: 0;
+  top: 0;
+  z-index: 70;
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  background: var(--surface);
+  color: var(--ink);
+  display: grid;
+  place-items: center;
+  box-shadow: 0 4px 18px rgba(0,0,0,0.14);
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+  transition: opacity 0.35s var(--ease), background 0.3s var(--ease), color 0.3s var(--ease);
+  will-change: transform;
+}
+
+.edge-chip.is-on {
+  opacity: 1;
+  visibility: visible;
+  pointer-events: auto;
+}
+
+.edge-chip:hover {
+  background: var(--ink);
+  color: var(--on-ink);
+  box-shadow: 0 8px 26px rgba(0,0,0,0.2);
+}
+
+/* romsligere treffflate rundt chipen */
+.edge-chip::after {
+  content: "";
+  position: absolute;
+  inset: -14px;
+  border-radius: 50%;
+}
+
+/* ============ INTRO-ANIMASJONER ============ */
+
+.line-mask { overflow: hidden; padding-bottom: 0.12em; }
+
+.intro-line {
+  transform: translateY(110%);
+  animation: rise 1s var(--ease) forwards;
+  animation-delay: var(--d, 0s);
+}
+
+@keyframes rise { to { transform: translateY(0); } }
+
+.intro-fade {
+  opacity: 0;
+  transform: translateY(14px);
+  animation: fadeUp 1.1s var(--ease) forwards;
+  animation-delay: var(--d, 0s);
+}
+
+@keyframes fadeUp { to { opacity: 1; transform: translateY(0); } }
+
+.deck-intro {
+  opacity: 0;
+  animation: fadeIn 1.2s var(--ease) forwards 0.4s;
+}
+
+@keyframes fadeIn { to { opacity: 1; } }
+
+@media (prefers-reduced-motion: reduce) {
+  .intro-line, .intro-fade, .deck-intro { animation: none; transform: none; opacity: 1; }
+  .card-art span { animation: none; }
+  .card, .card-art, .card .type-face, .card-text, .card-label,
+  .brand, .case-heading, .close-btn, .about-view,
+  .navbar, .about-id, .about-id > *, .about-media video { transition: none; }
+  /* sidestokken i OsloLut-kortet bytter uten glidning */
+  .mode-expanded .panel.is-active .reel-item,
+  .mode-expanded .panel.is-active .reel-item figcaption { transition: none; }
+  /* bildekarusellen bytter uten krysstoning, og blar ikke av seg selv */
+  .gal-slide, .gal-dot { transition: none; }
+}
+
+/* ============ RESPONSIVT ============ */
+
+@media (max-width: 1100px) {
+  .widget { padding: 0 0.85rem; font-size: 0.88rem; }
+  .nav-widgets { gap: 0.45rem; }
+}
+
+@media (max-width: 860px) {
+  :root {
+    --nav-h: clamp(5.6rem, 12vh, 7rem);
+    --deck-size: min(58vw, 40vh);
+    /* strammere vifte — naboene får lov til å blø ut over kantene */
+    --cf-x1: calc(var(--deck-size) * 0.8);
+    --exp-w: 92vw;
+  }
+
+  .navbar { gap: 0.8rem; }
+
+  .widget {
+    width: 40px;
+    height: 40px;
+    padding: 0;
+    justify-content: center;
+    border-radius: 12px;
+  }
+
+  .widget-label { display: none; }
+
+  .case-heading { width: 100%; }
+
+  /* om-siden: identiteten legger seg øverst, over luften foran figuren */
+  .about-id {
+    top: var(--nav-top);
+    transform: none;
+    width: auto;
+    max-width: none;
+    right: var(--pad);
+  }
+
+  .about-id-name,
+  .about-id-role { font-size: 1.5rem; }
+
+  .about-id-actions { margin-top: 1.2rem; }
+
+  .about-inner {
+    grid-template-columns: 1fr;
+    gap: 0;
+  }
+
+  .about-side { order: -1; }
+
+  .about-media {
+    position: static;
+    width: var(--deck-size);
+    margin: 30vh auto 0;
+  }
+
+  .about-copy {
+    padding-top: 7vh;
+    padding-bottom: 18vh;
+  }
+
+  .about-p { font-size: 1.15rem; }
+
+  .about-p + .about-p { margin-top: 5vh; }
+
+  .edge-chip { display: none; } /* touch har ✕ og Esc */
+
+  .type-big { font-size: clamp(2.6rem, 12vw, 4.5rem); }
+}
+
+@media (max-width: 520px) {
+  :root { --deck-size: min(56vw, 38vh); }
+
+  .logo { font-size: 1.25rem; }
+  .brand-role { font-size: 0.98rem; }
+}
+
+/* ============ KRYP: AVSPILLEREN I «KOMMER SNART»-KORTET ============
+
+   I kortstokken er kortet fortsatt bare svart med «kommer snart.».
+   Åpner du det, blir den samme svarte flaten en avspiller: plakaten
+   til venstre, tittel og kontroller til høyre — satt opp som en
+   strømmetjeneste. Bakgrunnen får ligge svart. Det eneste som slipper
+   til er et uskarpt gjenskinn av plakaten, samme grep som de uskarpe
+   kopiene bak bildene i karusellene.
+
+   Det er ett hørespill, ikke en spilleliste, så knappene rundt play
+   hopper 15 sekunder i stedet for å bla til neste spor. ============ */
+
+.spot {
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  overflow: hidden;
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 0.5s var(--ease), visibility 0s linear 0.5s;
+}
+
+/* Bare i forstørret modus. I tekstmodus ligger arket oppå, og en
+   spiller man ikke ser skal man heller ikke kunne tabbe seg inn i —
+   visibility tar både fokus og skjermleser med seg. */
+.mode-expanded .panel.is-active .spot {
+  opacity: 1;
+  visibility: visible;
+  transition: opacity 0.7s var(--ease) 0.2s;
+}
+
+/* Kortforsiden viker for spilleren, som har sin egen plakat i mindre
+   format. Uten dette ligger den gamle forsiden i full bredde bak og
+   lyser gjennom. */
+.mode-expanded .panel.is-active .card--snart .card-cover,
+.mode-text .panel.is-active .card--snart .card-cover { opacity: 0; }
+
+/* Gjenskinnet: plakaten selv, blåst opp og ute av fokus. Lav opasitet,
+   så det leser som farget lys på svart og ikke som et bilde. */
+.spot-glo {
+  position: absolute;
+  inset: -18%;
+  background: url("assets/kryp/cover/kryp_cover.jpg") center / cover no-repeat;
+  filter: blur(64px) saturate(1.35);
+  opacity: 0.3;
+  pointer-events: none;
+}
+
+/* og en mørk sky over igjen, så teksten alltid har noe å stå på */
+.spot-glo::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(120% 90% at 50% 30%, rgba(0,0,0,0.35) 0%, rgba(0,0,0,0.82) 100%);
+}
+
+.spot-inner {
+  position: relative;
+  height: 100%;
+  max-width: 66rem;
+  margin: 0 auto;
+  display: grid;
+  grid-template-columns: min(58vh, 46%) minmax(0, 1fr);
+  align-items: center;
+  gap: clamp(1.6rem, 4vw, 3.4rem);
+  padding: clamp(1.4rem, 3.5vw, 3rem) clamp(1.6rem, 5vw, 3.4rem);
+}
+
+.spot-cover {
+  aspect-ratio: 1;
+  border-radius: 10px;
+  overflow: hidden;
+  background: #000;
+  /* plakaten skal se ut som den ligger oppå flaten, ikke som en rute
+     stanset ut av den */
+  box-shadow: 0 34px 70px -22px rgba(0,0,0,0.95);
+}
+
+.spot-cover img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.spot-kicker {
+  font-size: 0.72rem;
+  font-weight: 500;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: rgba(255,255,255,0.5);
+}
+
+.spot-tittel {
+  font-size: clamp(2.1rem, 4.6vw, 3.6rem);
+  font-weight: 700;
+  letter-spacing: -0.035em;
+  line-height: 0.98;
+  color: #fff;
+  margin: 0.55rem 0 0.5rem;
+}
+
+.spot-artist {
+  font-size: 0.95rem;
+  color: rgba(255,255,255,0.62);
+}
+
+/* --- framdriftslinjen --- */
+
+.spot-linje { margin-top: clamp(1.3rem, 3.4vh, 2.2rem); }
+
+/* Et ekte range-felt: da følger tastatur, dra og trykk-på-linjen med
+   uten at vi må skrive dem selv. --p er hvor langt sporet har kommet,
+   og settes fra JS-en. */
+.spot-scrub {
+  --p: 0%;
+  -webkit-appearance: none;
+  appearance: none;
+  display: block;
+  width: 100%;
+  height: 16px;          /* treffeflate, ikke tykkelse */
+  background: transparent;
+  cursor: pointer;
+}
+
+.spot-scrub::-webkit-slider-runnable-track {
+  height: 4px;
+  border-radius: 99px;
+  background:
+    linear-gradient(to right, #fff 0 var(--p), rgba(255,255,255,0.24) var(--p) 100%);
+}
+
+.spot-scrub::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  width: 12px;
+  height: 12px;
+  margin-top: -4px;
+  border: 0;
+  border-radius: 50%;
+  background: #fff;
+  opacity: 0;
+  transition: opacity 0.2s var(--ease);
+}
+
+.spot-scrub::-moz-range-track {
+  height: 4px;
+  border-radius: 99px;
+  background: rgba(255,255,255,0.24);
+}
+
+.spot-scrub::-moz-range-progress {
+  height: 4px;
+  border-radius: 99px;
+  background: #fff;
+}
+
+.spot-scrub::-moz-range-thumb {
+  width: 12px;
+  height: 12px;
+  border: 0;
+  border-radius: 50%;
+  background: #fff;
+  opacity: 0;
+  transition: opacity 0.2s var(--ease);
+}
+
+/* knotten kommer fram når du er på linjen — ellers er den bare en strek */
+.spot-scrub:hover::-webkit-slider-thumb,
+.spot-scrub:focus-visible::-webkit-slider-thumb { opacity: 1; }
+
+.spot-scrub:hover::-moz-range-thumb,
+.spot-scrub:focus-visible::-moz-range-thumb { opacity: 1; }
+
+.spot-scrub:focus { outline: none; }
+
+.spot-scrub:focus-visible::-webkit-slider-runnable-track { outline: 2px solid rgba(255,255,255,0.6); outline-offset: 5px; }
+.spot-scrub:focus-visible::-moz-range-track { outline: 2px solid rgba(255,255,255,0.6); outline-offset: 5px; }
+
+.spot-tid {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 0.2rem;
+  font-size: 0.72rem;
+  font-variant-numeric: tabular-nums;
+  color: rgba(255,255,255,0.5);
+}
+
+/* --- knappene --- */
+
+.spot-kontroller {
+  display: flex;
+  align-items: center;
+  gap: clamp(1rem, 2.4vw, 1.6rem);
+  margin-top: clamp(0.9rem, 2.6vh, 1.5rem);
+}
+
+.spot-hopp {
+  display: grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  padding: 0;
+  border: 0;
+  border-radius: 50%;
+  background: transparent;
+  color: rgba(255,255,255,0.78);
+  font: inherit;
+  cursor: pointer;
+  transition: color 0.2s var(--ease), background 0.2s var(--ease);
+}
+
+.spot-hopp:hover { color: #fff; background: rgba(255,255,255,0.08); }
+
+.spot-play {
+  display: grid;
+  place-items: center;
+  width: clamp(54px, 5.2vw, 62px);
+  height: clamp(54px, 5.2vw, 62px);
+  padding: 0;
+  border: 0;
+  border-radius: 50%;
+  background: #fff;
+  color: #0b0b0b;
+  cursor: pointer;
+  transition: transform 0.2s var(--ease), background 0.2s var(--ease);
+}
+
+.spot-play:hover { transform: scale(1.06); }
+.spot-play:active { transform: scale(0.97); }
+
+/* de to ikonene ligger oppå hverandre i samme rute, så knappen ikke
+   hopper i bredden når den bytter */
+.spot-ikon { grid-area: 1 / 1; }
+.spot-ikon--pause { display: none; }
+.spot.spiller .spot-ikon--play { display: none; }
+.spot.spiller .spot-ikon--pause { display: block; }
+
+.spot-hopp:focus-visible,
+.spot-play:focus-visible,
+.spot-mer:focus-visible {
+  outline: 2px solid rgba(255,255,255,0.75);
+  outline-offset: 3px;
+}
+
+.spot-status {
+  margin-top: 0.9rem;
+  font-size: 0.8rem;
+  color: rgba(255,255,255,0.45);
+}
+
+.spot-status:empty { display: none; }
+
+.spot-mer {
+  display: inline-flex;
+  align-items: center;
+  margin-top: clamp(1.1rem, 3vh, 1.9rem);
+  padding: 0.5rem 1.05rem;
+  border: 1px solid rgba(255,255,255,0.22);
+  border-radius: 99px;
+  background: transparent;
+  color: rgba(255,255,255,0.78);
+  font: inherit;
+  font-size: 0.82rem;
+  cursor: pointer;
+  transition: color 0.25s var(--ease), border-color 0.25s var(--ease), background 0.25s var(--ease);
+}
+
+.spot-mer:hover {
+  color: #fff;
+  border-color: rgba(255,255,255,0.5);
+  background: rgba(255,255,255,0.07);
+}
+
+/* uten lydfil er det ingenting å trykke på — knappene blir stående,
+   men slokner, og statuslinjen sier hvorfor */
+.spot--tom .spot-play,
+.spot--tom .spot-hopp,
+.spot--tom .spot-scrub { opacity: 0.35; pointer-events: none; }
+
+/* --- smalt: plakaten legger seg over teksten, alt midtstilles --- */
+
+@media (max-width: 860px) {
+  .spot-inner {
+    grid-template-columns: minmax(0, 1fr);
+    align-content: center;
+    justify-items: center;
+    text-align: center;
+    gap: clamp(1.2rem, 3.5vh, 2rem);
+    padding: clamp(1.2rem, 5vw, 2rem);
+  }
+
+  .spot-cover { width: min(72%, 32vh); }
+
+  .spot-panel {
+    width: 100%;
+    max-width: 24rem;
+  }
+
+  .spot-tittel { font-size: clamp(2rem, 10vw, 2.8rem); }
+  .spot-kontroller { justify-content: center; }
+}
+
+/* Lav, bred skjerm (mobil på tvers): plakaten tar all høyden, og
+   resten må stramme seg inn for at «Om prosjektet» ikke skal havne
+   nedenfor kortkanten. */
+@media (max-width: 860px) and (max-height: 520px) {
+  .spot-cover { display: none; }
+
+  .spot-kicker { font-size: 0.66rem; }
+  .spot-tittel { font-size: clamp(1.6rem, 6vw, 2.2rem); margin: 0.3rem 0 0.25rem; }
+  .spot-artist { font-size: 0.85rem; }
+  .spot-linje { margin-top: 0.8rem; }
+  .spot-kontroller { margin-top: 0.55rem; }
+  .spot-play { width: 46px; height: 46px; }
+  .spot-hopp { width: 38px; height: 38px; }
+  .spot-mer { margin-top: 0.7rem; padding: 0.4rem 0.9rem; font-size: 0.78rem; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .spot, .spot-play, .spot-hopp, .spot-mer, .spot-scrub::-webkit-slider-thumb { transition: none; }
+  .spot-play:hover { transform: none; }
+}

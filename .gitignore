@@ -1,0 +1,13 @@
+# macOS
+.DS_Store
+._*
+
+# editorer
+.vscode/
+.idea/
+
+# Vercel
+.vercel/
+
+# Claude Code (lokal kjørekonfig)
+.claude/

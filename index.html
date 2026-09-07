@@ -1,0 +1,624 @@
+<!DOCTYPE html>
+<html lang="no">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Kai Faiz — Digital markedsfører × kreativ</title>
+  <meta name="description" content="Kai Faiz — digital markedsfører × kreativ. Strategi, merkevare og innhold — fra innsikt og idé til innhold, nettside og måling.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Schibsted+Grotesk:ital,wght@0,400..900;1,400..900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+  <script>
+    // Kjøres før siden males: uten dette blinker den lys i et øyeblikk
+    // før JS-en nederst rekker å sette temaet.
+    (() => {
+      try {
+        const lagret = localStorage.getItem('tema');
+        const mork = lagret ? lagret === 'dark'
+          : matchMedia('(prefers-color-scheme: dark)').matches;
+        if (mork) document.documentElement.dataset.theme = 'dark';
+      } catch (e) { /* privat modus: da blir det lyst */ }
+    })();
+  </script>
+</head>
+<body class="mode-deck">
+
+  <nav class="sr-only" aria-label="Innhold">
+    <ul>
+      <li><a href="#oslolut">OsloLut</a></li>
+      <li><a href="#knytt">Knytt</a></li>
+      <li><a href="#badstulaug">Norges Badstulaug</a></li>
+      <li><a href="#kryp">Kryp</a></li>
+      <li><a href="#nettbutikk">Nettbutikk</a></li>
+      <li><a href="#verktoy">Verktøy</a></li>
+      <li><a href="#om">Om meg</a></li>
+    </ul>
+  </nav>
+
+  <main class="stage">
+
+    <!-- ======== NAVBAR: logo til venstre, widgets til høyre ======== -->
+    <header class="navbar">
+
+      <div class="nav-left">
+        <div class="brand" role="button" tabindex="0" aria-label="Til forsiden">
+          <div class="line-mask"><h1 class="logo intro-line" style="--d:.1s">Kai Faiz<span class="logo-dot">.</span></h1></div>
+          <div class="line-mask"><h2 class="brand-role intro-line" style="--d:.22s">Digital markedsfører × kreativ</h2></div>
+        </div>
+
+        <div class="case-heading" data-i="0" aria-hidden="true">
+          <h2>OsloLut</h2>
+          <p>One LUT. One identity.</p>
+        </div>
+        <div class="case-heading" data-i="1" aria-hidden="true">
+          <h2>Knytt</h2>
+          <p>Studentdrevet initiativ som gjør det lettere å finne tilhørighet i en ny by.</p>
+        </div>
+        <div class="case-heading" data-i="2" aria-hidden="true">
+          <h2>Norges Badstulaug</h2>
+          <p>Kom inn i varmen.</p>
+        </div>
+        <div class="case-heading" data-i="3" aria-hidden="true">
+          <h2>Kryp</h2>
+          <p>Hørespill — lyddesign.</p>
+        </div>
+        <div class="case-heading" data-i="4" aria-hidden="true">
+          <h2>Nettbutikk</h2>
+          <p>Under arbeid — ikke klar for visning ennå.</p>
+        </div>
+        <div class="case-heading" data-i="5" aria-hidden="true">
+          <h2>Verktøy</h2>
+          <p>Klikk videre for avsløringen.</p>
+        </div>
+      </div>
+
+      <nav class="nav-widgets intro-fade" style="--d:.6s" aria-label="Snarveier">
+        <button class="widget theme-toggle" type="button" aria-label="Bytt til nattmodus" aria-pressed="false">
+          <svg class="icon-moon" width="15" height="15" viewBox="0 0 15 15" fill="none" aria-hidden="true"><path d="M12.4 9.3A5.2 5.2 0 0 1 5.7 2.6a5.4 5.4 0 1 0 6.7 6.7Z" stroke="currentColor" stroke-width="1.2" stroke-linejoin="round"/></svg>
+          <svg class="icon-sun" width="15" height="15" viewBox="0 0 15 15" fill="none" aria-hidden="true"><circle cx="7.5" cy="7.5" r="2.9" stroke="currentColor" stroke-width="1.2"/><path d="M7.5 1.4v1.3m0 9.6v1.3M13.6 7.5h-1.3m-9.6 0H1.4m10.4-4.3-.9.9m-6 6-.9.9m0-7.8.9.9m6 6 .9.9" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/></svg>
+          <span class="widget-label label-moon">Natt</span>
+          <span class="widget-label label-sun">Dag</span>
+        </button>
+
+        <button class="widget about-toggle" type="button" aria-label="Om meg">
+          <svg width="15" height="15" viewBox="0 0 15 15" fill="none" aria-hidden="true"><circle cx="7.5" cy="5" r="2.6" stroke="currentColor" stroke-width="1.2"/><path d="M2.6 13c.6-2.5 2.6-3.8 4.9-3.8s4.3 1.3 4.9 3.8" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/></svg>
+          <span class="widget-label">Om meg</span>
+        </button>
+
+        <a class="widget" href="mailto:kai.private@hotmail.com" aria-label="Send e-post">
+          <svg width="15" height="15" viewBox="0 0 15 15" fill="none" aria-hidden="true"><rect x="1.8" y="3" width="11.4" height="9" rx="1.6" stroke="currentColor" stroke-width="1.2"/><path d="m2.4 3.9 5.1 4.2 5.1-4.2" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          <span class="widget-label">E-post</span>
+        </a>
+
+        <a class="widget" href="https://www.linkedin.com/" target="_blank" rel="noopener" aria-label="LinkedIn" title="Bytt til din LinkedIn-profil-URL">
+          <svg width="15" height="15" viewBox="0 0 15 15" fill="none" aria-hidden="true"><rect x="1.8" y="1.8" width="11.4" height="11.4" rx="2" stroke="currentColor" stroke-width="1.2"/><path d="M4.9 6.6v3.9M4.9 4.6v.1M7.4 10.5V8.2c0-.9.7-1.6 1.6-1.6s1.6.7 1.6 1.6v2.3" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/></svg>
+          <span class="widget-label">LinkedIn</span>
+        </a>
+      </nav>
+
+    </header>
+
+    <!-- ======== KORTSTOKKEN (horisontal) ======== -->
+    <div class="deck deck-intro">
+
+      <!-- ---- 02: OsloLut ---- -->
+      <article class="panel panel--pages" id="oslolut" data-i="0">
+        <div class="card" role="button" tabindex="0" aria-label="OsloLut">
+          <div class="card-art art--oslolut" aria-hidden="true"><span></span><span></span><span></span><span></span><span></span></div>
+          <div class="case-reel" tabindex="-1">
+            <figure class="reel-item" data-r="0">
+              <div class="card-art art--oslolut" aria-hidden="true"><span></span><span></span><span></span><span></span><span></span></div>
+              <video src="assets/oslolut/page_1/oslolut_page1.mp4#t=0.1" muted loop playsinline preload="auto"></video>
+              <figcaption>Forsiden — filmisk anslag og én tydelig oppfordring, så poenget sitter med en gang.</figcaption>
+              <span class="reel-hint" aria-hidden="true"><span class="reel-hint-label">Les om prosjektet</span><svg class="hint-klikk" width="17" height="17" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.25" stroke-linecap="round" stroke-linejoin="round"><path d="M9.2 11.3V6.2a1.1 1.1 0 0 1 2.2 0v4.3"/><path d="M11.4 10.5V9.3a1.1 1.1 0 0 1 2.2 0v1.3"/><path d="M13.6 10.7V9.9a1.1 1.1 0 0 1 2.2 0v3.3a4 4 0 0 1-4 4h-1.3c-1.1 0-1.9-.35-2.6-1.05l-2.2-2.2a1.1 1.1 0 0 1 1.55-1.55l1.35 1.3"/><path d="M6.1 4.5 4.8 3.2M4.9 7.4 3.1 6.9M7.6 3.3 7.2 1.6"/></svg></span>
+            </figure>
+            <figure class="reel-item" data-r="1">
+              <div class="card-art art--oslolut" aria-hidden="true"><span></span><span></span><span></span><span></span><span></span></div>
+              <video src="assets/oslolut/pag_2/page_2.mp4#t=0.1" muted loop playsinline preload="metadata"></video>
+              <figcaption>LUT-en i aksjon — graden lagt på S-Log 3 i DaVinci Resolve.</figcaption>
+              <span class="reel-hint" aria-hidden="true"><span class="reel-hint-label">Les om prosjektet</span><svg class="hint-klikk" width="17" height="17" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.25" stroke-linecap="round" stroke-linejoin="round"><path d="M9.2 11.3V6.2a1.1 1.1 0 0 1 2.2 0v4.3"/><path d="M11.4 10.5V9.3a1.1 1.1 0 0 1 2.2 0v1.3"/><path d="M13.6 10.7V9.9a1.1 1.1 0 0 1 2.2 0v3.3a4 4 0 0 1-4 4h-1.3c-1.1 0-1.9-.35-2.6-1.05l-2.2-2.2a1.1 1.1 0 0 1 1.55-1.55l1.35 1.3"/><path d="M6.1 4.5 4.8 3.2M4.9 7.4 3.1 6.9M7.6 3.3 7.2 1.6"/></svg></span>
+            </figure>
+            <figure class="reel-item" data-r="2">
+              <div class="card-art art--oslolut" aria-hidden="true"><span></span><span></span><span></span><span></span><span></span></div>
+              <video src="assets/oslolut/page_3/page_3.mp4#t=0.1" muted loop playsinline preload="metadata"></video>
+              <figcaption>Kjøpsreisen — fra produktseksjon til kasse, med sporing hele veien.</figcaption>
+              <span class="reel-hint" aria-hidden="true"><span class="reel-hint-label">Les om prosjektet</span><svg class="hint-klikk" width="17" height="17" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.25" stroke-linecap="round" stroke-linejoin="round"><path d="M9.2 11.3V6.2a1.1 1.1 0 0 1 2.2 0v4.3"/><path d="M11.4 10.5V9.3a1.1 1.1 0 0 1 2.2 0v1.3"/><path d="M13.6 10.7V9.9a1.1 1.1 0 0 1 2.2 0v3.3a4 4 0 0 1-4 4h-1.3c-1.1 0-1.9-.35-2.6-1.05l-2.2-2.2a1.1 1.1 0 0 1 1.55-1.55l1.35 1.3"/><path d="M6.1 4.5 4.8 3.2M4.9 7.4 3.1 6.9M7.6 3.3 7.2 1.6"/></svg></span>
+            </figure>
+          </div>
+
+          <span class="reel-count" aria-hidden="true"><b>1</b>&thinsp;/&thinsp;3</span>
+
+          <span class="card-label">OsloLut</span>
+
+          <div class="card-text" tabindex="-1">
+            <div class="card-text-inner">
+              <header class="text-head">
+                <p class="text-kicker">Utvalgt arbeid — 02</p>
+                <h2>OsloLut</h2>
+                <p class="text-sub">One LUT. One identity.</p>
+              </header>
+
+              <section class="text-block">
+                <p>OsloLut er et kreativt fargeverktøy for Sony S-Log 3, utviklet for filmskapere som vil gi opptakene en tydelig og gjenkjennelig look uten å bruke timer på fargearbeid. Produktet samler en LUT og en PowerGrade for DaVinci Resolve i en enkel løsning som gir en filmisk start og mer rom til selve fortellingen.</p>
+                <p>Jeg tok OsloLut fra idé til lansering og hadde ansvar for merkevare, produkt, nettside, foto, video og måling. Jeg formet et uttrykk inspirert av nordisk lys og bygget et kjøpsløp med tydelig veiledning, demonstrasjoner og strukturert sporing.</p>
+              </section>
+
+              <section class="text-block">
+                <h3>Rolle</h3>
+                <p class="text-role">Strategi · Merkevare · Innhold · Nettside · Analyse</p>
+              </section>
+            </div>
+          </div>
+        </div>
+      </article>
+
+      <!-- ---- 03: Knytt ---- -->
+      <article class="panel panel--pages" id="knytt" data-i="1">
+        <div class="card" role="button" tabindex="0" aria-label="Knytt">
+          <div class="card-art art--knytt" aria-hidden="true"><span></span><span></span><span></span><span></span><span></span></div>
+          <div class="case-reel" tabindex="-1">
+
+            <figure class="reel-item reel-item--lys reel-item--fyll reel-item--fri" data-r="0">
+              <div class="card-art art--knytt" aria-hidden="true"><span></span><span></span><span></span><span></span><span></span></div>
+              <div class="knytt-flate">
+                <div class="tlf">
+                    <div class="tlf-skjerm"><video src="assets/knytt/page_1/intro.mp4#t=0.1" muted loop playsinline preload="metadata"></video></div>
+                    <span class="tlf-oy" aria-hidden="true"></span>
+                  </div>
+              </div>
+              <button class="lyd-knapp" type="button" aria-label="Slå på lyd" aria-pressed="false"><span class="lyd-til"><svg width="15" height="15" viewBox="0 0 15 15" fill="none" aria-hidden="true"><path d="M7.4 2.6 4.3 5.2H2.1v4.6h2.2l3.1 2.6V2.6Z" stroke="currentColor" stroke-width="1.2" stroke-linejoin="round"/><path d="M9.9 5.7a2.6 2.6 0 0 1 0 3.6M11.7 3.9a5.1 5.1 0 0 1 0 7.2" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/></svg><span>Lyd på</span></span><span class="lyd-fra"><svg width="15" height="15" viewBox="0 0 15 15" fill="none" aria-hidden="true"><path d="M7.4 2.6 4.3 5.2H2.1v4.6h2.2l3.1 2.6V2.6Z" stroke="currentColor" stroke-width="1.2" stroke-linejoin="round"/><path d="m10.2 5.9 3.1 3.2m0-3.2-3.1 3.2" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/></svg><span>Lyd av</span></span></button>
+              <figcaption>Kampanjefilmen — invitasjonen til nye studenter, laget for telefonen.</figcaption>
+              <span class="reel-hint" aria-hidden="true"><span class="reel-hint-label">Les om prosjektet</span><svg class="hint-klikk" width="17" height="17" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.25" stroke-linecap="round" stroke-linejoin="round"><path d="M9.2 11.3V6.2a1.1 1.1 0 0 1 2.2 0v4.3"/><path d="M11.4 10.5V9.3a1.1 1.1 0 0 1 2.2 0v1.3"/><path d="M13.6 10.7V9.9a1.1 1.1 0 0 1 2.2 0v3.3a4 4 0 0 1-4 4h-1.3c-1.1 0-1.9-.35-2.6-1.05l-2.2-2.2a1.1 1.1 0 0 1 1.55-1.55l1.35 1.3"/><path d="M6.1 4.5 4.8 3.2M4.9 7.4 3.1 6.9M7.6 3.3 7.2 1.6"/></svg></span>
+            </figure>
+
+            <figure class="reel-item reel-item--fyll" data-r="1">
+              <img class="reel-bg" src="assets/knytt/page_2/bakgrunn/DSC01904.jpg" alt="To studenter i Knytt-capser over en kopp kaffe." loading="lazy">
+              <div class="knytt-flate">
+                <div class="tlf">
+                    <div class="tlf-skjerm"><video src="assets/knytt/page_2/caps.mp4#t=0.1" muted loop playsinline preload="metadata"></video></div>
+                    <span class="tlf-oy" aria-hidden="true"></span>
+                  </div>
+              </div>
+              <button class="lyd-knapp" type="button" aria-label="Slå på lyd" aria-pressed="false"><span class="lyd-til"><svg width="15" height="15" viewBox="0 0 15 15" fill="none" aria-hidden="true"><path d="M7.4 2.6 4.3 5.2H2.1v4.6h2.2l3.1 2.6V2.6Z" stroke="currentColor" stroke-width="1.2" stroke-linejoin="round"/><path d="M9.9 5.7a2.6 2.6 0 0 1 0 3.6M11.7 3.9a5.1 5.1 0 0 1 0 7.2" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/></svg><span>Lyd på</span></span><span class="lyd-fra"><svg width="15" height="15" viewBox="0 0 15 15" fill="none" aria-hidden="true"><path d="M7.4 2.6 4.3 5.2H2.1v4.6h2.2l3.1 2.6V2.6Z" stroke="currentColor" stroke-width="1.2" stroke-linejoin="round"/><path d="m10.2 5.9 3.1 3.2m0-3.2-3.1 3.2" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/></svg><span>Lyd av</span></span></button>
+              <figcaption>Dokumentarisk innhold — folkene bak fortalte selv hvorfor Knytt fantes.</figcaption>
+              <span class="reel-hint" aria-hidden="true"><span class="reel-hint-label">Les om prosjektet</span><svg class="hint-klikk" width="17" height="17" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.25" stroke-linecap="round" stroke-linejoin="round"><path d="M9.2 11.3V6.2a1.1 1.1 0 0 1 2.2 0v4.3"/><path d="M11.4 10.5V9.3a1.1 1.1 0 0 1 2.2 0v1.3"/><path d="M13.6 10.7V9.9a1.1 1.1 0 0 1 2.2 0v3.3a4 4 0 0 1-4 4h-1.3c-1.1 0-1.9-.35-2.6-1.05l-2.2-2.2a1.1 1.1 0 0 1 1.55-1.55l1.35 1.3"/><path d="M6.1 4.5 4.8 3.2M4.9 7.4 3.1 6.9M7.6 3.3 7.2 1.6"/></svg></span>
+            </figure>
+
+            <figure class="reel-item reel-item--lys reel-item--fyll" data-r="2">
+              <div class="card-art art--knytt" aria-hidden="true"><span></span><span></span><span></span><span></span><span></span></div>
+              <div class="knytt-flate">
+                <div class="par">
+                  <img class="par-staaende" src="assets/knytt/page_3/study.jpg" alt="Plakat for Study n’ Sip: Knytt x Kulturhuset, mandager 19–23 i biblioteket." loading="lazy">
+                  <img class="par-liggende" src="assets/knytt/page_3/bead.jpg" alt="Plakat for Bead ’n Sip: Anker Studentbolig x Knytt x Bunks at Rode, fredag 21. november kl. 19." loading="lazy">
+                </div>
+              </div>
+              <figcaption>Arrangementene — små, gratis møteplasser på stedene studentene alt brukte.</figcaption>
+              <span class="reel-hint" aria-hidden="true"><span class="reel-hint-label">Les om prosjektet</span><svg class="hint-klikk" width="17" height="17" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.25" stroke-linecap="round" stroke-linejoin="round"><path d="M9.2 11.3V6.2a1.1 1.1 0 0 1 2.2 0v4.3"/><path d="M11.4 10.5V9.3a1.1 1.1 0 0 1 2.2 0v1.3"/><path d="M13.6 10.7V9.9a1.1 1.1 0 0 1 2.2 0v3.3a4 4 0 0 1-4 4h-1.3c-1.1 0-1.9-.35-2.6-1.05l-2.2-2.2a1.1 1.1 0 0 1 1.55-1.55l1.35 1.3"/><path d="M6.1 4.5 4.8 3.2M4.9 7.4 3.1 6.9M7.6 3.3 7.2 1.6"/></svg></span>
+            </figure>
+
+            <figure class="reel-item reel-item--lys reel-item--fyll" data-r="3">
+              <div class="card-art art--knytt" aria-hidden="true"><span></span><span></span><span></span><span></span><span></span></div>
+              <div class="knytt-flate">
+                <div class="maling">
+
+                  <div class="gal-boks">
+                    <p class="tlf-merke"><svg width="15" height="15" viewBox="0 0 15 15" fill="none" aria-hidden="true"><rect x="2.2" y="2.2" width="10.6" height="10.6" rx="3.2" stroke="currentColor" stroke-width="1.2"/><circle cx="7.5" cy="7.5" r="2.7" stroke="currentColor" stroke-width="1.2"/><circle cx="10.75" cy="4.25" r="0.8" fill="currentColor"/></svg><span>Instagram</span></p>
+                    <div class="tlf">
+                    <div class="tlf-skjerm">
+                      <div class="reel-gallery reel-gallery--naken reel-gallery--tap" data-tid="4200">
+                        <div class="gal-slide is-on" data-tittel="Visninger"><img class="gal-bilde" src="assets/knytt/page_4/Insta1.PNG" alt="Instagram-statistikk: 17 633 visninger, 28,2 % følgere og 71,8 % ikke-følgere." loading="lazy"></div>
+                        <div class="gal-slide" data-tittel="Alder"><img class="gal-bilde" src="assets/knytt/page_4/insta2.PNG" alt="Instagram-statistikk: mest sette innlegg og aldersfordeling, 40,1 % i 25–34 og 37,8 % i 18–24." loading="lazy"></div>
+                        <div class="gal-slide" data-tittel="Byer"><img class="gal-bilde" src="assets/knytt/page_4/insta3.PNG" alt="Instagram-statistikk: 61,2 % av publikum holder til i Oslo." loading="lazy"></div>
+                      </div>
+                    </div>
+                    <span class="tlf-oy" aria-hidden="true"></span>
+                  </div>
+                    <span class="gal-dots"><button class="gal-dot is-on" type="button" data-g="0" aria-label="Visninger"></button><button class="gal-dot" type="button" data-g="1" aria-label="Alder"></button><button class="gal-dot" type="button" data-g="2" aria-label="Byer"></button></span>
+                    <span class="gal-label">Visninger</span>
+                  </div>
+
+                  <div class="gal-boks">
+                    <p class="tlf-merke"><svg width="15" height="15" viewBox="0 0 15 15" fill="none" aria-hidden="true"><path d="M9.1 2.3v7.25a2.5 2.5 0 1 1-2.1-2.47" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/><path d="M9.1 2.3c.25 1.72 1.5 2.85 3.2 3" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/></svg><span>TikTok</span></p>
+                    <div class="tlf">
+                    <div class="tlf-skjerm">
+                      <div class="reel-gallery reel-gallery--naken reel-gallery--tap" data-tid="5100">
+                        <div class="gal-slide is-on" data-tittel="Nøkkeltall"><img class="gal-bilde" src="assets/knytt/page_4/tiktok1.PNG" alt="TikTok-statistikk: 11 000 visninger, 553 profilbesøk, 319 likerklikk og 72 delinger." loading="lazy"></div>
+                        <div class="gal-slide" data-tittel="Trafikk"><img class="gal-bilde" src="assets/knytt/page_4/tiktok2.PNG" alt="TikTok-statistikk: 91,5 % av trafikken kom fra For You, og 75,5 % av søkene var på «Knytt»." loading="lazy"></div>
+                        <div class="gal-slide" data-tittel="Følgere"><img class="gal-bilde" src="assets/knytt/page_4/tiktok3.PNG" alt="TikTok-statistikk: 55 følgere totalt, 36 nye i perioden." loading="lazy"></div>
+                        <div class="gal-slide" data-tittel="Alder"><img class="gal-bilde" src="assets/knytt/page_4/tiktok4.PNG" alt="TikTok-statistikk: 62,8 % av seerne var mellom 18 og 24 år." loading="lazy"></div>
+                      </div>
+                    </div>
+                    <span class="tlf-oy" aria-hidden="true"></span>
+                  </div>
+                    <span class="gal-dots"><button class="gal-dot is-on" type="button" data-g="0" aria-label="Nøkkeltall"></button><button class="gal-dot" type="button" data-g="1" aria-label="Trafikk"></button><button class="gal-dot" type="button" data-g="2" aria-label="Følgere"></button><button class="gal-dot" type="button" data-g="3" aria-label="Alder"></button></span>
+                    <span class="gal-label">Nøkkeltall</span>
+                  </div>
+
+                  <dl class="tall">
+                    <div><dt>17 633</dt><dd>visninger på Instagram gjennom høsten</dd></div>
+                    <div><dt>71,8 %</dt><dd>av dem fra folk som ikke fulgte oss</dd></div>
+                    <div><dt>62,8 %</dt><dd>av TikTok-publikummet var 18–24 år</dd></div>
+                  </dl>
+
+                </div>
+              </div>
+              <figcaption>Tallene — vi målte om innholdet nådde ut av boblen, og om det traff riktig.</figcaption>
+              <span class="reel-hint" aria-hidden="true"><span class="reel-hint-label">Les om prosjektet</span><svg class="hint-klikk" width="17" height="17" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.25" stroke-linecap="round" stroke-linejoin="round"><path d="M9.2 11.3V6.2a1.1 1.1 0 0 1 2.2 0v4.3"/><path d="M11.4 10.5V9.3a1.1 1.1 0 0 1 2.2 0v1.3"/><path d="M13.6 10.7V9.9a1.1 1.1 0 0 1 2.2 0v3.3a4 4 0 0 1-4 4h-1.3c-1.1 0-1.9-.35-2.6-1.05l-2.2-2.2a1.1 1.1 0 0 1 1.55-1.55l1.35 1.3"/><path d="M6.1 4.5 4.8 3.2M4.9 7.4 3.1 6.9M7.6 3.3 7.2 1.6"/></svg></span>
+            </figure>
+
+          </div>
+
+          <span class="reel-count" aria-hidden="true"><b>1</b>&thinsp;/&thinsp;4</span>
+
+          <span class="card-label card-label--ink">Knytt</span>
+
+          <div class="card-text" tabindex="-1">
+            <div class="card-text-inner">
+              <header class="text-head">
+                <p class="text-kicker">Utvalgt arbeid — 03</p>
+                <h2>Knytt</h2>
+                <p class="text-sub">Studentdrevet initiativ som gjør det lettere å finne tilhørighet i en ny by.</p>
+              </header>
+
+              <section class="text-block">
+                <p>Knytt begynte som et studentprosjekt og endte med å bli ekte. Utgangspunktet var ensomhet blant nye studenter i Oslo: mange flytter til en ny by og finner aldri helt inn i et miljø. Vi ville lage mindre møteplasser der det er lettere å bli kjent enn på et stort arrangement, og gjøre terskelen for å komme alene så lav som mulig.</p>
+                <p>Som daglig leder hadde jeg ansvar for retning, koordinering og markedsføring på tvers av teamet. Innholdsstrategien bygget på personlige, dokumentariske videoer som skulle føles som noe en venn sendte deg, ikke som en annonse. Gjennom høsten ga det 17 633 visninger på Instagram, og 71,8 % av dem kom fra folk som ikke fulgte oss fra før — nettopp de vi trengte å nå.</p>
+                <p>Underveis gikk prosjektet fra skoleoppgave til noe med ordentlige samarbeidspartnere i ryggen, og arrangementene ble holdt på steder studentene allerede brukte.</p>
+              </section>
+
+              <section class="text-block">
+                <h3>Samarbeidspartnere</h3>
+                <p class="text-role">NoHo Norway · Anker Studentbolig · Mesh Oslo · Punkt Oslo · SiO</p>
+              </section>
+
+              <section class="text-block">
+                <h3>Rolle</h3>
+                <p class="text-role">Ledelse · Strategi · Innhold · Webutvikling</p>
+              </section>
+            </div>
+          </div>
+        </div>
+      </article>
+
+      <!-- ---- 04: Norges Badstulaug ---- -->
+      <article class="panel panel--pages" id="badstulaug" data-i="2">
+        <div class="card" role="button" tabindex="0" aria-label="Norges Badstulaug">
+          <div class="card-art art--badstulaug" aria-hidden="true"><span></span><span></span><span></span><span></span><span></span></div>
+          <div class="case-reel" tabindex="-1">
+            <figure class="reel-item" data-r="0">
+              <div class="card-art art--badstulaug" aria-hidden="true"><span></span><span></span><span></span><span></span><span></span></div>
+              <video src="assets/badstulaug/page_1/page_1.mp4#t=0.1" muted loop playsinline preload="metadata"></video>
+              <figcaption>Landingssiden — varmen møter deg først, medlemskapet rett etter.</figcaption>
+              <span class="reel-hint" aria-hidden="true"><span class="reel-hint-label">Les om prosjektet</span><svg class="hint-klikk" width="17" height="17" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.25" stroke-linecap="round" stroke-linejoin="round"><path d="M9.2 11.3V6.2a1.1 1.1 0 0 1 2.2 0v4.3"/><path d="M11.4 10.5V9.3a1.1 1.1 0 0 1 2.2 0v1.3"/><path d="M13.6 10.7V9.9a1.1 1.1 0 0 1 2.2 0v3.3a4 4 0 0 1-4 4h-1.3c-1.1 0-1.9-.35-2.6-1.05l-2.2-2.2a1.1 1.1 0 0 1 1.55-1.55l1.35 1.3"/><path d="M6.1 4.5 4.8 3.2M4.9 7.4 3.1 6.9M7.6 3.3 7.2 1.6"/></svg></span>
+            </figure>
+            <figure class="reel-item reel-item--galleri" data-r="1">
+              <div class="card-art art--badstulaug" aria-hidden="true"><span></span><span></span><span></span><span></span><span></span></div>
+              <div class="reel-gallery">
+                <div class="gal-slide is-on" data-tittel="Moodboard">
+                  <img class="gal-bak" src="assets/badstulaug/page_2/moodboard.png" alt="" aria-hidden="true">
+                  <img class="gal-bilde" src="assets/badstulaug/page_2/moodboard.png" alt="Moodboard med filmreferanser i kjølig blått som møter det varme badstulyset.">
+                </div>
+                <div class="gal-slide" data-tittel="Storyboard">
+                  <img class="gal-bak" src="assets/badstulaug/page_2/storyboard.png" alt="" aria-hidden="true" loading="lazy">
+                  <img class="gal-bilde" src="assets/badstulaug/page_2/storyboard.png" alt="Storyboard i åtte scener, fra panikk og stress til ro i badstuen." loading="lazy">
+                </div>
+                <div class="gal-slide" data-tittel="Skuddliste">
+                  <img class="gal-bak" src="assets/badstulaug/page_2/skuddliste.png" alt="" aria-hidden="true" loading="lazy">
+                  <img class="gal-bilde" src="assets/badstulaug/page_2/skuddliste.png" alt="Skuddliste med scene, lokasjon, kamerabevegelse, objektiv og bildefrekvens for hvert klipp." loading="lazy">
+                </div>
+                <div class="gal-slide" data-tittel="Klipp og lyd">
+                  <img class="gal-bak" src="assets/badstulaug/page_2/editing.png" alt="" aria-hidden="true" loading="lazy">
+                  <img class="gal-bilde" src="assets/badstulaug/page_2/editing.png" alt="Tidslinjen i klipp og lyd, med bilde-, musikk- og effektspor lagt i lag." loading="lazy">
+                </div>
+                <button class="gal-arrow gal-arrow--prev" type="button" aria-label="Forrige bilde"><svg width="15" height="15" viewBox="0 0 15 15" fill="none" aria-hidden="true"><path d="M9.5 2.8 4.8 7.5l4.7 4.7" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+                <button class="gal-arrow gal-arrow--next" type="button" aria-label="Neste bilde"><svg width="15" height="15" viewBox="0 0 15 15" fill="none" aria-hidden="true"><path d="M5.5 2.8 10.2 7.5l-4.7 4.7" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+                <div class="gal-bar">
+                  <span class="gal-label">Moodboard</span>
+                  <span class="gal-dots"><button class="gal-dot is-on" type="button" data-g="0" aria-label="Moodboard"></button><button class="gal-dot" type="button" data-g="1" aria-label="Storyboard"></button><button class="gal-dot" type="button" data-g="2" aria-label="Skuddliste"></button><button class="gal-dot" type="button" data-g="3" aria-label="Klipp og lyd"></button></span>
+                </div>
+              </div>
+              <figcaption>Forarbeidet — moodboard, storyboard, skuddliste og tidslinje i én rød tråd.</figcaption>
+              <span class="reel-hint" aria-hidden="true"><span class="reel-hint-label">Les om prosjektet</span><svg class="hint-klikk" width="17" height="17" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.25" stroke-linecap="round" stroke-linejoin="round"><path d="M9.2 11.3V6.2a1.1 1.1 0 0 1 2.2 0v4.3"/><path d="M11.4 10.5V9.3a1.1 1.1 0 0 1 2.2 0v1.3"/><path d="M13.6 10.7V9.9a1.1 1.1 0 0 1 2.2 0v3.3a4 4 0 0 1-4 4h-1.3c-1.1 0-1.9-.35-2.6-1.05l-2.2-2.2a1.1 1.1 0 0 1 1.55-1.55l1.35 1.3"/><path d="M6.1 4.5 4.8 3.2M4.9 7.4 3.1 6.9M7.6 3.3 7.2 1.6"/></svg></span>
+            </figure>
+            <figure class="reel-item" data-r="2">
+              <div class="card-art art--badstulaug" aria-hidden="true"><span></span><span></span><span></span><span></span><span></span></div>
+              <video src="assets/badstulaug/page_3/badstu_vid.mp4#t=0.1" muted loop playsinline preload="metadata"></video>
+              <figcaption>Kampanjefilmen — stresset som slipper taket i det varmen tar over.</figcaption>
+              <span class="reel-hint" aria-hidden="true"><span class="reel-hint-label">Les om prosjektet</span><svg class="hint-klikk" width="17" height="17" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.25" stroke-linecap="round" stroke-linejoin="round"><path d="M9.2 11.3V6.2a1.1 1.1 0 0 1 2.2 0v4.3"/><path d="M11.4 10.5V9.3a1.1 1.1 0 0 1 2.2 0v1.3"/><path d="M13.6 10.7V9.9a1.1 1.1 0 0 1 2.2 0v3.3a4 4 0 0 1-4 4h-1.3c-1.1 0-1.9-.35-2.6-1.05l-2.2-2.2a1.1 1.1 0 0 1 1.55-1.55l1.35 1.3"/><path d="M6.1 4.5 4.8 3.2M4.9 7.4 3.1 6.9M7.6 3.3 7.2 1.6"/></svg></span>
+            </figure>
+            <figure class="reel-item reel-item--galleri" data-r="3">
+              <div class="card-art art--badstulaug" aria-hidden="true"><span></span><span></span><span></span><span></span><span></span></div>
+              <div class="reel-gallery">
+                <div class="gal-slide is-on" data-tittel="Kanalkart">
+                  <img class="gal-bak" src="assets/badstulaug/page_4/kanalkart.png" alt="" aria-hidden="true" loading="lazy">
+                  <img class="gal-bilde" src="assets/badstulaug/page_4/kanalkart.png" alt="Kanalkart som viser hvordan Instagram, Snapchat, YouTube, nyhetsbrev, storskjerm, reklametavler og app leder inn mot landingssiden og CRM." loading="lazy">
+                </div>
+              </div>
+              <figcaption>Kanalkartet — alle flatene kampanjen møter folk på, med kurs mot landingssiden.</figcaption>
+              <span class="reel-hint" aria-hidden="true"><span class="reel-hint-label">Les om prosjektet</span><svg class="hint-klikk" width="17" height="17" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.25" stroke-linecap="round" stroke-linejoin="round"><path d="M9.2 11.3V6.2a1.1 1.1 0 0 1 2.2 0v4.3"/><path d="M11.4 10.5V9.3a1.1 1.1 0 0 1 2.2 0v1.3"/><path d="M13.6 10.7V9.9a1.1 1.1 0 0 1 2.2 0v3.3a4 4 0 0 1-4 4h-1.3c-1.1 0-1.9-.35-2.6-1.05l-2.2-2.2a1.1 1.1 0 0 1 1.55-1.55l1.35 1.3"/><path d="M6.1 4.5 4.8 3.2M4.9 7.4 3.1 6.9M7.6 3.3 7.2 1.6"/></svg></span>
+            </figure>
+          </div>
+
+          <span class="reel-count" aria-hidden="true"><b>1</b>&thinsp;/&thinsp;4</span>
+
+          <span class="card-label">Norges Badstulaug</span>
+
+          <div class="card-text" tabindex="-1">
+            <div class="card-text-inner">
+              <header class="text-head">
+                <p class="text-kicker">Utvalgt arbeid — 04</p>
+                <h2>Norges Badstulaug</h2>
+                <p class="text-sub">Kom inn i varmen.</p>
+              </header>
+
+              <section class="text-block">
+                <p>For Norges Badstulaug utviklet vi en kampanje som løftet badstuen frem som et sted for ro, fellesskap og et avbrekk fra en travel hverdag. Konseptet bygget på innsikt om stress og ensomhet, og skulle gi målgruppen en følelse av å senke skuldrene før de leste et eneste ord.</p>
+                <p>Jeg bidro i innsiktsarbeidet og konseptutviklingen, og hadde ansvar for innholdsproduksjon og kampanjevideo. Konseptet ble utviklet for sosiale medier, utendørsflater, landingsside og CRM, med en tydelig rød tråd gjennom hele opplevelsen.</p>
+              </section>
+
+              <section class="text-block">
+                <h3>Rolle</h3>
+                <p class="text-role">Kreativ strategi · Konsept · Videoproduksjon · Klipp</p>
+              </section>
+            </div>
+          </div>
+        </div>
+      </article>
+
+      <!-- ---- 05: Kryp ---- -->
+      <article class="panel" id="kryp" data-i="3">
+        <div class="card card--snart" role="button" tabindex="0" aria-label="Kryp — nytt prosjekt">
+          <div class="card-art art--snart" aria-hidden="true"></div>
+          <img class="card-cover" src="assets/kryp/cover/kryp_cover.jpg" alt="" aria-hidden="true">
+
+          <!-- Avspilleren. Ligger i kortet hele tiden, men er usynlig
+               (og utenfor tabbing) til kortet er forstørret. -->
+          <div class="spot">
+            <div class="spot-glo" aria-hidden="true"></div>
+
+            <div class="spot-inner">
+              <div class="spot-cover">
+                <img src="assets/kryp/cover/kryp_cover.jpg" alt="Plakat for hørespillet Kryp: en mørk gang med et lysrør på veggen, kakerlakker langs gulvlisten og en gammel dreieskivetelefon på et bord." loading="lazy">
+              </div>
+
+              <div class="spot-panel">
+                <p class="spot-kicker">Hørespill</p>
+                <h3 class="spot-tittel">Kryp</h3>
+                <p class="spot-artist">Lyddesign — Kai Faiz &amp; Torje Johannessen</p>
+
+                <div class="spot-linje">
+                  <input class="spot-scrub" type="range" min="0" max="1000" step="1" value="0" aria-label="Søk i lydsporet">
+                  <div class="spot-tid"><span class="spot-na">0:00</span><span class="spot-lengde">--:--</span></div>
+                </div>
+
+                <div class="spot-kontroller">
+                  <button class="spot-hopp" type="button" data-hopp="-15" aria-label="15 sekunder tilbake">
+                    <svg width="27" height="27" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                      <path d="M8.62 5.25a8 8 0 1 0 4.08-.72" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+                      <path d="M13.5 2.3 8.9 4.6l4.6 2.3Z" fill="currentColor"/>
+                      <text x="12" y="14.6" text-anchor="middle" font-size="8.2" font-weight="700" fill="currentColor">15</text>
+                    </svg>
+                  </button>
+
+                  <button class="spot-play" type="button" aria-label="Spill av">
+                    <svg class="spot-ikon spot-ikon--play" width="26" height="26" viewBox="0 0 24 24" aria-hidden="true"><path d="M8.6 5.1 19 12 8.6 18.9Z" fill="currentColor"/></svg>
+                    <svg class="spot-ikon spot-ikon--pause" width="26" height="26" viewBox="0 0 24 24" aria-hidden="true"><rect x="7.4" y="5.4" width="3.3" height="13.2" rx="1.1" fill="currentColor"/><rect x="13.3" y="5.4" width="3.3" height="13.2" rx="1.1" fill="currentColor"/></svg>
+                  </button>
+
+                  <button class="spot-hopp" type="button" data-hopp="15" aria-label="15 sekunder fram">
+                    <svg width="27" height="27" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                      <path d="M15.38 5.25a8 8 0 1 1-4.08-.72" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+                      <path d="M10.5 2.3 15.1 4.6l-4.6 2.3Z" fill="currentColor"/>
+                      <text x="12" y="14.6" text-anchor="middle" font-size="8.2" font-weight="700" fill="currentColor">15</text>
+                    </svg>
+                  </button>
+                </div>
+
+                <p class="spot-status" role="status"></p>
+
+                <button class="spot-mer" type="button">Om prosjektet</button>
+              </div>
+            </div>
+
+            <audio class="spot-lyd" preload="metadata">
+              <source src="assets/kryp/lyd/Kryp%20Lyddrama_01.mp3" type="audio/mpeg">
+            </audio>
+          </div>
+
+          <div class="card-text" tabindex="-1">
+            <div class="card-text-inner">
+              <header class="text-head">
+                <p class="text-kicker">Utvalgt arbeid — 05</p>
+                <h2>Kryp</h2>
+                <p class="text-sub">Hørespill — lyddesign.</p>
+              </header>
+
+              <section class="text-block">
+                <p>Kryp er et hørespill på knappe tretten minutter. Uten bilde er det lyden som må bygge rommet: hvor stort det er, hvor langt unna noe beveger seg, og når det kommer for nært.</p>
+                <p>Jeg hadde ansvaret for lyddesignet sammen med Torje Johannessen.</p>
+              </section>
+
+              <section class="text-block">
+                <h3>Rolle</h3>
+                <p class="text-role">Lyddesign</p>
+              </section>
+
+              <section class="text-block">
+                <h3>Medvirkende</h3>
+                <p class="text-role">Manus og regi: Daniel Jørgensen · Jens Jonsen · Helle Eia<br>Med: Ida Nilsen · Filip Fedøy · Tuva Holen · Aurora Ovanger</p>
+              </section>
+            </div>
+          </div>
+        </div>
+      </article>
+
+      <!-- ---- 06: Nettbutikk ----
+           Kortet er med i stokken, men kan ikke åpnes: det finnes ingen
+           tekstbeskrivelse å vise ennå. Derfor står det uten role og
+           tabindex — det er ikke en knapp, og skal ikke annonseres som
+           en. Lastelinjen er den eneste beskjeden kortet gir. -->
+      <article class="panel" id="nettbutikk" data-i="4">
+        <div class="card card--laast">
+          <div class="card-art art--silke" aria-hidden="true"><span></span><span></span><span></span><span></span><span></span></div>
+          <div class="type-face">
+            <span class="type-big">nettbutikk.</span>
+            <div class="laste" aria-hidden="true"><span class="laste-fyll"></span></div>
+          </div>
+          <span class="card-label">Under arbeid</span>
+        </div>
+      </article>
+
+      <!-- ---- 07: Verktøy ---- -->
+      <article class="panel" id="verktoy" data-i="5">
+        <div class="card" role="button" tabindex="0" aria-label="Verktøy">
+
+          <!-- Det fysiske utstyret, i ring rundt midten. Ringen ER
+               kortforsiden — den går allerede i kortstokken, og fortsetter
+               i samme runde når kortet åpnes. Navn og hjelpetekst kommer
+               først fram i forstørret visning, der det er plass til dem.
+               Selve ringen er dekorativ; lista like under bærer det samme
+               innholdet i tekst, så utstyret ikke bare finnes som bilder
+               som beveger seg. -->
+          <div class="orbit" aria-hidden="true">
+            <div class="orbit-flate"></div>
+            <div class="orbit-ring">
+              <div class="orbit-ting" data-navn="Kamera" data-modell="Sony ZV-E1"><img src="assets/verktoy/1.png" alt="" loading="lazy"></div>
+              <div class="orbit-ting" data-navn="Objektiv" data-modell="Thypoch 24–50 mm f/2.8"><img src="assets/verktoy/2.png" alt="" loading="lazy"></div>
+              <div class="orbit-ting" data-navn="Objektiv" data-modell="AF 14 mm f/4"><img src="assets/verktoy/3.png" alt="" loading="lazy"></div>
+              <div class="orbit-ting" data-navn="Objektiv" data-modell="Sony FE 50 mm f/1.8"><img src="assets/verktoy/4.png" alt="" loading="lazy"></div>
+              <div class="orbit-ting" data-navn="Filter" data-modell="K&amp;F Concept Black Diffusion 1/8"><img src="assets/verktoy/5.png" alt="" loading="lazy"></div>
+              <div class="orbit-ting" data-navn="Filter" data-modell="Variabelt ND-filter"><img src="assets/verktoy/6.png" alt="" loading="lazy"></div>
+              <div class="orbit-ting" data-navn="Maskin" data-modell="MacBook Pro"><img src="assets/verktoy/7.png" alt="" loading="lazy"></div>
+              <div class="orbit-ting" data-navn="Lagring" data-modell="Samsung T7"><img src="assets/verktoy/8.png" alt="" loading="lazy"></div>
+              <div class="orbit-ting" data-navn="Mikrofon" data-modell="DJI Mic"><img src="assets/verktoy/9.png" alt="" loading="lazy"></div>
+              <div class="orbit-ting" data-navn="Telefon" data-modell="iPhone 15 Pro"><img src="assets/verktoy/10.png" alt="" loading="lazy"></div>
+              <div class="orbit-ting" data-navn="Kompaktkamera" data-modell="Canon PowerShot G7 X Mark II"><img src="assets/verktoy/11.png" alt="" loading="lazy"></div>
+              <div class="orbit-ting" data-navn="Hodetelefoner" data-modell="AirPods Max"><img src="assets/verktoy/12.png" alt="" loading="lazy"></div>
+            </div>
+            <div class="orbit-tekst">
+              <p class="orbit-navn"></p>
+              <p class="orbit-modell"></p>
+              <button class="orbit-mer" type="button">Se stacken</button>
+            </div>
+          </div>
+
+          <ul class="sr-only">
+            <li>Kamera — Sony ZV-E1</li>
+            <li>Objektiv — Thypoch 24–50 mm f/2.8</li>
+            <li>Objektiv — AF 14 mm f/4</li>
+            <li>Objektiv — Sony FE 50 mm f/1.8</li>
+            <li>Filter — K&amp;F Concept Black Diffusion 1/8</li>
+            <li>Filter — Variabelt ND-filter</li>
+            <li>Maskin — MacBook Pro</li>
+            <li>Lagring — Samsung T7</li>
+            <li>Mikrofon — DJI Mic</li>
+            <li>Telefon — iPhone 15 Pro</li>
+            <li>Kompaktkamera — Canon PowerShot G7 X Mark II</li>
+            <li>Hodetelefoner — AirPods Max</li>
+          </ul>
+
+          <span class="card-label card-label--ink">Verktøy</span>
+
+          <div class="card-text" tabindex="-1">
+            <div class="card-text-inner">
+              <header class="text-head">
+                <p class="text-kicker">Verktøy — 07</p>
+                <h2>Stacken min</h2>
+              </header>
+
+              <section class="text-block">
+                <ul class="tool-chips">
+                  <li>Claude</li>
+                  <li>GPT</li>
+                  <li>Notion</li>
+                  <li>DaVinci Resolve</li>
+                  <li>Premiere Pro</li>
+                  <li>Audition</li>
+                  <li>Soundly</li>
+                  <li>Lightroom</li>
+                  <li>Canva</li>
+                  <li>Higgsfield</li>
+                  <li>Figma</li>
+                  <li>VS Code</li>
+                  <li>GitHub</li>
+                  <li>Vercel</li>
+                  <li>WordPress</li>
+                  <li>Gumroad</li>
+                  <li>Google Analytics</li>
+                  <li>Meta Ads</li>
+                </ul>
+              </section>
+            </div>
+          </div>
+        </div>
+      </article>
+
+    </div>
+
+    <!-- ======== OM MEG (egen «side» i samme viewport) ======== -->
+    <section class="about-view" id="om" aria-label="Om meg" tabindex="-1">
+      <div class="about-inner">
+
+        <div class="about-copy">
+          <p class="text-kicker">Om meg — 05</p>
+          <p class="about-p"><strong>Jeg liker å finne problemet bak problemet.</strong> Det går igjen i alt jeg har jobbet med: ensomhet blant nye studenter i Oslo, utbrenthet blant unge voksne og gapet mellom det en Sony-bruker ser for seg og det kameraet faktisk leverer. Samme mekanisme, tre ulike sammenhenger.</p>
+          <p class="about-p">Jeg studerer <strong>digital markedsføring</strong>, men det jeg liker aller best er skjæringspunktet mellom strategi og kreativ utførelse. Jeg trives med hele reisen fra innsikt og idé til innhold, nettside og måling. To år med <strong>lyddesign</strong> ligger også under videoarbeidet mitt, fordi lyd bærer like mye av følelsen som bildet gjør.</p>
+          <p class="about-p">Jeg bygger det jeg vil presentere selv, i stedet for å vente på at noen andre skal gjøre idéen virkelig.</p>
+        </div>
+
+        <div class="about-side">
+          <div class="about-media">
+            <video src="assets/figur/kai-figur.mp4" muted playsinline preload="auto" aria-label="Animasjon av Kai"></video>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- ======== IDENTITET PÅ OM-SIDEN (erstatter navbaren) ======== -->
+    <div class="about-id">
+      <p class="about-id-name" aria-hidden="true">Kai Faiz<span class="logo-dot">.</span></p>
+      <p class="about-id-role" aria-hidden="true">Digital markedsfører × kreativ</p>
+
+      <div class="about-id-actions">
+        <button class="widget widget--dark about-back" type="button" aria-label="Tilbake til arbeidene">
+          <svg width="15" height="15" viewBox="0 0 15 15" fill="none" aria-hidden="true"><path d="M9.5 2.8 4.8 7.5l4.7 4.7" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          <span class="widget-label">Tilbake</span>
+        </button>
+
+        <a class="widget" href="mailto:kai.private@hotmail.com" aria-label="Send e-post">
+          <svg width="15" height="15" viewBox="0 0 15 15" fill="none" aria-hidden="true"><rect x="1.8" y="3" width="11.4" height="9" rx="1.6" stroke="currentColor" stroke-width="1.2"/><path d="m2.4 3.9 5.1 4.2 5.1-4.2" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          <span class="widget-label">E-post</span>
+        </a>
+
+        <a class="widget" href="https://www.linkedin.com/" target="_blank" rel="noopener" aria-label="LinkedIn" title="Bytt til din LinkedIn-profil-URL">
+          <svg width="15" height="15" viewBox="0 0 15 15" fill="none" aria-hidden="true"><rect x="1.8" y="1.8" width="11.4" height="11.4" rx="2" stroke="currentColor" stroke-width="1.2"/><path d="M4.9 6.6v3.9M4.9 4.6v.1M7.4 10.5V8.2c0-.9.7-1.6 1.6-1.6s1.6.7 1.6 1.6v2.3" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/></svg>
+          <span class="widget-label">LinkedIn</span>
+        </a>
+      </div>
+    </div>
+
+    <!-- ======== NAVIGASJON / KONTROLLER ======== -->
+    <div class="deck-dots" role="tablist" aria-label="Bla i sider">
+      <button class="dot" data-goto="0" role="tab" aria-label="OsloLut"></button>
+      <button class="dot" data-goto="1" role="tab" aria-label="Knytt"></button>
+      <button class="dot" data-goto="2" role="tab" aria-label="Norges Badstulaug"></button>
+      <button class="dot" data-goto="3" role="tab" aria-label="Kryp"></button>
+      <button class="dot" data-goto="4" role="tab" aria-label="Nettbutikk"></button>
+      <button class="dot" data-goto="5" role="tab" aria-label="Verktøy"></button>
+    </div>
+
+    <button class="close-btn" type="button" aria-label="Lukk">
+      <svg width="14" height="14" viewBox="0 0 14 14" fill="none" aria-hidden="true"><path d="m2.5 2.5 9 9m0-9-9 9" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/></svg>
+    </button>
+
+    <button class="edge-chip" type="button" aria-label="Minimer">
+      <svg width="14" height="14" viewBox="0 0 14 14" fill="none" aria-hidden="true"><path d="M2.5 7h9" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg>
+    </button>
+
+  </main>
+
+  <script src="script.js"></script>
+</body>
+</html>
