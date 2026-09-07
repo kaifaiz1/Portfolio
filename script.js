@@ -1050,7 +1050,22 @@
     if (iFullskjerm()) return;
     const sidestokk = iSidestokk();
     if (mode !== 'deck' && !sidestokk) return; // tekstark og om-siden scroller selv
-    if (sidestokk) e.preventDefault();
+
+    // Stokken ligger vannrett, så det er sidelengs som blar den — det
+    // er den samme retningen kortene faktisk beveger seg i.
+    //
+    // Sidestokken i et åpnet kort er motsatt: der ligger sidene under
+    // hverandre, og da er loddrett den naturlige. Den tar begge akser,
+    // så en trackpad virker uansett hvilken vei man drar.
+    const delta = sidestokk
+      ? (Math.abs(e.deltaX) > Math.abs(e.deltaY) ? e.deltaX : e.deltaY)
+      : e.deltaX;
+
+    // Uten dette rekker aldri et sidelengs sveip fram: macOS tolker det
+    // som «tilbake» i historikken og tar hendelsen selv. Det er derfor
+    // bare opp og ned virket før.
+    if (delta) e.preventDefault();
+    else if (!sidestokk) return;   // rent loddrett i stokken: la siden være
 
     // en pause i rullingen nullstiller telleren, så en halvferdig
     // bevegelse ikke ligger og venter på å utløse neste
@@ -1058,8 +1073,6 @@
     wheelHvile = setTimeout(() => { wheelAcc = 0; }, 220);
 
     if (coolingDown) return;
-    // både vanlig hjul og sidelengs trackpad-sveip blar i stokken
-    const delta = Math.abs(e.deltaX) > Math.abs(e.deltaY) ? e.deltaX : e.deltaY;
     wheelAcc += delta;
     if (Math.abs(wheelAcc) < 60) return;
     const retning = wheelAcc > 0 ? 1 : -1;

@@ -76,6 +76,11 @@ body,
 
 html, body { height: 100%; }
 
+/* Sidelengs sveip på en styreflate skal bla i kortstokken, ikke gå
+   tilbake i nettleserhistorikken. preventDefault i JS tar det meste,
+   men denne stopper gesten før den rekker å starte. */
+html { overscroll-behavior-x: none; }
+
 body {
   background: var(--bg);
   color: var(--ink);
@@ -604,30 +609,22 @@ body.endrer-storrelse *::after {
   transition-duration: 0s !important;
 }
 
-/* --- OsloLut: svart, med så vidt et stål- og fiolettløft --- */
-.art--oslolut { --art-bg: #08090c; }
-.art--oslolut span:nth-child(1) { background: radial-gradient(circle closest-side, rgba(58,72,98,0.95) 0%, rgba(58,72,98,0.475) 48%, rgba(58,72,98,0) 100%); }
-.art--oslolut span:nth-child(2) { background: radial-gradient(circle closest-side, rgba(30,32,44,1) 0%, rgba(30,32,44,0.5) 48%, rgba(30,32,44,0) 100%); }
-.art--oslolut span:nth-child(3) { background: radial-gradient(circle closest-side, rgba(78,62,96,0.9) 0%, rgba(78,62,96,0.45) 48%, rgba(78,62,96,0) 100%); }
-.art--oslolut span:nth-child(4) { background: radial-gradient(circle closest-side, rgba(20,24,32,1) 0%, rgba(20,24,32,0.5) 48%, rgba(20,24,32,0) 100%); }
-.art--oslolut span:nth-child(5) { background: radial-gradient(circle closest-side, rgba(44,58,78,0.85) 0%, rgba(44,58,78,0.425) 48%, rgba(44,58,78,0) 100%); }
+/* Faste farger, ikke gradienter. Verdiene er ikke plukket i blinde:
+   de er gjennomsnittsfargen av kortene slik de så ut med flekkene, målt
+   over flere øyeblikk mens driften gikk. Kortene beholder altså kuløren
+   sin — det er bevegelsen og dybden som er borte.
 
-/* --- Norges Badstulaug: varm solnedgang --- */
-.art--badstulaug { --art-bg: #241320; }
-.art--badstulaug span:nth-child(1) { background: radial-gradient(circle closest-side, rgba(226,120,42,0.95) 0%, rgba(226,120,42,0.475) 48%, rgba(226,120,42,0) 100%); }
-.art--badstulaug span:nth-child(2) { background: radial-gradient(circle closest-side, rgba(232,170,62,0.92) 0%, rgba(232,170,62,0.46) 48%, rgba(232,170,62,0) 100%); }
-.art--badstulaug span:nth-child(3) { background: radial-gradient(circle closest-side, rgba(180,58,34,0.92) 0%, rgba(180,58,34,0.46) 48%, rgba(180,58,34,0) 100%); }
-.art--badstulaug span:nth-child(4) { background: radial-gradient(circle closest-side, rgba(70,30,66,0.9) 0%, rgba(70,30,66,0.45) 48%, rgba(70,30,66,0) 100%); }
-.art--badstulaug span:nth-child(5) { background: radial-gradient(circle closest-side, rgba(36,102,116,0.85) 0%, rgba(36,102,116,0.425) 48%, rgba(36,102,116,0) 100%); }
+   Nettbutikk er den eneste som fortsatt har gradient. Der er silken
+   selve poenget: kortet har ingenting annet å vise. */
 
-/* --- Knytt: lys og luftig blå. Multiply, så flekkene fordyper
-       i stedet for å blåse ut mot hvitt. --- */
-.art--knytt { --art-bg: #e6f2fa; --art-blend: multiply; }
-.art--knytt span:nth-child(1) { background: radial-gradient(circle closest-side, rgba(126,186,226,0.95) 0%, rgba(126,186,226,0.475) 48%, rgba(126,186,226,0) 100%); }
-.art--knytt span:nth-child(2) { background: radial-gradient(circle closest-side, rgba(228,242,250,1) 0%, rgba(228,242,250,0.5) 48%, rgba(228,242,250,0) 100%); }
-.art--knytt span:nth-child(3) { background: radial-gradient(circle closest-side, rgba(84,150,204,0.9) 0%, rgba(84,150,204,0.45) 48%, rgba(84,150,204,0) 100%); }
-.art--knytt span:nth-child(4) { background: radial-gradient(circle closest-side, rgba(168,214,238,0.95) 0%, rgba(168,214,238,0.475) 48%, rgba(168,214,238,0) 100%); }
-.art--knytt span:nth-child(5) { background: radial-gradient(circle closest-side, rgba(206,232,246,1) 0%, rgba(206,232,246,0.5) 48%, rgba(206,232,246,0) 100%); }
+/* --- OsloLut: kjølig stålblått --- */
+.art--oslolut { --art-bg: #4f546f; }
+
+/* --- Norges Badstulaug: varm terrakotta --- */
+.art--badstulaug { --art-bg: #a5765c; }
+
+/* --- Knytt: den lyse blå --- */
+.art--knytt { --art-bg: #79aed9; }
 
 /* --- Kommer snart: helt svart. Kortet har ingen flekker i det hele
        tatt — ikke bare usynlige, men fjernet fra markupen, så det ikke
@@ -811,51 +808,9 @@ body.endrer-storrelse *::after {
   to   { scale: 1; }
 }
 
-/* Gradienten males som ett statisk lag i bunnen av hvert sidekort.
-   Flekkene med blandingsmodus er det dyreste vi har: de tvinger
-   nettleseren til å tegne kortet på nytt for hver frame så lenge noe
-   beveger seg. Derfor er de borte mens sidene animerer. */
-.mode-expanded .panel--pages.is-active .reel-item .art--oslolut {
-  background:
-    radial-gradient(60% 55% at 22% 28%, rgba(58,72,98,0.85) 0%, rgba(58,72,98,0) 100%),
-    radial-gradient(58% 52% at 78% 72%, rgba(78,62,96,0.7) 0%, rgba(78,62,96,0) 100%),
-    radial-gradient(70% 60% at 62% 18%, rgba(44,58,78,0.6) 0%, rgba(44,58,78,0) 100%),
-    #08090c;
-}
+/* Sidene i et åpnet kort arver den samme faste fargen fra
+   .card-art lenger oppe — de trenger ingen egen regel lenger. */
 
-/* Samme oppskrift i varmt: solnedgangen fra kortstokken, men senket
-   et par hakk. Sidekortene er mye større enn kortet på forsiden, og
-   full styrke gjør flatene til lyskilder som stjeler oppmerksomheten
-   fra bildene de er ramme rundt. */
-.mode-expanded .panel--pages.is-active .reel-item .art--badstulaug {
-  background:
-    radial-gradient(60% 55% at 22% 28%, rgba(198,96,32,0.55) 0%, rgba(198,96,32,0) 100%),
-    radial-gradient(58% 52% at 78% 72%, rgba(126,40,58,0.62) 0%, rgba(126,40,58,0) 100%),
-    radial-gradient(70% 60% at 62% 18%, rgba(206,142,52,0.26) 0%, rgba(206,142,52,0) 100%),
-    #1b0d16;
-}
-
-/* sidekortene: bare det statiske laget, ingen flekker i det hele tatt */
-.mode-expanded .panel--pages.is-active .reel-item:not([data-pos="0"]) .card-art {
-  isolation: auto;
-}
-
-.mode-expanded .panel--pages.is-active .reel-item:not([data-pos="0"]) .card-art span {
-  display: none;
-}
-
-/* midtkortet: flekkene kommer tilbake først når kortet har landet */
-.mode-expanded .panel--pages.is-active .reel-item[data-pos="0"] .card-art span {
-  animation:
-    art-drift var(--dur) cubic-bezier(0.4, 0.2, 0.6, 0.8) infinite alternate,
-    flekk-inn 0.5s var(--ease) both;
-  animation-delay: var(--delay), 0.72s;
-}
-
-@keyframes flekk-inn {
-  from { opacity: 0; }
-  to   { opacity: 1; }
-}
 
 /* Sidene ligger rett under hverandre og scrolles gjennom. Ingen vifte,
    ingen dreining: hver side er en hel side, og avstanden mellom dem er
@@ -1131,8 +1086,13 @@ body.endrer-storrelse *::after {
   -webkit-line-clamp: 2;
   -webkit-box-orient: vertical;
   overflow: hidden;
-  color: rgba(255,255,255,0.74);
-  text-shadow: 0 1px 10px rgba(0,0,0,0.45);
+  /* Lysere og med en strammere skygge enn før. Kortene hadde en gradient
+     som var mørk nederst, og der holdt 0,74 uten videre. På en flat
+     farge er underlaget det samme hele veien, og på terrakottaen i
+     Badstulaug falt kontrasten til 2,8:1. Den tette skyggen gir
+     bokstavene sin egen kant å stå mot, uansett hvor lys flaten er. */
+  color: rgba(255,255,255,0.88);
+  text-shadow: 0 1px 3px rgba(0,0,0,0.55), 0 1px 12px rgba(0,0,0,0.4);
   opacity: 0;
   transition: opacity 0.5s var(--ease);
   pointer-events: none;
@@ -1152,8 +1112,8 @@ body.endrer-storrelse *::after {
   font-weight: 500;
   letter-spacing: 0.01em;
   white-space: nowrap;
-  color: rgba(255,255,255,0.62);
-  text-shadow: 0 1px 10px rgba(0,0,0,0.45);
+  color: rgba(255,255,255,0.78);
+  text-shadow: 0 1px 3px rgba(0,0,0,0.55), 0 1px 12px rgba(0,0,0,0.4);
   opacity: 0;
   transition: opacity 0.5s var(--ease), color 0.35s var(--ease);
   pointer-events: none;
@@ -1243,14 +1203,6 @@ body.endrer-storrelse *::after {
 /* Knytt er det lyse kortet i stokken, og sidene arver den lysheten.
    Da må bildeteksten og hintet snu: hvit tekst med skygge er lagt for
    de mørke kortene og forsvinner rett inn i den lyseblå flaten. */
-
-.mode-expanded .panel--pages.is-active .reel-item .art--knytt {
-  background:
-    radial-gradient(62% 56% at 20% 26%, rgba(255,255,255,0.85) 0%, rgba(255,255,255,0) 100%),
-    radial-gradient(58% 54% at 80% 74%, rgba(84,150,204,0.45) 0%, rgba(84,150,204,0) 100%),
-    radial-gradient(70% 62% at 64% 16%, rgba(126,186,226,0.5) 0%, rgba(126,186,226,0) 100%),
-    #dcebf7;
-}
 
 .mode-expanded .panel--pages.is-active .reel-item--lys figcaption {
   color: rgba(16,32,46,0.74);
