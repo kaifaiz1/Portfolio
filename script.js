@@ -33,6 +33,9 @@
   }));
   const aboutId = document.querySelector('.about-id');
   const aboutBack = document.querySelector('.about-back');
+  const menyKnapp = document.querySelector('.meny-knapp');
+  const lesMer = document.querySelector('.les-mer');
+  const bunnTeller = document.querySelector('.bunn-teller');
   const n = panels.length;
 
   let active = 0;
@@ -79,6 +82,13 @@
     });
 
     headings.forEach((h, i) => h.classList.toggle('is-current', i === active));
+
+    // bunnlinja på mobil hører til et åpnet kort med sider — Kryp og
+    // verktøyet har sin egen knapp videre inne i kortet
+    document.body.classList.toggle(
+      'sider-fremme',
+      mode === 'expanded' && panels[active].classList.contains('panel--pages'),
+    );
 
     dots.forEach((dot, i) => {
       dot.classList.toggle('is-active', i === active);
@@ -653,6 +663,13 @@
       });
 
       if (r.teller && apen && aktiv) r.teller.textContent = String(r.aktiv + 1);
+
+      // samme tall i bunnlinja på mobil, som også må vite hvor mange
+      // sider akkurat denne stokken har
+      if (bunnTeller && apen && aktiv) {
+        bunnTeller.querySelector('b').textContent = String(r.aktiv + 1);
+        bunnTeller.querySelector('.bunn-sum').textContent = String(r.items.length);
+      }
     });
   }
 
@@ -741,6 +758,7 @@
     mode = next;
 
     resetParallax();
+    lukkMeny();
 
     if (mode === 'text') {
       const sheet = panels[active].querySelector('.card-text');
@@ -814,6 +832,10 @@
   }, { passive: false });
 
   // --- sveip på touch (horisontalt først, vertikalt som reserve) ---
+  // Bare i kortstokken. Sidestokken i et åpnet kort er en ekte
+  // scrollflate med snapping, og fingeren ruller den selv; et ekstra
+  // programmert steg oppå det kjempet mot bevegelsen som allerede var i
+  // gang, og hoppet forbi sider.
   let touchX = null;
   let touchY = null;
   function iSidestokk() {
@@ -821,21 +843,17 @@
   }
 
   window.addEventListener('touchstart', (e) => {
-    if (mode !== 'deck' && !iSidestokk()) return;
+    if (mode !== 'deck') return;
     touchX = e.touches[0].clientX;
     touchY = e.touches[0].clientY;
   }, { passive: true });
 
   window.addEventListener('touchend', (e) => {
-    if ((mode !== 'deck' && !iSidestokk()) || touchX === null) return;
+    if (mode !== 'deck' || touchX === null) return;
     const dx = touchX - e.changedTouches[0].clientX;
     const dy = touchY - e.changedTouches[0].clientY;
     const d = Math.abs(dx) >= Math.abs(dy) ? dx : dy;
-    if (Math.abs(d) > 45) {
-      const retning = d > 0 ? 1 : -1;
-      if (iSidestokk()) stegReel(retning);
-      else goTo(active + retning);
-    }
+    if (Math.abs(d) > 45) goTo(active + (d > 0 ? 1 : -1));
     touchX = null;
     touchY = null;
   }, { passive: true });
@@ -877,6 +895,43 @@
 
   if (closeBtn) closeBtn.addEventListener('click', () => setMode('deck'));
 
+  // bunnlinja på mobil: samme steg som et trykk på siden i midten
+  if (lesMer) {
+    lesMer.addEventListener('click', () => {
+      if (mode === 'expanded') setMode('text');
+    });
+  }
+
+  // ============================================================
+  // Menyen bak hodet (mobil). Åpner og lukker på knappen; et trykk
+  // hvor som helst utenfor, Esc og ethvert modusbytte lukker den.
+  // På bred skjerm finnes ikke knappen, og ingenting av dette kjører.
+  // ============================================================
+
+  function lukkMeny() {
+    if (!navWidgets || !navWidgets.classList.contains('is-open')) return;
+    navWidgets.classList.remove('is-open');
+    if (menyKnapp) menyKnapp.setAttribute('aria-expanded', 'false');
+  }
+
+  if (menyKnapp && navWidgets) {
+    menyKnapp.addEventListener('click', (e) => {
+      e.stopPropagation();   // ellers lukker dokument-lytteren den igjen
+      const apen = navWidgets.classList.toggle('is-open');
+      menyKnapp.setAttribute('aria-expanded', apen ? 'true' : 'false');
+    });
+
+    document.addEventListener('click', (e) => {
+      if (!navWidgets.contains(e.target)) lukkMeny();
+    });
+
+    // et valg lukker den også — LinkedIn åpner i en ny fane, og menyen
+    // skal ikke stå og vente når man kommer tilbake
+    navWidgets.querySelectorAll('.nav-meny .widget').forEach((w) => {
+      w.addEventListener('click', lukkMeny);
+    });
+  }
+
   // --- logoen tar deg tilbake til kortstokken ---
   if (brand) {
     brand.addEventListener('click', () => setMode('deck'));
@@ -886,7 +941,12 @@
   }
 
   window.addEventListener('keydown', (e) => {
-    if (e.key === 'Escape') { back(); return; }
+    if (e.key === 'Escape') {
+      // en åpen meny er det nærmeste laget — Esc lukker den først
+      if (navWidgets && navWidgets.classList.contains('is-open')) { lukkMeny(); return; }
+      back();
+      return;
+    }
     const sidestokk = iSidestokk();
     if (mode !== 'deck' && !sidestokk) return;
     if (e.key === 'ArrowRight' || e.key === 'Right' || e.key === 'ArrowDown' || e.key === 'Down' || e.key === 'PageDown') {
