@@ -737,15 +737,60 @@
   setTimeout(() => { forhandsNivaa = 1; updateReel(); }, 3000);
   if (!sparData) setTimeout(() => { forhandsNivaa = 2; updateReel(); }, 9000);
 
-  function forhandslast(video) {
+  // ---- køen ----
+  // Første utgave ba om alle opptakene på én gang. Det er gratis på
+  // bredbånd og ødeleggende på mobil: fem nedlastinger deler linja med
+  // den ene som faktisk spiller, og da får den for lite. Målt på
+  // 4 Mbps sto opptaket på forsiden stille i 15 av 24 målinger — det
+  // spilte sju tideler, frøs i fem sekunder, spilte sju tideler igjen.
+  // Uten hentingen: 4 av 20, og de fire var oppstarten.
+  //
+  // Nå står de i kø, ett om gangen, og køen rører seg bare når det som
+  // spiller har nok i banken til å klare seg selv. Hentingen får bruke
+  // det som blir til overs, og ikke mer.
+  const koen = [];         // opptak som venter på tur
+  let henterNa = null;     // det ene som hentes akkurat nå
+  let spillerNa = null;    // det som står fremme og skal spille
+
+  function settIKo(video) {
     if (!video || video.preload !== 'none') return;
-    video.preload = 'auto';
-    // load() nullstiller et element som spiller, så den er bare for dem
-    // som ikke har rørt seg ennå
-    if (video.readyState === 0 && video.paused) video.load();
+    if (koen.indexOf(video) === -1) koen.push(video);
   }
 
+  // readyState 4 er nettleserens eget svar på «dette klarer jeg å spille
+  // til ende uten å stoppe». Er den ikke der, har den ikke båndbredde
+  // å avse, og køen står.
+  function harNokIBanken() {
+    if (!spillerNa || spillerNa.paused) return true;
+    return spillerNa.readyState >= 4;
+  }
+
+  function henteTikk() {
+    if (henterNa) {
+      // networkState 2 = NETWORK_LOADING. Er den ute av den, eller har
+      // nok til å spilles gjennom, er turen over.
+      if (henterNa.readyState < 4 && henterNa.networkState === 2) return;
+      henterNa = null;
+    }
+    if (!harNokIBanken()) return;
+    while (koen.length) {
+      const v = koen.shift();
+      // den som alt er i gang, eller alt er hentet, trenger ingen tur
+      if (!v || v.preload !== 'none' || !v.paused) continue;
+      v.preload = 'auto';
+      // load() nullstiller et element som spiller, så den er bare for
+      // dem som ikke har rørt seg ennå
+      if (v.readyState === 0) v.load();
+      henterNa = v;
+      return;
+    }
+  }
+
+  setInterval(henteTikk, 900);
+
   function updateReel() {
+    spillerNa = null;   // settes under, av den som skal spille nå
+
     reels.forEach((r) => {
       const aktiv = r.panel.classList.contains('is-active');
       const nabo = r.panel.classList.contains('is-left') || r.panel.classList.contains('is-right');
@@ -763,6 +808,7 @@
         const video = item.querySelector('video');
         if (video) {
           if (skalSpille) {
+            spillerNa = video;   // køen skal vike for denne
             if (video.paused) {
               // en boks som nettopp er blitt midtboks spiller fra begynnelsen
               if (item.dataset.sett !== '1' && video.currentTime > 0) video.currentTime = 0;
@@ -782,7 +828,7 @@
           const naboKort = nabo && iStokken;
           const restenAvStokken = forhandsNivaa >= 2 && iStokken;
           const nesteSide = aktiv && apen && Math.abs(i - r.aktiv) === 1;
-          if (naboKort || restenAvStokken || nesteSide) forhandslast(video);
+          if (naboKort || restenAvStokken || nesteSide) settIKo(video);
         }
 
         // bokser med stillbilder blar bare mens de står i midten, etter
