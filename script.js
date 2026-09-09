@@ -50,6 +50,12 @@
   // Slås opp på id og ikke som et tall, så rekkefølgen i stokken kan
   // endres uten at dette går i stykker.
   let active = Math.max(0, panels.findIndex((p) => p.id === 'verktoy'));
+
+  // 860 px er samme bredde som CSS-en bruker for å gå over til mobil-
+  // oppsettet — bunnlinja med «Om prosjektet»-knappen dukker opp der.
+  // Måles på nytt hver gang, i stedet for å slås fast ved sideåpning,
+  // så et vindu som endrer størrelse forbi grensa følger med.
+  const erMobil = () => matchMedia('(max-width: 860px)').matches;
   let lydPa = false;   // opptakene starter dempet; knappen slår på lyden
   let mode = 'deck'; // 'deck' | 'expanded' | 'text' | 'about'
   let wheelAcc = 0;
@@ -1054,13 +1060,23 @@
     if (r) goToReel(r, r.aktiv + retning);
   }
 
-  // klikk på en side du ikke står på ruller dit. Siden du ser på slipper
-  // klikket videre til kortet, som da åpner tekstbeskrivelsen.
+  // Klikk på en side du ikke står på ruller dit. Siden du ser på slipper
+  // klikket videre til kortet, som på bred skjerm åpner tekstbeskrivelsen
+  // — der er «Les om prosjektet»-hintet i hjørnet det eneste som sier
+  // fra om det, og selve klikket er den forventede måten å bla videre.
+  //
+  // På mobil har bunnlinja allerede en egen «Om prosjektet»-knapp for
+  // akkurat det. Uten stoppet her hoppet et trykk hvor som helst på
+  // opptaket rett til teksten — usynlig og uten forvarsel, siden hintet
+  // ikke vises der. Nå er det bare knappen som gjør det.
   reels.forEach((r) => {
     r.items.forEach((item, i) => {
       item.addEventListener('click', (e) => {
         if (mode !== 'expanded') return;
-        if (i === r.aktiv) return;
+        if (i === r.aktiv) {
+          if (erMobil()) e.stopPropagation();
+          return;
+        }
         e.stopPropagation();
         goToReel(r, i);
       });
