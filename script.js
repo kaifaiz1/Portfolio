@@ -327,6 +327,7 @@
     let sveipX = null;
     let sveipY = null;
     let retning = null;
+    let nettopSveipet = false;
 
     gal.addEventListener('touchstart', (e) => {
       if (e.touches.length !== 1) return;
@@ -346,7 +347,13 @@
       if (sveipX === null) return;
       const dx = e.changedTouches[0].clientX - sveipX;
       // 40 px: nok til å skille et sveip fra et trykk som skled litt
-      if (retning === 'x' && Math.abs(dx) > 40) bla(dx < 0 ? 1 : -1);
+      if (retning === 'x' && Math.abs(dx) > 40) {
+        bla(dx < 0 ? 1 : -1);
+        // Nettleserne demper som regel klikket etter en dragning, men
+        // ikke alle og ikke alltid. Uten dette kunne ett sveip blitt til
+        // to hopp i galleriene som også blar på trykk.
+        nettopSveipet = true;
+      }
       sveipX = null;
     }, { passive: true });
 
@@ -389,8 +396,17 @@
     });
 
     // en skjerm man kan trykke på blar videre selv, som en story
-    if (gal.classList.contains('reel-gallery--tap')) {
+    // Et trykk blar videre, som i en story. «--tap» gjelder overalt;
+    // «--tap-mobil» bare på smal skjerm, fordi et klikk på bred skjerm
+    // der skal fortsette til kortet og åpne teksten, slik hintet i
+    // hjørnet lover. Der er det pilene som blar.
+    const trykkAlltid = gal.classList.contains('reel-gallery--tap');
+    const trykkPaMobil = gal.classList.contains('reel-gallery--tap-mobil');
+
+    if (trykkAlltid || trykkPaMobil) {
       gal.addEventListener('click', (e) => {
+        if (trykkPaMobil && !trykkAlltid && !erMobil()) return;
+        if (nettopSveipet) { nettopSveipet = false; return; }
         e.stopPropagation();
         bla(1);
       });
