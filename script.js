@@ -35,6 +35,7 @@
   const aboutBack = document.querySelector('.about-back');
   const menyKnapp = document.querySelector('.meny-knapp');
   const lesMer = document.querySelector('.les-mer');
+  const tilbakeKnapp = document.querySelector('.tilbake-knapp');
   const bunnTeller = document.querySelector('.bunn-teller');
   const n = panels.length;
 
@@ -1290,6 +1291,14 @@
   if (lesMer) {
     lesMer.addEventListener('click', () => {
       if (mode === 'expanded') setMode('text');
+    });
+  }
+
+  // Tilbake fra tekstarket til kortet. Samme steg som Esc og
+  // minimer-knappen tar, bare innen rekkevidde for en tommel.
+  if (tilbakeKnapp) {
+    tilbakeKnapp.addEventListener('click', () => {
+      if (mode === 'text') setMode('expanded');
     });
   }
 

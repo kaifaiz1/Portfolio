@@ -265,7 +265,7 @@
                  løftet, «Om oss» er beviset på at det står folk bak. -->
             <figure class="reel-item reel-item--lys reel-item--fyll reel-item--galleri reel-item--skjerm" data-r="1">
               <div class="card-art art--knytt" aria-hidden="true"></div>
-              <div class="reel-gallery" data-tid="5200">
+              <div class="reel-gallery reel-gallery--tap-mobil" data-tid="5200">
                 <div class="gal-slide is-on">
                   <img class="gal-bilde" src="assets/knytt/page_2/nettside.png" alt="Forsiden på Knytt-nettsiden: «Finn ditt fellesskap i Oslo», med en knapp for å bli med." loading="lazy">
                 </div>
@@ -742,6 +742,13 @@
     <div class="bunnlinje">
       <span class="bunn-teller" aria-hidden="true"><b>1</b>&thinsp;/&thinsp;<span class="bunn-sum">3</span></span>
       <button class="les-mer" type="button">Om prosjektet</button>
+      <!-- Samme plass, andre retning: i tekstvisningen er «Om
+           prosjektet» byttet ut med veien tilbake til kortet. ✕-en oppe
+           i hjørnet lukker helt, og er dessuten lang vei for tommelen. -->
+      <button class="tilbake-knapp" type="button">
+        <svg width="15" height="15" viewBox="0 0 15 15" fill="none" aria-hidden="true"><path d="M9.5 2.8 4.8 7.5l4.7 4.7" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        <span>Tilbake</span>
+      </button>
     </div>
 
     <button class="edge-chip" type="button" aria-label="Minimer">

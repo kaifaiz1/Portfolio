@@ -2604,12 +2604,30 @@ html.port:not(.apnet) .deck-intro { animation-play-state: paused; }
     transition: opacity 0.4s var(--ease), transform 0.4s var(--ease), visibility 0s linear 0.4s;
   }
 
-  .mode-expanded.sider-fremme .bunnlinje {
+  .mode-expanded.sider-fremme .bunnlinje,
+  .mode-text .bunnlinje {
     opacity: 1;
     visibility: visible;
     transform: none;
     transition: opacity 0.45s var(--ease) 0.3s, transform 0.45s var(--ease) 0.3s;
   }
+
+  /* I tekstvisningen er det bare én vei videre, og det er tilbake.
+     Knappen tar plassen «Om prosjektet» hadde, så tommelen finner den
+     samme sted som den nettopp slapp. ✕-en oppe i hjørnet blir stående
+     — den lukker helt, som før — men den er lang vei på en telefon.
+
+     Gjelder alle kortene, ikke bare de med sider: Kryp og Verktøy har
+     samme tekstark og hadde samme blindvei. */
+  .tilbake-knapp { display: none; }
+
+  .mode-text .bunn-teller,
+  .mode-text .les-mer { display: none; }
+
+  .mode-text .tilbake-knapp { display: inline-flex; }
+
+  /* Teksten må slippe å ende under knappen som ligger og flyter. */
+  .mode-text .card-text-inner { padding-bottom: 7.5rem; }
 
   .bunn-teller {
     display: inline-flex;
@@ -2645,6 +2663,29 @@ html.port:not(.apnet) .deck-intro { animation-play-state: paused; }
   }
 
   .les-mer:active { transform: scale(0.97); }
+
+  .tilbake-knapp {
+    display: none;
+    align-items: center;
+    gap: 0.45rem;
+    height: 42px;
+    padding: 0 1.25rem 0 1rem;
+    border-radius: 999px;
+    background: var(--ink);
+    color: var(--on-ink);
+    font-size: 0.9rem;
+    font-weight: 500;
+    box-shadow: 0 8px 24px rgba(0,0,0,0.18);
+    transition: transform 0.2s var(--ease);
+  }
+
+  .tilbake-knapp svg { flex: none; }
+  .tilbake-knapp:active { transform: scale(0.97); }
+
+  .tilbake-knapp:focus-visible {
+    outline: 2px solid var(--ink);
+    outline-offset: 3px;
+  }
 
   .les-mer:focus-visible {
     outline: 2px solid var(--ink);
