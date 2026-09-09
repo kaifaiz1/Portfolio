@@ -229,12 +229,32 @@
               <span class="reel-hint" aria-hidden="true"><span class="reel-hint-label">Les om prosjektet</span><svg class="hint-klikk" width="17" height="17" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.25" stroke-linecap="round" stroke-linejoin="round"><path d="M9.2 11.3V6.2a1.1 1.1 0 0 1 2.2 0v4.3"/><path d="M11.4 10.5V9.3a1.1 1.1 0 0 1 2.2 0v1.3"/><path d="M13.6 10.7V9.9a1.1 1.1 0 0 1 2.2 0v3.3a4 4 0 0 1-4 4h-1.3c-1.1 0-1.9-.35-2.6-1.05l-2.2-2.2a1.1 1.1 0 0 1 1.55-1.55l1.35 1.3"/><path d="M6.1 4.5 4.8 3.2M4.9 7.4 3.1 6.9M7.6 3.3 7.2 1.6"/></svg></span>
             </figure>
 
-            <figure class="reel-item reel-item--lys reel-item--fyll reel-item--par" data-r="2">
+            <!-- Bilder fra arrangementene, ikke plakatene for dem. Fire
+                 stående opptak i en liggende ramme: karusellen er samme
+                 komponent som forarbeidet i Badstulaug-kortet, og den
+                 uskarpe kopien bak fyller sidene med bildets egen farge
+                 i stedet for en svart kant. Ingen etikett her — et
+                 dokumentarisk bilde trenger ingen overskrift, og
+                 prikkene sier hvor mange det er. -->
+            <figure class="reel-item reel-item--lys reel-item--fyll reel-item--galleri reel-item--foto" data-r="2">
               <div class="card-art art--knytt" aria-hidden="true"></div>
-              <div class="knytt-flate">
-                <div class="par">
-                  <img class="par-staaende" src="assets/knytt/page_3/study.jpg" alt="Plakat for Study n’ Sip: Knytt x Kulturhuset, mandager 19–23 i biblioteket." loading="lazy">
-                  <img class="par-liggende" src="assets/knytt/page_3/bead.jpg" alt="Plakat for Bead ’n Sip: Anker Studentbolig x Knytt x Bunks at Rode, fredag 21. november kl. 19." loading="lazy">
+              <div class="reel-gallery" data-tid="3600">
+                <div class="gal-slide is-on">
+                  <img class="gal-bilde" src="assets/knytt/page_3/perling.jpg" alt="Studenter rundt et bord som trer perler på snor, med røde kopper og et pyntet tre i bakgrunnen." loading="lazy">
+                </div>
+                <div class="gal-slide">
+                  <img class="gal-bilde" src="assets/knytt/page_3/gjest.jpg" alt="En gjest med caps smiler mot kameraet og holder opp et glass." loading="lazy">
+                </div>
+                <div class="gal-slide">
+                  <img class="gal-bilde" src="assets/knytt/page_3/armband.jpg" alt="To hender holder opp et ferdig perlearmbånd mot et opplyst lokale." loading="lazy">
+                </div>
+                <div class="gal-slide">
+                  <img class="gal-bilde" src="assets/knytt/page_3/kjokken.jpg" alt="To studenter står og prater ved en kjøkkenbenk i lokalet." loading="lazy">
+                </div>
+                <button class="gal-arrow gal-arrow--prev" type="button" aria-label="Forrige bilde"><svg width="15" height="15" viewBox="0 0 15 15" fill="none" aria-hidden="true"><path d="M9.5 2.8 4.8 7.5l4.7 4.7" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+                <button class="gal-arrow gal-arrow--next" type="button" aria-label="Neste bilde"><svg width="15" height="15" viewBox="0 0 15 15" fill="none" aria-hidden="true"><path d="M5.5 2.8 10.2 7.5l-4.7 4.7" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+                <div class="gal-bar">
+                  <span class="gal-dots"><button class="gal-dot is-on" type="button" data-g="0" aria-label="Bilde 1"></button><button class="gal-dot" type="button" data-g="1" aria-label="Bilde 2"></button><button class="gal-dot" type="button" data-g="2" aria-label="Bilde 3"></button><button class="gal-dot" type="button" data-g="3" aria-label="Bilde 4"></button></span>
                 </div>
               </div>
               <figcaption>Arrangementene — små, gratis møteplasser på stedene studentene alt brukte.</figcaption>
