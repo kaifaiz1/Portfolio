@@ -1010,15 +1010,42 @@ body.endrer-storrelse *::after {
 .gal-boks--reise .gal-dots,
 .gal-boks--reise .gal-label { display: none; }
 
-.mode-expanded .panel--pages.is-active .gal-boks--reise .gal-dots { display: flex; }
-.mode-expanded .panel--pages.is-active .gal-boks--reise .gal-label { display: block; }
-
 /* Navnet på kapittelet er selve fortellingen her, ikke en fotnote til
    et skjermbilde — det tåler et par hakk mer enn etikettene ellers. */
 .gal-boks.gal-boks--reise .gal-label {
   font-size: clamp(0.72rem, 1.5vw, 0.9rem);
   color: rgba(16,32,46,0.72);
 }
+
+/* Grunnoppsettet: kapitlene ligger oppå hverandre, ett synlig om
+   gangen. Det er dette kortforsiden i stokken viser, og det smale
+   oppsettet på mobil. Bred skjerm bygger om til tre telefoner lenger
+   ned. Klassen står to ganger for å slå .reel-gallery uten å være
+   avhengig av rekkefølgen i filen.
+
+   Galleriet må ligge I rutenettraden, ikke over den. Med «position:
+   absolute» falt det ut av flyten, og da rykket prikkene opp i
+   telefonens rad og ble en 330 piksler høy stripe bak den. Kapitlene
+   inni stables som vanlig, mot denne. */
+.reel-gallery.reise {
+  position: relative;
+  /* Full bredde, ikke «auto»: .gal-boks midtstiller barna sine, og et
+     element uten innhold i flyten krymper da til null — og kapitlene
+     inni, som er absolutt plassert, hadde ingenting å strekke seg mot. */
+  width: 100%;
+  /* Ingen «height: 100%». Kapitlene inni er absolutt plassert og bidrar
+     ikke med høyde, så prosenten hadde ingenting å måle mot og landet
+     på halve raden. Rutenettet strekker elementet selv. */
+  min-height: 0;
+  aspect-ratio: auto;
+  border-radius: 0;
+  overflow: visible;
+  background: none;
+  box-shadow: none;
+}
+
+/* navnet under hver telefon hører til den brede visningen */
+.reise-navn { display: none; }
 
 /* --- kontrollene. De hører til boksen i midten: naboene er små og
        dreid bort, og knapper der ville bare vært støy. --- */
@@ -2074,6 +2101,79 @@ body:not(.mode-deck) .deck-dots { opacity: 0; pointer-events: none; }
   border-radius: 50%;
 }
 
+/* ============ REISEN PÅ BRED SKJERM ============
+
+   Tre telefoner ved siden av hverandre. Den som spiller står i full
+   styrke; de to andre er dempet og står stille på plakatbildet sitt.
+   Et klikk gir en av dem ordet.
+
+   Dette er den ene regelen i filen som slår inn oppover og ikke
+   nedover, og det er med vilje: oppsettet med tre er tillegget, og
+   grunnvarianten — én telefon om gangen — er den som må virke overalt
+   ellers, også på kortforsiden i stokken. Derfor er dette låst til
+   åpnet kort, ikke bare til skjermbredden. */
+
+@media (min-width: 861px) {
+  .mode-expanded .panel--pages.is-active .reise {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: clamp(0.5rem, 2.4%, 1.5rem);
+    width: 100%;
+    height: 100%;
+  }
+
+  .mode-expanded .panel--pages.is-active .reise .gal-slide {
+    position: relative;
+    inset: auto;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.7rem;
+    height: 100%;
+    opacity: 0.4;
+    visibility: visible;
+    cursor: pointer;
+    transition: opacity 0.45s var(--ease);
+  }
+
+  .mode-expanded .panel--pages.is-active .reise .gal-slide.is-on {
+    opacity: 1;
+    cursor: default;
+  }
+
+  /* et hint om at de to andre kan velges, uten å rope */
+  .mode-expanded .panel--pages.is-active .reise .gal-slide:not(.is-on):hover { opacity: 0.66; }
+
+  /* Høyden settes konkret, ikke av flex. Telefonen henter bredden sin
+     fra aspect-ratio, og da må høyden være kjent først — lar man flex
+     bestemme den, blir bredden null, og det eneste som måler noe er
+     navnet under. Da sto telefonene igjen som striper på 50 piksler.
+     2,2 rem er navnet pluss mellomrommet over det. */
+  .mode-expanded .panel--pages.is-active .reise .tlf {
+    flex: none;
+    height: calc(100% - 2.2rem);
+  }
+
+  .mode-expanded .panel--pages.is-active .reise-navn {
+    display: block;
+    flex: none;
+    font-size: clamp(0.7rem, 1.3vw, 0.86rem);
+    font-weight: 500;
+    letter-spacing: -0.01em;
+    color: rgba(16,32,46,0.55);
+    white-space: nowrap;
+    transition: color 0.35s var(--ease);
+  }
+
+  .mode-expanded .panel--pages.is-active .reise .gal-slide.is-on .reise-navn { color: #16232f; }
+
+  /* Prikkene og fellesetiketten er den smale visningens styring. Her
+     er telefonene selve knappene, og navnet står under hver av dem. */
+  .mode-expanded .panel--pages.is-active .gal-boks--reise .gal-dots,
+  .mode-expanded .panel--pages.is-active .gal-boks--reise .gal-label { display: none; }
+}
+
 /* ============ INNGANGEN (bare mobil) ============
 
    Nettleserne på telefon lar ikke et opptak begynne før brukeren har
@@ -2405,6 +2505,11 @@ html.port:not(.apnet) .deck-intro { animation-play-state: paused; }
      Høyden settes direkte og ikke som sideforhold: da blir det plass
      til bildeteksten under, i stedet for at den legger seg oppå. Samme
      regnestykke som telefonsidene. */
+  /* Smal skjerm har ikke plass til tre telefoner. Her er det én om
+     gangen, og prikkene under er styringen. */
+  .mode-expanded .panel--pages.is-active .gal-boks--reise .gal-dots { display: flex; }
+  .mode-expanded .panel--pages.is-active .gal-boks--reise .gal-label { display: block; }
+
   .mode-expanded .panel--pages.is-active .reel-item--foto { --rbox-h: 1.4; }
 
   .mode-expanded .panel--pages.is-active .reel-item--foto .reel-gallery {

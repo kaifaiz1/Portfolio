@@ -344,6 +344,21 @@
       sveipX = null;
     }, { passive: true });
 
+    // Ligger kapitlene side om side, er de selv knappene: et klikk på
+    // et av dem som ikke spiller gir det ordet. Klikk på det som
+    // allerede spiller får boble videre til kortet, som da åpner
+    // teksten — samme regel som sidene i en sidestokk følger.
+    //
+    // Ingen mediespørring her: i det smale oppsettet ligger de andre
+    // med «visibility: hidden», og da kan de uansett ikke treffes.
+    bilder.forEach((b, k) => {
+      b.addEventListener('click', (e) => {
+        if (k === i) return;
+        e.stopPropagation();
+        byttTil(k);
+      });
+    });
+
     // en skjerm man kan trykke på blar videre selv, som en story
     if (gal.classList.contains('reel-gallery--tap')) {
       gal.addEventListener('click', (e) => {
