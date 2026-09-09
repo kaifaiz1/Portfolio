@@ -982,14 +982,42 @@ body.endrer-storrelse *::after {
    og den uskarpe kopien bak — som gir de mørke kortene et fargespill —
    blir bare en grå dis. Bildene får i stedet stå rett på kortet med sin
    egen skygge, slik plakatene gjorde før. */
-.reel-item--foto .reel-gallery {
+.reel-item--foto .reel-gallery,
+.reel-item--skjerm .reel-gallery {
   background: none;
   box-shadow: none;
 }
 
-.reel-item--foto .gal-bilde {
+.reel-item--foto .gal-bilde,
+.reel-item--skjerm .gal-bilde {
   border-radius: 14px;
   box-shadow: 0 20px 46px -20px rgba(12,22,36,0.55);
+}
+
+/* ---- reisen: tre kapitler i én telefon ----
+   Boksen har ingen merkelapp over telefonen slik statistikksidene har,
+   så den øverste raden faller bort. Prikkene og navnet hører til den
+   åpne visningen: på kortforsiden i stokken er dette bare én telefon
+   som spiller, og der ville kontroller vært støy man ikke kan bruke. */
+
+/* Klassen nevnes to ganger med vilje. Grunnregelen for .gal-boks står
+   lenger ned i filen, sammen med statistikksidene, og med lik vekt
+   ville den vunnet på rekkefølge alene — da havnet telefonen i en rad
+   uten høyde og forsvant helt. Vekt er riktigere verktøy her enn å
+   flytte reglene bort fra det de hører til. */
+.gal-boks.gal-boks--reise { grid-template-rows: minmax(0, 1fr) auto auto; }
+
+.gal-boks--reise .gal-dots,
+.gal-boks--reise .gal-label { display: none; }
+
+.mode-expanded .panel--pages.is-active .gal-boks--reise .gal-dots { display: flex; }
+.mode-expanded .panel--pages.is-active .gal-boks--reise .gal-label { display: block; }
+
+/* Navnet på kapittelet er selve fortellingen her, ikke en fotnote til
+   et skjermbilde — det tåler et par hakk mer enn etikettene ellers. */
+.gal-boks.gal-boks--reise .gal-label {
+  font-size: clamp(0.72rem, 1.5vw, 0.9rem);
+  color: rgba(16,32,46,0.72);
 }
 
 /* --- kontrollene. De hører til boksen i midten: naboene er små og

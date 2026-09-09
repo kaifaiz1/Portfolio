@@ -249,6 +249,12 @@
     // to karuseller ved siden av hverandre i takt ser ut som en feil.
     // Ulik lengde lar dem gli fra hverandre av seg selv.
     const TID = Number(gal.dataset.tid) || 4200;
+    // Et galleri med opptak i skal ikke bla av seg selv: da hadde
+    // kapittelet skiftet midt i det man så på.
+    const manuell = gal.classList.contains('reel-gallery--manuell');
+    // ...og når det skifter, må kortstokken få vite det. Det er den som
+    // starter og stopper avspilling.
+    const harVideo = !!gal.querySelector('video');
     let i = 0;
     let timer = null;
     let synlig = false;
@@ -274,13 +280,21 @@
     // nettopp valgte får hele sin tid.
     function planlegg() {
       stopp();
-      if (!synlig || roligBevegelse.matches) return;
-      timer = setTimeout(() => { vis(i + 1); planlegg(); }, TID);
+      if (manuell || !synlig || roligBevegelse.matches) return;
+      timer = setTimeout(() => byttTil(i + 1), TID);
+    }
+
+    // Ett sted for alle bytter brukeren eller klokka utløser. «vis»
+    // alene brukes bare der updateReel allerede kjører, og der ville et
+    // kall herfra gått i ring.
+    function byttTil(n) {
+      vis(n);
+      planlegg();
+      if (harVideo) updateReel();
     }
 
     function bla(steg) {
-      vis(i + steg);
-      planlegg();
+      byttTil(i + steg);
     }
 
     // Kontrollene må stoppe klikket selv. Ellers bobler det opp til
@@ -296,10 +310,39 @@
     prikker.forEach((d, k) => {
       d.addEventListener('click', (e) => {
         e.stopPropagation();
-        vis(k);
-        planlegg();
+        byttTil(k);
       });
     });
+
+    // Sveip mellom bildene. Retningen låses ved første bevegelse: går
+    // fingeren mest sidelengs er det galleriet som skal bla, går den
+    // mest opp eller ned er det siden som skal rulle, og da holder
+    // galleriet seg unna resten av dragningen.
+    let sveipX = null;
+    let sveipY = null;
+    let retning = null;
+
+    gal.addEventListener('touchstart', (e) => {
+      if (e.touches.length !== 1) return;
+      sveipX = e.touches[0].clientX;
+      sveipY = e.touches[0].clientY;
+      retning = null;
+    }, { passive: true });
+
+    gal.addEventListener('touchmove', (e) => {
+      if (sveipX === null || retning) return;
+      const dx = e.touches[0].clientX - sveipX;
+      const dy = e.touches[0].clientY - sveipY;
+      if (Math.abs(dx) + Math.abs(dy) > 10) retning = Math.abs(dx) > Math.abs(dy) ? 'x' : 'y';
+    }, { passive: true });
+
+    gal.addEventListener('touchend', (e) => {
+      if (sveipX === null) return;
+      const dx = e.changedTouches[0].clientX - sveipX;
+      // 40 px: nok til å skille et sveip fra et trykk som skled litt
+      if (retning === 'x' && Math.abs(dx) > 40) bla(dx < 0 ? 1 : -1);
+      sveipX = null;
+    }, { passive: true });
 
     // en skjerm man kan trykke på blar videre selv, som en story
     if (gal.classList.contains('reel-gallery--tap')) {
@@ -347,13 +390,20 @@
     return !!item.querySelector('.lyd-knapp');
   }
 
+  // En boks kan ha flere opptak: reisen i Knytt-kortet har tre kapitler
+  // i samme telefon. Det som ligger fremme i galleriet er det som
+  // gjelder — de andre finnes, men skal verken spille eller hentes.
+  function synligVideo(item) {
+    return item.querySelector('.gal-slide.is-on video') || item.querySelector('video');
+  }
+
   function settLyd(pa) {
     lydPa = pa;
     document.body.classList.toggle('lyd-pa', pa);
 
     reels.forEach((r) => r.items.forEach((item) => {
-      const v = item.querySelector('video');
-      if (v) v.muted = !pa || !kanHaLyd(item);
+      const stum = !pa || !kanHaLyd(item);
+      item.querySelectorAll('video').forEach((v) => { v.muted = stum; });
     }));
 
     lydKnapper.forEach((k) => {
@@ -383,7 +433,7 @@
       const r = aktivReel();
       if (!r) return;
       const midt = r.items[r.aktiv];
-      const v = midt && midt.querySelector('video');
+      const v = midt && synligVideo(midt);
       if (v && v.paused) start(v);
     });
   });
@@ -867,7 +917,14 @@
         if (aktiv && mode === 'deck') skalSpille = i === 0;      // bare den første i kortstokken
         else if (aktiv && apen) skalSpille = i === r.aktiv;      // bare siden du har scrollet til
 
-        const video = item.querySelector('video');
+        // Alt annet enn kapittelet som vises skal stå stille. Uten
+        // dette ville et kapittel man bladde bort fra fortsatt spilt
+        // bak det man ser på.
+        const video = synligVideo(item);
+        item.querySelectorAll('video').forEach((v) => {
+          if (v !== video && !v.paused) v.pause();
+        });
+
         if (video) {
           if (skalSpille) {
             spillerNa = video;   // køen skal vike for denne

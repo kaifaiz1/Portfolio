@@ -16,4 +16,4 @@
 # skal ikke ut på nett: 32 megapiksler og 2–4 MB stykket, til bruk som
 # vises i noen hundre piksler. Nettversjonene ligger ved siden av,
 # nedskalert. Slett originalene når du har dem trygt et annet sted.
-assets/**/DSC*-kopi.jpg
+assets/**/DSC*.jpg
