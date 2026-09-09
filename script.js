@@ -351,11 +351,34 @@
     //
     // Ingen mediespørring her: i det smale oppsettet ligger de andre
     // med «visibility: hidden», og da kan de uansett ikke treffes.
+    // Står kapitlene side om side? Vi spør oppsettet i stedet for å
+    // gjenta bruddpunktet fra CSS-en her: i det smale oppsettet ligger
+    // alle unntatt ett med «visibility: hidden».
+    function sideOmSide() {
+      return bilder.filter((x) => getComputedStyle(x).visibility !== 'hidden').length > 1;
+    }
+
     bilder.forEach((b, k) => {
       b.addEventListener('click', (e) => {
         if (k === i) return;
         e.stopPropagation();
         byttTil(k);
+      });
+
+      // Pekeren over et kapittel gir det ordet, og det begynner forfra
+      // hver gang — ikke der det slapp sist. Et opptak som plukker opp
+      // midt i en setning gir ingen mening når man akkurat har valgt
+      // det.
+      //
+      // Berøring holdes utenfor: der finnes det ingen «over», og et
+      // trykk ville utløst både denne og klikket.
+      b.addEventListener('pointerenter', (e) => {
+        if (e.pointerType === 'touch') return;
+        if (!sideOmSide()) return;
+        const v = b.querySelector('video');
+        if (v) v.currentTime = 0;
+        if (k !== i) byttTil(k);
+        else if (v && v.paused) start(v);
       });
     });
 

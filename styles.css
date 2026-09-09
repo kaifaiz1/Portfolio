@@ -2101,6 +2101,16 @@ body:not(.mode-deck) .deck-dots { opacity: 0; pointer-events: none; }
   border-radius: 50%;
 }
 
+/* Åpnet kort: flaten bak reisen trekker seg tilbake et par hakk, så
+   opptakene står fram. Det er en mørkere utgave av den samme blå, ikke
+   et filter — et filter ville tvunget fram et eget lag og en ny
+   opptegning av kortet mens det vokser, og den overgangen har vi brukt
+   tid på å få rolig. Kortforsiden i stokken beholder full farge. */
+.mode-expanded .panel--pages.is-active .reel-item--reise > .card-art {
+  --art-bg: #6896bb;
+  transition: background-color 0.5s var(--ease), opacity 0.6s var(--ease);
+}
+
 /* ============ REISEN PÅ BRED SKJERM ============
 
    Tre telefoner ved siden av hverandre. Den som spiller står i full
@@ -2142,8 +2152,18 @@ body:not(.mode-deck) .deck-dots { opacity: 0; pointer-events: none; }
     cursor: default;
   }
 
-  /* et hint om at de to andre kan velges, uten å rope */
-  .mode-expanded .panel--pages.is-active .reise .gal-slide:not(.is-on):hover { opacity: 0.66; }
+  /* Den som spiller står i full størrelse, de to andre trekker seg et
+     hakk tilbake. Det er telefonen som skaleres og ikke hele kapittelet
+     — navnet under skal ikke krympe med. Bunnen er festepunktet, så
+     avstanden ned til navnet er den samme for alle tre og bare toppene
+     skiller seg. */
+  .mode-expanded .panel--pages.is-active .reise .tlf {
+    transform-origin: center bottom;
+    transform: scale(0.88);
+    transition: transform 0.45s var(--ease);
+  }
+
+  .mode-expanded .panel--pages.is-active .reise .gal-slide.is-on .tlf { transform: scale(1); }
 
   /* Høyden settes konkret, ikke av flex. Telefonen henter bredden sin
      fra aspect-ratio, og da må høyden være kjent først — lar man flex
