@@ -1168,21 +1168,25 @@
     const sidestokk = iSidestokk();
     if (mode !== 'deck' && !sidestokk) return; // tekstark og om-siden scroller selv
 
-    // Stokken ligger vannrett, så det er sidelengs som blar den — det
-    // er den samme retningen kortene faktisk beveger seg i.
+    // Begge akser teller, både i stokken og i sidestokken: den av dem
+    // som beveger seg mest, blar.
     //
-    // Sidestokken i et åpnet kort er motsatt: der ligger sidene under
-    // hverandre, og da er loddrett den naturlige. Den tar begge akser,
-    // så en trackpad virker uansett hvilken vei man drar.
-    const delta = sidestokk
-      ? (Math.abs(e.deltaX) > Math.abs(e.deltaY) ? e.deltaX : e.deltaY)
-      : e.deltaX;
+    // Stokken var en periode bundet til sidelengs alene, fordi den
+    // ligger vannrett og det er den retningen kortene faktisk går i.
+    // Men et mushjul har ingen sidelengs akse — den gir bare deltaY —
+    // og da fantes det ingen måte å bla stokken med hjulet i det hele
+    // tatt. Sidelengs var aldri problemet: det var at macOS spiste det
+    // som «tilbake» i historikken før siden fikk se det, og det er
+    // preventDefault under her som løser.
+    //
+    // I stokken finnes det ingenting annet loddrett kan bety — siden
+    // ruller ikke — så det koster ingenting å ta imot begge.
+    const delta = Math.abs(e.deltaX) > Math.abs(e.deltaY) ? e.deltaX : e.deltaY;
 
     // Uten dette rekker aldri et sidelengs sveip fram: macOS tolker det
-    // som «tilbake» i historikken og tar hendelsen selv. Det er derfor
-    // bare opp og ned virket før.
+    // som «tilbake» i historikken og tar hendelsen selv.
     if (delta) e.preventDefault();
-    else if (!sidestokk) return;   // rent loddrett i stokken: la siden være
+    else return;
 
     // en pause i rullingen nullstiller telleren, så en halvferdig
     // bevegelse ikke ligger og venter på å utløse neste
