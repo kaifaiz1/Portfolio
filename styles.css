@@ -2249,9 +2249,15 @@ html.port:not(.apnet) .deck-intro { animation-play-state: paused; }
   /* To knapper i stedet for fire. Da får navnet igjen halve skjermen,
      og «Digital markedsfører × kreativ» står på én linje. Luften til
      høyre er knappenes plass, siden de ikke lenger dytter selv. */
-  .brand { padding-right: 6.5rem; }
+  /* Tre knapper skal få stå i fred: 3 × 40 px pluss to mellomrom på
+     0,45 rem, og litt luft. Widgetene ligger absolutt plassert i
+     hjørnet, så det er denne polstringen som holder navnet unna dem. */
+  .brand { padding-right: 9rem; }
   .logo { font-size: 1.3rem; }
-  .brand-role { font-size: 0.92rem; }
+  /* Undertittelen skal stå på én linje hele veien ned til de smaleste
+     telefonene. Med tre knapper i hjørnet er det ikke plass til 0,92
+     rem på 360 px, så den krymper med skjermen i stedet for å brekke. */
+  .brand-role { font-size: clamp(0.78rem, 3.4vw, 0.92rem); }
 
   .widget {
     width: 40px;
@@ -2555,8 +2561,6 @@ html.port:not(.apnet) .deck-intro { animation-play-state: paused; }
 
 @media (max-width: 520px) {
   :root { --deck-size: min(74vw, 40vh); }
-
-  .brand-role { font-size: 0.9rem; }
 }
 
 /* Telefon på tvers: her er det høyden som er knapp, ikke bredden.
