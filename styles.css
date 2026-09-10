@@ -556,6 +556,11 @@ button { font: inherit; color: inherit; background: none; border: none; cursor: 
   box-shadow: 0 1px 2px rgba(0,0,0,0.05);
 }
 
+/* «under arbeid» er en fotnote inne i chipen, ikke en del av navnet:
+   samme grå som annen metadata på sida, så verktøyet leser først og
+   forbeholdet etterpå. */
+.tool-chips .chip-merk { color: var(--grey); }
+
 /* ============ ANIMERTE GRADIENTER PÅ KORTENE ============ */
 
 /* Hvert kort har fem myke fargeflekker forankret på hvert sitt sted, som
@@ -649,6 +654,14 @@ body.endrer-storrelse *::after {
        hint av kjølighet som rent svart ikke har. Til øyet er den
        svart. --- */
 .art--oslolut { --art-bg: #08090c; }
+
+/* I nattmodus er #08090c mørkere enn sida bak (--bg: #0e0f12), og da
+   synker kortet ned i bakgrunnen i stedet for å ligge oppå den — skyggen
+   er det eneste som røper hvor kanten går. Her løftes bunnen så vidt
+   over sidefargen, nok til at silhuetten leser. Kortet er fortsatt det
+   mørkeste i stokken, og godt under --card (#1b1c21): til øyet er det
+   framleis svart. */
+:root[data-theme="dark"] .art--oslolut { --art-bg: #14151a; }
 
 /* --- Norges Badstulaug: varm terrakotta --- */
 .art--badstulaug { --art-bg: #a5765c; }
