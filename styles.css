@@ -1896,6 +1896,64 @@ body.lyd-pa .lyd-knapp .lyd-fra { display: inline-flex; }
   font-weight: 500;
 }
 
+/* --- anbefalinga: en fotnote til teksten over, ikke en testimonial-boks.
+       Samme strek-som-skille som .text-role bruker inne i prosjekt-
+       tekstene, bare snudd til siden, og ingenting her er større eller
+       mørkere enn brødteksten den henger under. Fargene er tokens, så
+       natt/dag følger med av seg selv. --- */
+
+.about-note {
+  margin-top: 8vh;             /* samme luft som mellom avsnittene over */
+  padding-left: 1.15rem;
+  border-left: 1px solid var(--grey-soft);
+}
+
+.about-note-quote {
+  font-size: 1.08rem;
+  line-height: 1.5;
+  letter-spacing: -0.01em;
+  font-weight: 400;
+  color: var(--grey);
+}
+
+/* attribusjon og kilde stables, så lange navn aldri presser lenka utenfor
+   kanten på smal skjerm */
+.about-note-by {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0.3rem;
+  margin-top: 0.9rem;
+  font-size: 0.85rem;
+  line-height: 1.45;
+  color: var(--grey);
+}
+
+/* lenka har metadata-vekt, ikke knappevekt: den skiller seg bare ut når
+   pekeren er på den */
+.about-note-doc {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  /* ikonet har litt luft inni seg; uten dette står streken i arket et par
+     piksler til høyre for S-en i navnet over, og venstrekanten blir ujevn */
+  margin-left: -0.13rem;
+  color: var(--grey);
+  transition: color 0.25s var(--ease);
+}
+
+.about-note-doc svg {
+  flex: none;
+  opacity: 0.7;
+  transition: opacity 0.25s var(--ease);
+}
+
+.about-note-doc:hover,
+.about-note-doc:focus-visible { color: var(--ink); }
+
+.about-note-doc:hover svg,
+.about-note-doc:focus-visible svg { opacity: 1; }
+
 .about-side { position: relative; }
 
 /* --- identiteten på om-siden: samme plassering som før navbaren, med
@@ -2727,6 +2785,14 @@ html.port:not(.apnet) .deck-intro { animation-play-state: paused; }
   .about-p { font-size: 1.15rem; }
 
   .about-p + .about-p { margin-top: 5vh; }
+
+  /* følger avsnittene ned i skala og luft */
+  .about-note {
+    margin-top: 5vh;
+    padding-left: 0.95rem;
+  }
+
+  .about-note-quote { font-size: 1rem; }
 
   .edge-chip { display: none; } /* touch har ✕ og Esc */
 
