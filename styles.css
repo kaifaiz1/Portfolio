@@ -269,6 +269,33 @@ button { font: inherit; color: inherit; background: none; border: none; cursor: 
 .widget--dark:hover,
 .widget--dark:focus-visible { background: #000; }
 
+/* bare ikon — e-post og LinkedIn. Samme kvadrat som alle widgetene faller
+   ned i på smal skjerm, bare hentet opp på bred: høyde og radius kommer
+   fra .widget, så det er bredda og sentreringen som skiller. Navnet ligger
+   i aria-label og title, så det er lesbart for skjermleser og kommer fram
+   som hjelpetekst ved hover. */
+.widget--icon {
+  width: 42px;
+  padding: 0;
+  justify-content: center;
+}
+
+/* Navnet blir stående i markupen og skjules her, ikke omvendt: i
+   mobilmenyen bak konvolutten hentes det fram igjen, og der er det
+   nettopp navnene som gjør radene lesbare. */
+.widget--icon .widget-label { display: none; }
+
+/* Loddrett skille mellom snarveiene og kontaktene. Tynn nok til å lese
+   som et opphold i rekka, ikke som enda et element. */
+.widget-delelinje {
+  flex: none;
+  align-self: center;
+  width: 1px;
+  height: 20px;
+  margin: 0 0.15rem;
+  background: var(--grey-soft);
+}
+
 /* i forstørret/tekst-modus viker widgetene for lukkeknappen */
 .mode-expanded .nav-widgets,
 .mode-text .nav-widgets {
@@ -2461,6 +2488,11 @@ html.port:not(.apnet) .deck-intro { animation-play-state: paused; }
   }
 
   .widget-label { display: none; }
+
+  /* Navbaren er allerede trang på 360 px; streken der ville stjålet av
+     plassen undertittelen trenger. På om-siden står knappene på egen
+     linje under navnet, og der er det rom til den. */
+  .nav-widgets .widget-delelinje { display: none; }
 
   /* --- menyen bak hodet --- */
 
