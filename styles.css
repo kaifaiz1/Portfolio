@@ -44,6 +44,13 @@
   --cf-rot: 41deg;                          /* dreining inn mot midten */
   --cf-persp: calc(var(--deck-size) * 3);
 
+  /* Én felles skygge for alle kortene. Ligger som variabel fordi
+     kortene bak midten får den tilbake mens de går rundt i ringen
+     ved sideåpning. */
+  --kort-skygge:
+    0 20px 45px -8px rgba(0,0,0,0.26),
+    0 8px 18px -6px rgba(0,0,0,0.12);
+
   /* forstørret kort */
   --exp-w: min(1080px, 92vw);
 }
@@ -340,9 +347,7 @@ button { font: inherit; color: inherit; background: none; border: none; cursor: 
      griper rundt sidene og leser også mot et mørkt foto — med stor
      negativ spread la den seg bare under kortet, og da så bare det
      lyse morro-kortet ut til å ha skygge. */
-  box-shadow:
-    0 20px 45px -8px rgba(0,0,0,0.26),
-    0 8px 18px -6px rgba(0,0,0,0.12);
+  box-shadow: var(--kort-skygge);
   transform-origin: 50% 50%;
   backface-visibility: hidden;
   will-change: transform, opacity;
@@ -2397,7 +2402,8 @@ html.port.apnet .inngang {
    som står bak porten. De holdes igjen til bryteren er vippet. */
 html.port:not(.apnet) .intro-line,
 html.port:not(.apnet) .intro-fade,
-html.port:not(.apnet) .deck-intro { animation-play-state: paused; }
+html.port:not(.apnet) .deck-intro,
+html.port:not(.apnet) .deck-intro > .panel > .card { animation-play-state: paused; }
 
 /* ============ INTRO-ANIMASJONER ============ */
 
@@ -2420,15 +2426,187 @@ html.port:not(.apnet) .deck-intro { animation-play-state: paused; }
 
 @keyframes fadeUp { to { opacity: 1; transform: translateY(0); } }
 
+/* --- kortstokken legger seg ---
+
+   Flata toner inn, og kortene inni den går rundt på en ring før de
+   legger seg på plass (se karusellen lenger ned). Da har stokken lagt
+   seg for øynene dine i stedet for å stå ferdig fra første frame.
+
+   Opasiteten er oppe etter en snau sjettedel av tida — flata skal bare
+   ta bort smellet i første frame, ikke ligge som et slør over ringen.
+   Resten av varigheten er der for å holde animasjonen i gang: det er
+   slutten på DENNE som forteller JS-en at intro-klassen kan ryddes
+   bort, og den må komme etter at siste kort har landet. */
 .deck-intro {
   opacity: 0;
-  animation: fadeIn 1.2s var(--ease) forwards 0.4s;
+  transform-style: preserve-3d;
+  animation: dekk-inn 1.7s var(--ease) forwards;
+
+  /* Ringen: radius og størrelse mens kortene går rundt. Kortene er
+     mindre enn de blir til slutt og ringen er smalere enn den ferdige
+     stokken, så det er tett der inne — og det er nettopp det som gjør
+     at den åpner seg når den bremses opp. */
+  --kar-r: calc(var(--deck-size) * 0.58);
+  --kar-s: 0.62;
+  --kar-spinn: 180deg;   /* en halv runde før de legger seg */
 }
 
-@keyframes fadeIn { to { opacity: 1; } }
+@keyframes dekk-inn {
+  0%   { opacity: 0; }
+  15%  { opacity: 1; }
+  100% { opacity: 1; }
+}
+
+/* --- karusellen ---
+
+   Ved sideåpning står ikke kortene i stokken ennå: de går en halv runde
+   på en ring om en loddrett akse midt i bildet, tett i tett, og bremses
+   opp til hvert kort står på sin egen plass. Ringen er trangere enn
+   stokken er bred, så det åpner seg utover mot slutten.
+
+   Hele veien ligger i ÉN transform med samme funksjonsrekke i begge
+   ender — det er betingelsen for at nettleseren skal regne om hvert
+   ledd for seg. Er rekkene ulike, brytes de ned til matriser i stedet,
+   og en dreining på flere hele runder forsvinner (en runde er det samme
+   som ingen runde for en matrise). Rekkefølgen er nøye:
+
+     translateX()  plassen i stokken — ytterst, så den ligger i
+                   skjermplanet og ikke blir dreid med rundt av ringen
+     rotateY()     hvor på ringen kortet er
+     translateZ()  ringens radius
+     rotateY()     kortets egen vinkel
+     scale()       størrelsen
+
+   De to dreiningene er poenget: kortet skal IKKE snurre om sin egen
+   akse mens det går rundt. Den innerste begynner derfor som den
+   ytterste med motsatt fortegn, og løfter kortet rett ut igjen —
+   ringen bærer det rundt, men flata blir stående mot deg, som en
+   hestekarusell der hesten aldri vrir seg.
+
+   Begge ender på hver sin verdi, og siden begge følger samme kurve, er
+   summen av dem — det kortet faktisk viser — hele veien sluttvinkelen
+   ganget med hvor langt animasjonen er kommet. Kortet står altså rett
+   forfra i starten og vrir seg rolig inn i coverflow-vinkelen sin mot
+   slutten. Ingen vei innom baksida, så `backface-visibility: hidden`
+   kan bli stående der den er.
+
+   Sluttverdiene er ord for ord de samme som coverflow-klassene setter,
+   bare med de to tomme leddene imellom, så ingenting flytter seg når
+   intro-klassen ryddes bort.
+
+   `preserve-3d` på flata er det som gjør ringen til en ring: uten den
+   males kortene i vanlig stablingsrekkefølge, og midtkortet ville
+   ligget øverst også når det er på baksida av ringen. Med den sorteres
+   de på dybde, slik en karusell skal. Derfor nulles z-indeksene også —
+   de hører til den flate stokken, ikke til ringen. */
+.deck-intro > .panel > .card {
+  transition: none;
+  z-index: auto;
+  animation-duration: 1.45s;
+  animation-delay: 0.06s;
+  /* Kurven er det som avgjør om dette leser som en rolig karusell
+     eller som et rykk, og den skal være myk i BEGGE ender. Starter den
+     bratt — som en vanlig ease-out gjør — flytter kortet på ytterkanten
+     av ringen seg 40 piksler mellom to bilder i det animasjonen
+     begynner, og da blafrer det i stedet for å gli. Denne tar seg opp
+     i fart først: 18 % etter 0,23 s, 44 % etter 0,39 s, 71 % etter
+     0,58 s, 92 % etter 0,9 s, og så en siste, knapt merkbar innsving.
+     Målt over hele inngangen flytter ingen kort seg mer enn 27 piksler
+     mellom to bilder, og da klarer øyet å følge dem rundt. */
+  animation-timing-function: cubic-bezier(0.35, 0.2, 0.2, 1);
+  animation-fill-mode: both;
+}
+
+/* Kortene som ellers venter usynlige bak midten er med i ringen, og
+   skal se ut som resten mens de går rundt — `is-back` tar skyggen fra
+   dem. Driften i gradienten står fortsatt på pause der, så de koster
+   ikke mer enn de må. */
+.deck-intro > .panel.is-back > .card { box-shadow: var(--kort-skygge); }
+
+.deck-intro > .panel.is-active > .card { animation-name: karusell-midt; }
+.deck-intro > .panel.is-left > .card   { animation-name: karusell-venstre; }
+.deck-intro > .panel.is-right > .card  { animation-name: karusell-hoyre; }
+.deck-intro > .panel.is-back > .card   { animation-name: karusell-bak; }
+
+/* Utgangspunktet er likt for alle seks: samme ring, samme størrelse,
+   to hele runder å gå. Det eneste som skiller dem er plassen på ringen
+   — `--ring` er avstanden fra midtkortet, satt i render() i script.js,
+   og 60° er en sjettedel av runden. */
+@keyframes karusell-midt {
+  from {
+    transform:
+      translateX(0)
+      rotateY(calc(var(--ring, 0) * 60deg + var(--kar-spinn)))
+      translateZ(var(--kar-r))
+      rotateY(calc(var(--ring, 0) * -60deg - var(--kar-spinn)))
+      scale(var(--kar-s));
+  }
+  to {
+    transform: translateX(0) rotateY(0deg) translateZ(0px) rotateY(0deg) scale(1);
+  }
+}
+
+@keyframes karusell-venstre {
+  from {
+    transform:
+      translateX(0)
+      rotateY(calc(var(--ring, 0) * 60deg + var(--kar-spinn)))
+      translateZ(var(--kar-r))
+      rotateY(calc(var(--ring, 0) * -60deg - var(--kar-spinn)))
+      scale(var(--kar-s));
+  }
+  to {
+    transform:
+      translateX(calc(var(--cf-x1) * -1))
+      rotateY(0deg)
+      translateZ(0px)
+      rotateY(calc(var(--cf-rot) * -1))
+      scale(var(--cf-s1));
+  }
+}
+
+@keyframes karusell-hoyre {
+  from {
+    transform:
+      translateX(0)
+      rotateY(calc(var(--ring, 0) * 60deg + var(--kar-spinn)))
+      translateZ(var(--kar-r))
+      rotateY(calc(var(--ring, 0) * -60deg - var(--kar-spinn)))
+      scale(var(--kar-s));
+  }
+  to {
+    transform:
+      translateX(var(--cf-x1))
+      rotateY(0deg)
+      translateZ(0px)
+      rotateY(var(--cf-rot))
+      scale(var(--cf-s1));
+  }
+}
+
+/* De tre som ikke får plass i stokken går runden ferdig og legger seg
+   bak midtkortet. De tones ut på veien inn dit — der er de dekket av
+   midtkortet uansett, og da er det ingenting som blir borte for øyet. */
+@keyframes karusell-bak {
+  from {
+    opacity: 1;
+    transform:
+      translateX(0)
+      rotateY(calc(var(--ring, 0) * 60deg + var(--kar-spinn)))
+      translateZ(var(--kar-r))
+      rotateY(calc(var(--ring, 0) * -60deg - var(--kar-spinn)))
+      scale(var(--kar-s));
+  }
+  42% { opacity: 1; }
+  to {
+    opacity: 0;
+    transform: translateX(0) rotateY(0deg) translateZ(0px) rotateY(0deg) scale(var(--cf-s2));
+  }
+}
 
 @media (prefers-reduced-motion: reduce) {
   .intro-line, .intro-fade, .deck-intro { animation: none; transform: none; opacity: 1; }
+  .deck-intro > .panel > .card { animation: none; }
   .card-art span { animation: none; }
   .card, .card-art, .card .type-face, .card-text, .card-label,
   .brand, .case-heading, .close-btn, .about-view,

@@ -68,15 +68,36 @@
   // «animation-fill-mode: forwards» opasiteten og modusbyttene får ikke
   // fade elementene ut. Tidsavbruddet er en reserve for tilfeller der
   // animationend aldri kommer (redusert bevegelse, bakgrunnsfane).
-  function clearIntro(el, cls, fallback) {
+  function clearIntro(el, cls, fallback, etterpa) {
     if (!el) return;
     const done = (e) => {
       if (e && e.target !== el) return; // ignorer bobling fra barn
       el.classList.remove(cls);
       el.removeEventListener('animationend', done);
+      if (etterpa) { const f = etterpa; etterpa = null; f(); }
     };
     el.addEventListener('animationend', done);
     setTimeout(done, fallback);
+  }
+
+  // Parallaksen lenger ned skriver til `translate`/`scale` på det
+  // aktive kortet hver eneste frame. Mens karusellen går, skal kortet
+  // ligge der ringen setter det og ingen andre steder — står pekeren
+  // allerede over midten av skjermen når siden lastes, ville den ellers
+  // dra i kortet før det har landet. Så parallaksen holder seg unna til
+  // stokken har lagt seg.
+  //
+  // Står man bak porten, begynner ikke intro-en før bryteren er vippet
+  // — derfor står flagget på med en gang, og slås av av ryddingen.
+  let introGar = true;
+
+  // Tar du selv tak i stokken mens den kommer inn, er det ditt trekk
+  // som gjelder: intro-en avsluttes der den er, og kortene går videre
+  // på sine egne overganger.
+  function avsluttIntro() {
+    if (!introGar) return;
+    introGar = false;
+    if (deck) deck.classList.remove('deck-intro');
   }
 
   // Bak porten står intro-animasjonene på pause (CSS), og da kommer
@@ -85,7 +106,8 @@
   // har til gode å spille.
   function startIntro() {
     clearIntro(navWidgets, 'intro-fade', 2000);
-    clearIntro(deck, 'deck-intro', 2000);
+    introGar = true;
+    clearIntro(deck, 'deck-intro', 2000, () => { introGar = false; });
   }
 
   // ============================================================
@@ -192,6 +214,9 @@
       // like naturlig begge veier.
       let d = (i - active + n) % n;
       if (d > n / 2) d -= n;
+      // Samme avstand forteller CSS-en hvor kortet står i ringen når
+      // stokken kommer inn ved sideåpning — se «karusell» i styles.css.
+      panel.style.setProperty('--ring', d);
       if (d === 0) panel.classList.add('is-active');
       else if (d === -1) panel.classList.add('is-left');
       else if (d === 1) panel.classList.add('is-right');
@@ -1117,6 +1142,7 @@
   // frys der ga ingen gevinst, men lot gradienten stå død de første
   // 660 millisekundene man så på siden.
   function goTo(i) {
+    avsluttIntro();
     markerFlytting();
     resetParallax();
     active = ((i % n) + n) % n; // looper begge veier
@@ -1128,6 +1154,7 @@
     const prev = mode;
     mode = next;
 
+    avsluttIntro();
     markerFlytting();
     resetParallax();
     lukkMeny();
@@ -1554,7 +1581,7 @@
 
     // parallaks: selve boksen følger pekeren (translate/scale ligger
     // utenom transform-egenskapen, så kort-animasjonene forstyrres ikke)
-    if (mode === 'deck') {
+    if (mode === 'deck' && !introGar) {
       par.x += (parTarget.x - par.x) * 0.12;
       par.y += (parTarget.y - par.y) * 0.12;
       par.s += (parTarget.s - par.s) * 0.12;
