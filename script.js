@@ -83,11 +83,11 @@
   }
 
   // Parallaksen lenger ned skriver til `translate`/`scale` på det
-  // aktive kortet hver eneste frame. Mens karusellen går, skal kortet
-  // ligge der ringen setter det og ingen andre steder — står pekeren
-  // allerede over midten av skjermen når siden lastes, ville den ellers
-  // dra i kortet før det har landet. Så parallaksen holder seg unna til
-  // stokken har lagt seg.
+  // aktive kortet hver eneste frame. Mens kortene stiger opp på plass,
+  // skal de ligge der animasjonen setter dem og ingen andre steder —
+  // står pekeren allerede over midten av skjermen når siden lastes,
+  // ville den ellers dra i kortet før det har landet. Så parallaksen
+  // holder seg unna til stokken har lagt seg.
   //
   // Står man bak porten, begynner ikke intro-en før bryteren er vippet
   // — derfor står flagget på med en gang, og slås av av ryddingen.
@@ -216,9 +216,6 @@
       // like naturlig begge veier.
       let d = (i - active + n) % n;
       if (d > n / 2) d -= n;
-      // Samme avstand forteller CSS-en hvor kortet står i ringen når
-      // stokken kommer inn ved sideåpning — se «karusell» i styles.css.
-      panel.style.setProperty('--ring', d);
       if (d === 0) panel.classList.add('is-active');
       else if (d === -1) panel.classList.add('is-left');
       else if (d === 1) panel.classList.add('is-right');
