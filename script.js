@@ -39,18 +39,20 @@
   const bunnTeller = document.querySelector('.bunn-teller');
   const n = panels.length;
 
-  // Verktøykortet møter deg først. Det er det eneste kortet i stokken
-  // uten opptak, så det virker uansett hva nettleseren mener om
-  // autoplay — ringen går, og kortet ser levende ut fra første sekund.
+  // OsloLut møter deg først. Her sto verktøykortet før, fordi det er
+  // det eneste uten opptak og dermed virker uansett hva nettleseren
+  // mener om autoplay. Det argumentet holder ikke lenger: porten på
+  // mobil kaller start() inne i selve trykket, og det er den samme
+  // håndsopprekningen et sveip ville gitt. På maskin er opptakene
+  // dempet og playsinline, som nettleserne slipper gjennom av seg selv.
   //
-  // Og for å komme videre må du sveipe. Det sveipet er nettopp den
-  // håndsopprekningen de andre kortene trenger: et play() som skjer
-  // inne i en berøring slipper gjennom der et på egen hånd blir
-  // avvist. Så når du kommer til OsloLut, spiller det.
+  // Sier de likevel nei — strømsparing på iOS, datasparing på Android —
+  // blir kortet stående på plakatbildet til første trykk, og da spør
+  // vaktbikkja lenger nede om igjen.
   //
   // Slås opp på id og ikke som et tall, så rekkefølgen i stokken kan
   // endres uten at dette går i stykker.
-  let active = Math.max(0, panels.findIndex((p) => p.id === 'verktoy'));
+  let active = Math.max(0, panels.findIndex((p) => p.id === 'oslolut'));
 
   // 860 px er samme bredde som CSS-en bruker for å gå over til mobil-
   // oppsettet — bunnlinja med «Om prosjektet»-knappen dukker opp der.
