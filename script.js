@@ -65,6 +65,9 @@
   let coolingDown = false;
   let spotSync = null;   // settes av Kryp-avspilleren lenger ned
   let orbitTikk = null;  // settes av utstyrsringen lenger ned
+  let fotoSync = null;   // settes av lysbordet i Foto-kortet lenger ned
+  let fotoTast = null;   // ...og det samme lysbordet sine taster
+  let figurFly = null;   // figuren på vei fra Om meg-kortet til om-siden
 
   // Når intro-animasjonene er ferdige må klassene bort, ellers låser
   // «animation-fill-mode: forwards» opasiteten og modusbyttene får ikke
@@ -224,11 +227,12 @@
 
     headings.forEach((h, i) => h.classList.toggle('is-current', i === active));
 
-    // bunnlinja på mobil hører til et åpnet kort med sider — Kryp og
-    // verktøyet har sin egen knapp videre inne i kortet
+    // bunnlinja på mobil hører til et åpnet kort man blar i — kortene
+    // med sider, og lysbordet i Foto. Kryp og verktøyet har sin egen
+    // knapp videre inne i kortet.
     document.body.classList.toggle(
       'sider-fremme',
-      mode === 'expanded' && panels[active].classList.contains('panel--pages'),
+      mode === 'expanded' && panels[active].matches('.panel--pages, .panel--bunnlinje'),
     );
 
     dots.forEach((dot, i) => {
@@ -240,6 +244,7 @@
 
     updateReel();
     if (spotSync) spotSync();
+    if (fotoSync) fotoSync();
   }
 
   // ============================================================
@@ -852,6 +857,585 @@
     };
   }
 
+  // ============================================================
+  // Lysbordet i Foto-kortet — bordet og veggen
+  //
+  // To rom i samme kort. Hvor hver kopi og hver ramme er, regnes ut her
+  // og settes som egenskaper CSS-en leser (--x, --y, --s og så videre).
+  // CSS-en tar seg av overgangen mellom to plasser, så alt denne koden
+  // gjør er å bestemme hvor ting skal være.
+  //
+  // Bordet har to tilstander:
+  //   vifta — alle sju spredt utover, som kort man holder i hånda.
+  //           Pekeren over en kopi løfter den og skyver naboene unna.
+  //   lupe  — én kopi oppe i stort format, resten skjøvet til side i to
+  //           bunker: de som kommer før til venstre, de som kommer etter
+  //           til høyre. Rekkefølgen er den samme som i vifta, så ingen
+  //           kopi bytter side når man går mellom dem.
+  // Vifta krever bredde. Står scenen på høykant, finnes den ikke, og da
+  // er det alltid én kopi oppe.
+  //
+  // Veggen har også to:
+  //   opphenget — seks rammer i et salongoppheng.
+  //   tatt ned  — én ramme midt i rommet, lyset dempet rundt, og en lapp
+  //               ved siden av med det bildet er laget med.
+  //
+  // Veggen henger over bordet. Ruller man opp fra bordet, ser man opp på
+  // den; ruller man ned fra veggen, ser man ned på bordet igjen.
+  // ============================================================
+
+  const lysbord = document.querySelector('.lysbord');
+  if (lysbord) {
+    const fotoPanel = lysbord.closest('.panel');
+    const romBord = lysbord.querySelector('.rom--bord');
+    const romVegg = lysbord.querySelector('.rom--vegg');
+    const scene = romBord.querySelector('.lysbord-scene');
+    const veggScene = romVegg.querySelector('.lysbord-scene');
+    const kopier = Array.from(romBord.querySelectorAll('.kopi'));
+    const rammer = Array.from(romVegg.querySelectorAll('.ramme'));
+    const lapp = romVegg.querySelector('.vegglapp');
+    const romKnapper = Array.from(lysbord.querySelectorAll('.rom-bryter button'));
+    const navnFelt = lysbord.querySelector('.lysbord-navn');
+    const exifFelt = lysbord.querySelector('.lysbord-exif');
+    const tellerFelt = lysbord.querySelector('.lysbord-teller b');
+    const sumFelt = lysbord.querySelector('.lysbord-sum');
+    const N = kopier.length;
+    const M = rammer.length;
+    const FORMAT = 9 / 16;   // kopiene er beskåret til samme format i CSS-en
+
+    let rom = 'bord';
+    let valgt = null;      // kopien som er oppe på bordet; null = vifta
+    let over = null;       // kopien pekeren står på i vifta
+    let tatt = null;       // rammen som er tatt ned fra veggen
+    let veggOver = null;   // rammen pekeren står på
+    let apnet = false;     // er kortet åpnet siden det sist lå i stokken
+    let sveipet = false;
+    const hentet = new Set();   // rommene som har fått bildene sine
+
+    function fremme() {
+      return mode === 'expanded' && fotoPanel.classList.contains('is-active');
+    }
+
+    // Scenen sier selv hvilket format den har. Det står i CSS-en og
+    // skifter med skjermen, og herfra regnes bredden på en kopi ut, i
+    // prosent av scenens bredde. Da er det bare ett sted å endre det.
+    function maal(sc = scene) {
+      const cs = getComputedStyle(sc);
+      const a = parseFloat(cs.getPropertyValue('--a')) || 1.5;
+      const kh = parseFloat(cs.getPropertyValue('--kh')) || 70;
+      return { smal: a < 1, kb: (kh / a) * FORMAT };
+    }
+
+    // ---------- bordet ----------
+
+    function legg() {
+      const { smal, kb } = maal();
+      if (smal) {
+        over = null;
+        if (valgt === null) valgt = 0;
+      }
+
+      kopier.forEach((k, i) => {
+        let x = 50;
+        let y = 51;
+        let r = 0;
+        let s = 1;
+        let z = 10 + i;
+        let o = 1;
+        let m = 0;
+
+        if (valgt === null) {
+          // Jevnt fordelt, med kantene litt lavere og dreid utover. Avstanden
+          // krymper hvis scenen er trang, så den ytterste aldri havner
+          // utenfor.
+          const t = i - (N - 1) / 2;
+          const steg = Math.min(10.6, (92 - kb) / (N - 1));
+          x = 50 + t * steg;
+          y = 51 + t * t * 0.85;
+          r = t * 3.4;
+          if (over !== null) {
+            if (i === over) { y -= 6; r = 0; s = 1.08; z = 60; }
+            else x += (i < over ? -1 : 1) * 2.4;   // naboene viker
+          }
+        } else {
+          const d = i - valgt;
+          if (d === 0) {
+            s = smal ? 1 : 1.22;
+            z = 60;
+          } else {
+            const side = d < 0 ? -1 : 1;
+            const dybde = Math.abs(d) - 1;   // 0 = øverst i bunken
+            const sb = smal ? 0.9 : 0.84;    // skalaen i bunkene
+            // På bred skjerm ligger bunkene tett inntil den som er oppe.
+            // På høykant er det ikke plass, og der stikker de så vidt inn
+            // fra kanten i stedet — nok til å si at det er flere.
+            const kant = smal
+              ? 48 + (kb * sb) / 2
+              : (kb * 1.22 + kb * sb) / 2 + 1.2;
+            x = 50 + side * (kant + dybde * (smal ? 1.6 : 2.2));
+            y = 51 + dybde * 1.1;
+            r = side * (3.5 + dybde * 2.2);
+            s = sb;
+            z = 40 - dybde;
+            m = Math.min(0.75, 0.42 + dybde * 0.1);
+            // dypere enn fire er bare en tykkere bunke
+            if (dybde > 3) o = 0;
+          }
+        }
+
+        k.style.setProperty('--x', `${x.toFixed(2)}%`);
+        k.style.setProperty('--y', `${y.toFixed(2)}%`);
+        k.style.setProperty('--r', `${r.toFixed(2)}deg`);
+        k.style.setProperty('--s', s.toFixed(3));
+        k.style.setProperty('--z', String(z));
+        k.style.setProperty('--o', String(o));
+        k.style.setProperty('--m', m.toFixed(2));
+        k.classList.toggle('er-oppe', i === valgt);
+      });
+
+      visTekst();
+    }
+
+    // Kopiene deles ut fra bunken midt på bordet — den samme bunken som lå
+    // på kortforsiden. De settes der uten overgang, og legges så ut én
+    // etter én, med et lite opphold mellom hver.
+    function del() {
+      if (roligBevegelse.matches) { legg(); return; }
+      kopier.forEach((k, i) => {
+        k.style.transition = 'none';
+        k.style.setProperty('--x', '50%');
+        k.style.setProperty('--y', '52%');
+        k.style.setProperty('--r', `${((i % 3) - 1) * 5}deg`);
+        k.style.setProperty('--s', '0.82');
+        k.style.setProperty('--o', '0');
+        k.style.setProperty('--m', '0');
+      });
+      void scene.offsetWidth;   // startplassen må tegnes før de kan gå fra den
+      kopier.forEach((k, i) => {
+        k.style.transition = '';
+        k.style.transitionDelay = `${0.14 + i * 0.05}s`;
+      });
+      legg();
+      setTimeout(() => kopier.forEach((k) => { k.style.transitionDelay = ''; }), 1400);
+    }
+
+    // Fram og tilbake stopper i endene i stedet for å loope. Bunkene er
+    // fysiske: å loope ville sendt hele den ene bunken over bordet til
+    // den andre siden.
+    function bla(steg) {
+      if (valgt === null) valgt = steg > 0 ? 0 : N - 1;
+      else valgt = Math.min(Math.max(valgt + steg, 0), N - 1);
+      over = null;
+      legg();
+    }
+
+    // ---------- veggen ----------
+
+    // Opphenget. Høyden på hver ramme er i prosent av scenens høyde, og
+    // hver rad henger mot en felles linje: raden over med underkanten på
+    // linja, raden under med overkanten, og en rad i midten med midten.
+    // Det er slik et salongoppheng gjøres for at det skal se planlagt ut,
+    // selv om ingen av rammene er like store. Tallene foran er rammenes
+    // plass i markupen, som står i tidsrekkefølge.
+    //
+    // De største bildene henger i hvert sitt hjørne — munkene oppe til
+    // venstre, fjorden nede til høyre — så tyngden fordeler seg på skrå.
+    const OPPHENG = {
+      bred: [
+        { y: 48, anker: -1, rammer: [[4, 44], [0, 30], [3, 34]] },
+        { y: 52, anker: 1, rammer: [[5, 33], [1, 37], [2, 44]] },
+      ],
+      smal: [
+        { y: 3, anker: 1, rammer: [[4, 30], [0, 25]] },
+        { y: 50, anker: 0, rammer: [[3, 26], [5, 28]] },
+        { y: 97, anker: -1, rammer: [[1, 26], [2, 29]] },
+      ],
+    };
+    const LUFT = { bred: 2.4, smal: 4 };   // mellom rammene, i prosent av bredden
+
+    function heng() {
+      const { smal } = maal(veggScene);
+      const oppsett = OPPHENG[smal ? 'smal' : 'bred'];
+      const luft = LUFT[smal ? 'smal' : 'bred'];
+      // Lappen står ved siden av rammen der det er plass til den. Står den
+      // ikke, er det ingen grunn til å skyve rammen til side for den.
+      const medLapp = getComputedStyle(lapp).display !== 'none';
+
+      // Høyden først. Bredden følger av bildets format og rammens list og
+      // passepartout, og den leses av etterpå i stedet for å regnes ut på
+      // to steder.
+      oppsett.forEach((rad) => rad.rammer.forEach(([i, h]) => {
+        rammer[i].style.setProperty('--h', String(h));
+      }));
+      const W = veggScene.clientWidth || 1;
+      const bredde = rammer.map((r) => (r.offsetWidth / W) * 100);
+
+      oppsett.forEach((rad) => {
+        const sum = rad.rammer.reduce((s, [i]) => s + bredde[i], 0) + luft * (rad.rammer.length - 1);
+        let x = 50 - sum / 2;
+
+        rad.rammer.forEach(([i, h]) => {
+          let cx = x + bredde[i] / 2;
+          let cy = rad.y;
+          let ty = rad.anker === -1 ? -100 : rad.anker === 1 ? 0 : -50;
+          let s = 1;
+          let z = 10;
+
+          if (i === tatt) {
+            // Tatt ned: midt i rommet, så stor som det er plass til —
+            // litt til venstre der lappen skal stå ved siden av.
+            s = Math.min((smal ? 70 : 84) / h, (smal ? 92 : 52) / bredde[i]);
+            cx = medLapp ? 44 : 50;
+            cy = 50;
+            ty = -50;
+            z = 60;
+            if (medLapp) {
+              lapp.style.setProperty('--lx', `${(cx + (bredde[i] * s) / 2 + 2.6).toFixed(2)}%`);
+              lapp.style.setProperty('--ly', `${(50 + (h * s) / 2).toFixed(2)}%`);
+            }
+          } else if (i === veggOver && tatt === null) {
+            s = 1.035;
+            z = 20;
+          }
+
+          const r = rammer[i];
+          r.style.setProperty('--x', `${cx.toFixed(2)}%`);
+          r.style.setProperty('--y', `${cy.toFixed(2)}%`);
+          r.style.setProperty('--ty', `${ty}%`);
+          r.style.setProperty('--s', s.toFixed(3));
+          r.style.setProperty('--z', String(z));
+          r.classList.toggle('er-oppe', i === tatt);
+          x += bredde[i] + luft;
+        });
+      });
+
+      if (tatt !== null) {
+        const r = rammer[tatt];
+        lapp.querySelector('.lapp-kamera').textContent = r.dataset.kamera;
+        lapp.querySelector('.lapp-objektiv').textContent = r.dataset.objektiv;
+        lapp.querySelector('.lapp-eksponering').textContent = r.dataset.eksponering;
+      }
+
+      visTekst();
+    }
+
+    // I tidsrekkefølge, ikke etter hvor de henger: opphenget er laget for
+    // øyet, rekkefølgen for den som blar.
+    function blaVegg(steg) {
+      if (tatt === null) tatt = steg > 0 ? 0 : M - 1;
+      else tatt = Math.min(Math.max(tatt + steg, 0), M - 1);
+      veggOver = null;
+      heng();
+    }
+
+    // ---------- felles ----------
+
+    // Kamera og eksponering for det som er oppe, eller det pekeren står
+    // på. Står ingen av delene, sier linja hva rommet er — den teksten står
+    // på selve rommet i markupen. Datoene er utelatt med vilje: det er
+    // hvordan bildet er tatt som er interessant, ikke når.
+    function visTekst() {
+      let navn;
+      let exif;
+      let nr;
+      let sum;
+
+      if (rom === 'bord') {
+        const i = valgt !== null ? valgt : over;
+        // Alle sju er tatt med samme kamera, så det står på rommet og ikke
+        // på hver kopi.
+        navn = i === null ? romBord.dataset.navn : romBord.dataset.kamera;
+        exif = (i === null ? romBord : kopier[i]).dataset.exif;
+        nr = (valgt || 0) + 1;
+        sum = N;
+        lysbord.classList.toggle('lupe', valgt !== null);
+      } else {
+        const i = tatt !== null ? tatt : veggOver;
+        if (i === null) {
+          navn = romVegg.dataset.navn;
+          exif = romVegg.dataset.exif;
+        } else {
+          const r = rammer[i];
+          navn = r.dataset.kamera;
+          exif = `${r.dataset.objektiv} · ${r.dataset.eksponering}`;
+        }
+        nr = (tatt || 0) + 1;
+        sum = M;
+        lysbord.classList.toggle('lupe', tatt !== null);
+      }
+
+      navnFelt.textContent = navn;
+      exifFelt.textContent = exif;
+      if (tellerFelt) tellerFelt.textContent = String(nr);
+      if (sumFelt) sumFelt.textContent = String(sum);
+      // samme tall i bunnlinja på mobil, som også må vite hvor mange
+      if (bunnTeller && fremme()) {
+        bunnTeller.querySelector('b').textContent = String(nr);
+        bunnTeller.querySelector('.bunn-sum').textContent = String(sum);
+      }
+    }
+
+    // Den lille versjonen med en gang, den store byttes inn først når den
+    // er ferdig dekodet — så et bilde aldri står tomt mens det lastes.
+    // Hvert rom hentes for seg, og bare én gang.
+    function hent(navn, liste) {
+      if (hentet.has(navn)) return;
+      hentet.add(navn);
+      liste.forEach((el) => {
+        const img = el.querySelector('img');
+        img.src = img.dataset.liten;
+        const stor = new Image();
+        stor.src = img.dataset.stor;
+        stor.decode().then(() => { img.src = stor.src; }).catch(() => {});
+      });
+    }
+
+    // Bytter rom. «direkte» er for når kortet åpnes på nytt: da skal man
+    // bare stå ved bordet, ikke se veggen gli bort først.
+    function settRom(nytt, direkte) {
+      if (nytt === rom) return;
+      rom = nytt;
+      if (direkte) lysbord.classList.add('uten-overgang');
+      lysbord.classList.toggle('pa-veggen', rom === 'vegg');
+      romKnapper.forEach((k) => {
+        k.setAttribute('aria-pressed', k.dataset.rom === rom ? 'true' : 'false');
+      });
+      if (direkte) {
+        void lysbord.offsetWidth;
+        lysbord.classList.remove('uten-overgang');
+      }
+      over = null;
+      veggOver = null;
+      if (rom === 'vegg') {
+        hent('vegg', rammer);
+        heng();
+      } else {
+        legg();
+      }
+    }
+
+    romKnapper.forEach((k) => {
+      k.addEventListener('click', (e) => {
+        e.stopPropagation();   // ellers åpner kortet tekstarket
+        settRom(k.dataset.rom);
+      });
+    });
+
+    kopier.forEach((k, i) => {
+      k.addEventListener('pointerenter', (e) => {
+        if (e.pointerType === 'touch' || valgt !== null || !fremme()) return;
+        over = i;
+        legg();
+      });
+
+      k.addEventListener('pointerleave', () => {
+        if (over !== i) return;
+        over = null;
+        legg();
+      });
+
+      // Klikket må stoppes her. Ellers bobler det til kortet, som tar det
+      // som «vis tekstbeskrivelsen».
+      k.addEventListener('click', (e) => {
+        e.stopPropagation();
+        if (sveipet) { sveipet = false; return; }
+        if (valgt === null || i !== valgt) valgt = i;
+        // Den som er oppe: på bred skjerm legges den tilbake i vifta. På
+        // høykant finnes ingen vifte, og der blar et trykk videre, som i
+        // en story — samme regel som galleriene ellers på siden.
+        else if (maal().smal) valgt = (valgt + 1) % N;
+        else valgt = null;
+        over = null;
+        legg();
+      });
+    });
+
+    rammer.forEach((r, i) => {
+      r.addEventListener('pointerenter', (e) => {
+        if (e.pointerType === 'touch' || tatt !== null || !fremme()) return;
+        veggOver = i;
+        heng();
+      });
+
+      r.addEventListener('pointerleave', () => {
+        if (veggOver !== i) return;
+        veggOver = null;
+        heng();
+      });
+
+      // Et klikk tar rammen ned, et klikk til henger den opp igjen. En
+      // annen ramme bak det dempede lyset kan klikkes på direkte.
+      r.addEventListener('click', (e) => {
+        e.stopPropagation();
+        if (sveipet) { sveipet = false; return; }
+        tatt = tatt === i ? null : i;
+        veggOver = null;
+        heng();
+      });
+    });
+
+    // Rommet rundt bildene. Er noe tatt opp eller ned, legger et klikk ved
+    // siden av det tilbake — slik man legger fra seg noe man har løftet
+    // opp. Ellers slipper klikket gjennom til kortet og åpner teksten,
+    // slik det gjør på de andre kortene på bred skjerm. På mobil er det
+    // bunnlinja som tar deg dit, og et bom-trykk skal ikke gjøre det i
+    // det stille.
+    lysbord.addEventListener('click', (e) => {
+      if (e.target.closest('.lysbord-mer')) return;   // den skal nettopp videre
+      if (rom === 'vegg' && tatt !== null) {
+        e.stopPropagation();
+        tatt = null;
+        heng();
+        return;
+      }
+      if (rom === 'bord' && valgt !== null && !maal().smal) {
+        e.stopPropagation();
+        valgt = null;
+        legg();
+        return;
+      }
+      if (erMobil()) e.stopPropagation();
+    });
+
+    // Kortet lytter selv etter Enter og mellomrom og ville tatt dem fra
+    // kopiene — «løft opp» ble til «vis teksten». Samme vakt som i Kryp.
+    lysbord.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter' || e.key === ' ' || e.key === 'Spacebar') e.stopPropagation();
+    });
+
+    // Hjulet. Er noe oppe, blar det mellom bildene. Ellers flytter det
+    // blikket: opp fra bordet til veggen, ned fra veggen til bordet.
+    let hjulSum = 0;
+    let hjulPause = false;
+    let hjulHvile = null;
+
+    lysbord.addEventListener('wheel', (e) => {
+      if (!fremme()) return;
+      e.preventDefault();
+      const loddrett = Math.abs(e.deltaY) >= Math.abs(e.deltaX);
+      const d = loddrett ? e.deltaY : e.deltaX;
+      clearTimeout(hjulHvile);
+      hjulHvile = setTimeout(() => { hjulSum = 0; }, 220);
+      if (hjulPause) return;
+      hjulSum += d;
+      if (Math.abs(hjulSum) < 60) return;
+      const retning = hjulSum > 0 ? 1 : -1;
+      hjulSum = 0;
+
+      const oppe = rom === 'bord' ? valgt !== null : tatt !== null;
+      let pause = 520;
+      if (oppe) {
+        if (rom === 'bord') bla(retning); else blaVegg(retning);
+      } else if (loddrett && rom === 'bord' && retning < 0) {
+        settRom('vegg');
+        pause = 950;   // la blikket komme fram før neste rulling teller
+      } else if (loddrett && rom === 'vegg' && retning > 0) {
+        settRom('bord');
+        pause = 950;
+      } else {
+        return;
+      }
+      hjulPause = true;
+      setTimeout(() => { hjulPause = false; }, pause);
+    }, { passive: false });
+
+    // Sveip på touch. Sidelengs blar mellom bildene. Loddrett flytter
+    // blikket, som hjulet: drar man ned fra bordet, kommer veggen ned, og
+    // drar man opp fra veggen, kommer bordet opp.
+    let sveipX = null;
+    let sveipY = null;
+
+    lysbord.addEventListener('touchstart', (e) => {
+      if (e.touches.length !== 1) return;
+      sveipX = e.touches[0].clientX;
+      sveipY = e.touches[0].clientY;
+    }, { passive: true });
+
+    lysbord.addEventListener('touchend', (e) => {
+      if (sveipX === null) return;
+      const dx = e.changedTouches[0].clientX - sveipX;
+      const dy = e.changedTouches[0].clientY - sveipY;
+      sveipX = null;
+      if (!fremme()) return;
+
+      if (Math.abs(dx) >= 40 && Math.abs(dx) > Math.abs(dy)) {
+        if (rom === 'bord') bla(dx < 0 ? 1 : -1);
+        else if (tatt !== null) blaVegg(dx < 0 ? 1 : -1);
+        else return;
+      } else if (Math.abs(dy) >= 60 && Math.abs(dy) > Math.abs(dx)) {
+        if (rom === 'bord' && dy > 0) settRom('vegg');
+        else if (rom === 'vegg' && dy < 0 && tatt === null) settRom('bord');
+        else return;
+      } else {
+        return;
+      }
+      // Nettleseren demper som regel klikket etter et sveip, men ikke
+      // alltid. Kommer det likevel, skal det ikke bla én gang til — og
+      // kommer det ikke, skal flagget ikke bli stående og spise neste.
+      sveipet = true;
+      setTimeout(() => { sveipet = false; }, 400);
+    }, { passive: true });
+
+    window.addEventListener('resize', () => {
+      if (!fremme()) return;
+      if (rom === 'bord') legg(); else heng();
+    }, { passive: true });
+
+    // Kalles fra render(). Åpnes kortet fra stokken, begynner man ved
+    // bordet med vifta. Kommer man tilbake fra tekstarket, er alt der man
+    // forlot det.
+    fotoSync = () => {
+      if (!fotoPanel.classList.contains('is-active') || mode === 'deck' || mode === 'about') {
+        apnet = false;
+        return;
+      }
+      if (mode !== 'expanded') return;
+      if (!apnet) {
+        apnet = true;
+        valgt = null;
+        over = null;
+        tatt = null;
+        veggOver = null;
+        settRom('bord', true);
+        hent('bord', kopier);
+        del();
+        heng();
+        // Veggen hentes i bakgrunnen litt etter, så den er klar før noen
+        // snur seg dit — men ikke før bordet har fått sine.
+        setTimeout(() => { if (apnet) hent('vegg', rammer); }, 1600);
+      } else {
+        visTekst();   // bunnlinja har vist et annet kort i mellomtiden
+      }
+    };
+
+    // Piltaster blar i rommet man står i, også fra vifta og opphenget —
+    // da løftes den første opp. Esc legger fra seg det som er oppe før den
+    // lukker kortet; på bordet på høykant er det alltid én oppe, og der
+    // lukker den som før.
+    fotoTast = (e) => {
+      if (!fremme()) return false;
+      if (e.key === 'Escape') {
+        if (rom === 'vegg') {
+          if (tatt === null) return false;
+          tatt = null;
+          heng();
+          return true;
+        }
+        if (valgt === null || maal().smal) return false;
+        valgt = null;
+        legg();
+        return true;
+      }
+      const frem = ['ArrowRight', 'Right', 'ArrowDown', 'Down', 'PageDown'].includes(e.key);
+      const bak = ['ArrowLeft', 'Left', 'ArrowUp', 'Up', 'PageUp'].includes(e.key);
+      if (!frem && !bak) return false;
+      e.preventDefault();
+      if (rom === 'vegg') blaVegg(frem ? 1 : -1);
+      else bla(frem ? 1 : -1);
+      return true;
+    };
+  }
+
   // stokken i kortet som står fremme — den eneste som skal svare på
   // skroll, sveip og piltaster
   function aktivReel() {
@@ -1158,6 +1742,19 @@
     resetParallax();
     lukkMeny();
 
+    // Kommer man fra Om meg-kortet, skal figuren fly derfra. Kortet må
+    // måles nå, mens det fortsatt står i stokken — etter render() er det
+    // borte. Klassen holder om-siden på plass og kortet skjult mens
+    // figuren er i lufta; se «figur-flyr» i CSS-en.
+    let figurFra = null;
+    if (mode === 'about' && prev === 'deck' && !roligBevegelse.matches) {
+      const omKort = panels[active].querySelector('.card--om');
+      if (omKort) {
+        figurFra = omKort.getBoundingClientRect();
+        document.body.classList.add('figur-flyr');
+      }
+    }
+
     if (mode === 'text') {
       const sheet = panels[active].querySelector('.card-text');
       if (sheet) sheet.scrollTop = 0;
@@ -1168,6 +1765,9 @@
       const r = aktivReel();
       if (r) r.aktiv = 0;   // alltid inn på side 1
     }
+
+    // ut av om-siden før figuren har landet: da skal den ikke fly videre
+    if (prev === 'about' && figurFly) figurFly.cancel();
 
     if (prev === 'about' && aboutId) {
       aboutId.style.opacity = ''; // tilbake til utgangspunktet
@@ -1195,7 +1795,42 @@
       }
       aboutView.scrollTop = 0;
       updateAboutScroll();
+      if (figurFra) flyFiguren(figurFra);
     }
+  }
+
+  // ============================================================
+  // Fra Om meg-kortet til om-siden
+  //
+  // Kortet i stokken og figuren på om-siden er det samme bildet i samme
+  // størrelse — .about-media er satt til kortets mål. Så i stedet for at
+  // det ene toner ut og det andre toner inn et annet sted, tar figuren
+  // over kortets plass i samme frame og glir derfra til sin egen.
+  //
+  // FLIP: målet er der figuren ligger nå, med om-siden allerede på plass;
+  // startpunktet er kortet, målt før det ble borte. Animasjonen går fra
+  // forskjellen mellom dem og ned til ingenting.
+  // ============================================================
+
+  function flyFiguren(fra) {
+    const media = aboutVideo && aboutVideo.parentElement;
+    const slutt = () => {
+      figurFly = null;
+      document.body.classList.remove('figur-flyr');
+    };
+    if (!media || !aboutVideo.animate) { slutt(); return; }
+
+    const til = media.getBoundingClientRect();
+    if (!til.width) { slutt(); return; }
+
+    const start = `translate(${fra.left - til.left}px, ${fra.top - til.top}px) scale(${fra.width / til.width})`;
+    figurFly = aboutVideo.animate([
+      { transformOrigin: '0 0', transform: start },
+      { transformOrigin: '0 0', transform: 'none' },
+    ], { duration: 950, easing: 'cubic-bezier(0.22, 1, 0.36, 1)' });
+
+    figurFly.onfinish = slutt;
+    figurFly.oncancel = slutt;
   }
 
   // --- skroll blar: i kortstokken mellom prosjekter, i åpent kort mellom sider ---
@@ -1290,6 +1925,11 @@
       // etter at nabo-klikket har fått gjøre jobben sin: å klikke det inn
       // til midten er navigasjon i stokken, ikke et forsøk på å åpne det.
       if (card.classList.contains('card--laast')) return;
+      // Om meg-kortet har ingen forstørret visning: om-siden er den.
+      if (card.classList.contains('card--om')) {
+        if (mode === 'deck') setMode('about');
+        return;
+      }
       if (mode === 'deck') setMode('expanded');
       else if (mode === 'expanded') setMode('text');
     }
@@ -1373,9 +2013,13 @@
     if (e.key === 'Escape') {
       // en åpen meny er det nærmeste laget — Esc lukker den først
       if (navWidgets && navWidgets.classList.contains('is-open')) { lukkMeny(); return; }
+      // ...og et bilde som er løftet opp på lysbordet er det neste
+      if (fotoTast && fotoTast(e)) return;
       back();
       return;
     }
+    // lysbordet har ingen sidestokk, men blar likevel med pilene
+    if (fotoTast && fotoTast(e)) return;
     const sidestokk = iSidestokk();
     if (mode !== 'deck' && !sidestokk) return;
     if (e.key === 'ArrowRight' || e.key === 'Right' || e.key === 'ArrowDown' || e.key === 'Down' || e.key === 'PageDown') {

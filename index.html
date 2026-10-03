@@ -45,6 +45,9 @@
        bryter, og siden er på. Etterpå spiller alt som det skal. -->
   <div class="inngang">
     <div class="inngang-inner">
+      <!-- Ansiktet først. Inngangen er det eneste man ser før man er
+           inne, og et navn uten et menneske er bare et merke. -->
+      <img class="inngang-ansikt" src="assets/favicon/profile-picture.png" alt="" width="76" height="76">
       <p class="inngang-navn">Kai Faiz<span class="logo-dot">.</span></p>
       <p class="inngang-rolle">Digital markedsfører × kreativ</p>
       <!-- Bryteren står uten tekst. Formen sier hva den gjør. Navnet
@@ -58,13 +61,14 @@
 
   <nav class="sr-only" aria-label="Innhold">
     <ul>
+      <li><a href="#om">Om meg</a></li>
       <li><a href="#oslolut">OsloLut</a></li>
       <li><a href="#knytt">Knytt</a></li>
       <li><a href="#badstulaug">Norges Badstulaug</a></li>
       <li><a href="#kryp">Kryp</a></li>
       <li><a href="#nettbutikk">Nettbutikk</a></li>
       <li><a href="#verktoy">Verktøy</a></li>
-      <li><a href="#om">Om meg</a></li>
+      <li><a href="#foto">Foto</a></li>
     </ul>
   </nav>
 
@@ -79,29 +83,40 @@
           <div class="line-mask"><h2 class="brand-role intro-line" style="--d:.22s">Digital markedsfører × kreativ</h2></div>
         </div>
 
+        <!-- Overskriftene slås opp på plass i rekka, ikke på data-i, så
+             det må stå én for hvert kort — også for Om meg, som aldri
+             forstørres og derfor aldri viser sin. -->
         <div class="case-heading" data-i="0" aria-hidden="true">
+          <h2>Om meg</h2>
+          <p>Digital markedsfører × kreativ</p>
+        </div>
+        <div class="case-heading" data-i="1" aria-hidden="true">
           <h2>OsloLut</h2>
           <p>One LUT. One identity.</p>
         </div>
-        <div class="case-heading" data-i="1" aria-hidden="true">
+        <div class="case-heading" data-i="2" aria-hidden="true">
           <h2>Knytt</h2>
           <p>Studentdrevet initiativ som gjør det lettere å finne tilhørighet i en ny by.</p>
         </div>
-        <div class="case-heading" data-i="2" aria-hidden="true">
+        <div class="case-heading" data-i="3" aria-hidden="true">
           <h2>Norges Badstulaug</h2>
           <p>Kom inn i varmen.</p>
         </div>
-        <div class="case-heading" data-i="3" aria-hidden="true">
+        <div class="case-heading" data-i="4" aria-hidden="true">
           <h2>Kryp</h2>
           <p>Hørespill — lyddesign.</p>
         </div>
-        <div class="case-heading" data-i="4" aria-hidden="true">
+        <div class="case-heading" data-i="5" aria-hidden="true">
           <h2>Nettbutikk</h2>
           <p>Under arbeid — ikke klar for visning ennå.</p>
         </div>
-        <div class="case-heading" data-i="5" aria-hidden="true">
+        <div class="case-heading" data-i="6" aria-hidden="true">
           <h2>Verktøy</h2>
           <p>Klikk videre for avsløringen.</p>
+        </div>
+        <div class="case-heading" data-i="7" aria-hidden="true">
+          <h2>Foto</h2>
+          <p>Bordet og veggen.</p>
         </div>
       </div>
 
@@ -116,8 +131,11 @@
         <!-- Om meg står for seg selv, også på mobil. Den lå før inne i
              menyen bak hodet, og da var den i praksis gjemt — man måtte
              vite at den fantes for å finne den. -->
+        <!-- Ansiktet i stedet for et person-ikon. Ikonet sa «profil», og
+             det er et ord man har lært å hoppe over; et ansikt sier at
+             det står noen bak. Samme bilde som i nettleserfanen. -->
         <button class="widget about-toggle" type="button" aria-label="Om meg">
-          <svg width="15" height="15" viewBox="0 0 15 15" fill="none" aria-hidden="true"><circle cx="7.5" cy="5" r="2.6" stroke="currentColor" stroke-width="1.2"/><path d="M2.6 13c.6-2.5 2.6-3.8 4.9-3.8s4.3 1.3 4.9 3.8" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/></svg>
+          <img class="widget-ansikt" src="assets/favicon/ansikt-96.png" alt="" width="24" height="24">
           <span class="widget-label">Om meg</span>
         </button>
 
@@ -152,8 +170,28 @@
     <!-- ======== KORTSTOKKEN (horisontal) ======== -->
     <div class="deck deck-intro">
 
+      <!-- ---- 01: Om meg ----
+           Om-siden lå bare bak en knapp i navbaren, og den er lett å gå
+           forbi: det er stokken man ser, og i stokken fantes det ingen.
+           Nå ligger den der som et kort blant de andre — først i rekka,
+           og siden stokken looper og OsloLut står fremme, betyr det rett
+           til venstre for OsloLut. Prosjektet møter deg fortsatt først,
+           men med et ansikt ved siden av.
+
+           Kortet har ingen forstørret visning. Om-siden ER den visningen,
+           så klikket går rett dit, og figuren glir fra kortet over til
+           plassen sin der. Det er samme bilde i samme størrelse — se
+           «flyFiguren» i script.js. -->
+      <article class="panel" id="meg" data-i="0">
+        <div class="card card--om" role="button" tabindex="0" aria-label="Om meg">
+          <img class="om-figur" src="assets/figur/kai-figur.jpg" alt="" aria-hidden="true">
+          <span class="om-hei" aria-hidden="true">Hei, jeg er Kai</span>
+          <span class="card-label card-label--ink">Om meg</span>
+        </div>
+      </article>
+
       <!-- ---- 02: OsloLut ---- -->
-      <article class="panel panel--pages" id="oslolut" data-i="0">
+      <article class="panel panel--pages" id="oslolut" data-i="1">
         <div class="card" role="button" tabindex="0" aria-label="OsloLut">
           <div class="card-art art--oslolut" aria-hidden="true"></div>
           <div class="case-reel" tabindex="-1">
@@ -210,7 +248,7 @@
       </article>
 
       <!-- ---- 03: Knytt ---- -->
-      <article class="panel panel--pages" id="knytt" data-i="1">
+      <article class="panel panel--pages" id="knytt" data-i="2">
         <div class="card" role="button" tabindex="0" aria-label="Knytt">
           <div class="card-art art--knytt" aria-hidden="true"></div>
           <div class="case-reel" tabindex="-1">
@@ -414,7 +452,7 @@
       </article>
 
       <!-- ---- 04: Norges Badstulaug ---- -->
-      <article class="panel panel--pages" id="badstulaug" data-i="2">
+      <article class="panel panel--pages" id="badstulaug" data-i="3">
         <div class="card" role="button" tabindex="0" aria-label="Norges Badstulaug">
           <div class="card-art art--badstulaug" aria-hidden="true"></div>
           <div class="case-reel" tabindex="-1">
@@ -499,7 +537,7 @@
       </article>
 
       <!-- ---- 05: Kryp ---- -->
-      <article class="panel" id="kryp" data-i="3">
+      <article class="panel" id="kryp" data-i="4">
         <div class="card card--snart" role="button" tabindex="0" aria-label="Kryp — nytt prosjekt">
           <div class="card-art art--snart" aria-hidden="true"></div>
           <img class="card-cover" src="assets/kryp/cover/kryp_cover.jpg" alt="" aria-hidden="true">
@@ -590,7 +628,7 @@
            tekstbeskrivelse å vise ennå. Derfor står det uten role og
            tabindex — det er ikke en knapp, og skal ikke annonseres som
            en. Lastelinjen er den eneste beskjeden kortet gir. -->
-      <article class="panel" id="nettbutikk" data-i="4">
+      <article class="panel" id="nettbutikk" data-i="5">
         <div class="card card--laast">
           <div class="card-art art--silke" aria-hidden="true"><span></span><span></span><span></span><span></span><span></span></div>
           <div class="type-face">
@@ -602,7 +640,7 @@
       </article>
 
       <!-- ---- 07: Verktøy ---- -->
-      <article class="panel" id="verktoy" data-i="5">
+      <article class="panel" id="verktoy" data-i="6">
         <div class="card" role="button" tabindex="0" aria-label="Verktøy">
 
           <!-- Det fysiske utstyret, i ring rundt midten. Ringen ER
@@ -691,17 +729,196 @@
         </div>
       </article>
 
+      <!-- ---- 08: Foto ----
+           To sett bilder i to formater, og formatet er det som skiller
+           dem: løse kopier og innrammet arbeid. Kortet er derfor to rom.
+
+           Bordet: sju bilder, alle tatt med kompaktkameraet som
+           står i ringen i kortet før — utstyret og det utstyret har laget
+           står ved siden av hverandre. 9:16, kornete, rett fra lomma. De
+           ligger løst, som papirkopier.
+
+           Veggen: seks bilder, tatt med speilrefleks og
+           fastobjektiv og ferdigbehandlet i Lightroom. 4:5 og 2:3. De
+           henger innrammet, i et salongoppheng — der er det nettopp de
+           ulike formatene som gjør veggen levende.
+
+           Veggen henger over bordet. Bryteren øverst bytter rom, og
+           rullehjulet gjør det samme: ruller man opp fra bordet, ser man
+           opp på veggen.
+
+           I stokken er kortet en bunke papirkopier oppå en innrammet kopi
+           som er tatt ned fra veggen. Åpner du det, spres kopiene utover
+           bordet som en vifte. Holder du pekeren over en, løfter den seg
+           og forteller hva kameraet sto på. Klikker du, kommer den opp i
+           stort format, med resten skjøvet til side i to bunker: de du
+           har sett, og de du har igjen. På veggen tas rammen ned i
+           stedet, lyset i rommet dempes, og en lapp ved siden av forteller
+           det samme som på et museum.
+
+           På smal skjerm er det ikke plass til vifta. Der er det alltid
+           ett bilde oppe på bordet, og sveip blar.
+
+           Kopiene og rammene har ingen src i markupen. De ligger skjult
+           til kortet åpnes, og skulle ikke hentes ned for alle som aldri
+           gjør det — script.js legger inn den lille versjonen først og
+           bytter til den store når den er klar. -->
+      <article class="panel panel--bunnlinje" id="foto" data-i="7">
+        <div class="card card--foto" role="button" tabindex="0" aria-label="Foto">
+          <div class="card-art art--foto" aria-hidden="true"></div>
+
+          <div class="foto-bunke" aria-hidden="true">
+            <!-- nederst i bunken: en ramme tatt ned fra veggen -->
+            <span class="bunke-ramme"><img src="assets/bilder/web/Elvina-02av10-liten.jpg" alt="" fetchpriority="low" decoding="async"></span>
+            <img src="assets/bilder/web/IMG_1677-liten.jpg" alt="" fetchpriority="low" decoding="async">
+            <img src="assets/bilder/web/IMG_1720-liten.jpg" alt="" fetchpriority="low" decoding="async">
+            <img src="assets/bilder/web/IMG_1529-liten.jpg" alt="" fetchpriority="low" decoding="async">
+          </div>
+
+          <div class="lysbord">
+
+            <!-- To knapper, ikke en bryter av/på: det er to steder, og
+                 begge skal kunne nås direkte. aria-pressed sier hvilket
+                 rom man står i. -->
+            <div class="rom-bryter" role="group" aria-label="Velg rom">
+              <span class="rom-markor" aria-hidden="true"></span>
+              <button type="button" data-rom="bord" aria-pressed="true">Bordet</button>
+              <button type="button" data-rom="vegg" aria-pressed="false">Veggen</button>
+            </div>
+
+          <!-- EXIF-dataene er lest rett ut av originalfilene. Brennvidden
+               er oppgitt som 35 mm-ekvivalent — G7 X-en har en 1-tommers
+               brikke, så de faktiske 8,8–36,8 mm sier lite til noen som
+               tenker i fullformat. Når bildene er tatt, står ikke her: det
+               er kameraet og innstillingene som er poenget, ikke datoen.
+               Kameraet er det samme for alle sju, så det står på rommet. -->
+            <div class="rom rom--bord" data-navn="Sju bilder" data-exif="Canon PowerShot G7 X Mark II" data-kamera="Canon PowerShot G7 X Mark II">
+            <div class="lysbord-scene">
+              <button class="kopi" type="button" data-exif="42 mm · f/2.5 · 1/400 s · ISO 125">
+                <img data-liten="assets/bilder/web/IMG_1529-liten.jpg" data-stor="assets/bilder/web/IMG_1529-stor.jpg" alt="Det røde Freia-skiltet med klokke på taket av en bygård i skumringen, med en måke på vingene over.">
+              </button>
+              <button class="kopi" type="button" data-exif="86 mm · f/2.8 · 1/320 s · ISO 640">
+                <img data-liten="assets/bilder/web/IMG_1668-liten.jpg" data-stor="assets/bilder/web/IMG_1668-stor.jpg" alt="En bygate i skumringen, med rosa og fiolette skystriper over takene og gatelys som akkurat har tent.">
+              </button>
+              <button class="kopi" type="button" data-exif="85 mm · f/2.8 · 1/250 s · ISO 800">
+                <img data-liten="assets/bilder/web/IMG_1677-liten.jpg" data-stor="assets/bilder/web/IMG_1677-stor.jpg" alt="To minareter med blå mosaikk mot en fiolett kveldshimmel, ved siden av en rekke bygårder.">
+              </button>
+              <button class="kopi" type="button" data-exif="34 mm · f/2.2 · 1/200 s · ISO 1600">
+                <img data-liten="assets/bilder/web/IMG_1720-liten.jpg" data-stor="assets/bilder/web/IMG_1720-stor.jpg" alt="En silhuett ved en bil med røde baklys, under en himmel som går fra oransje til dyp blå.">
+              </button>
+              <button class="kopi" type="button" data-exif="24 mm · f/1.8 · 1/250 s · ISO 200">
+                <img data-liten="assets/bilder/web/IMG_2317-liten.jpg" data-stor="assets/bilder/web/IMG_2317-stor.jpg" alt="Portrett av en mann med skjegg og sixpence foran en grønn vogn med opplyste vinduer.">
+              </button>
+              <button class="kopi" type="button" data-exif="56 mm · f/2.8 · 1/125 s · ISO 125">
+                <img data-liten="assets/bilder/web/IMG_2761-liten.jpg" data-stor="assets/bilder/web/IMG_2761-stor.jpg" alt="Speilbilde i en forgylt ramme: en person i leopardskjorte og caps holder et kompaktkamera foran ansiktet.">
+              </button>
+              <button class="kopi" type="button" data-exif="24 mm · f/2 · 1/50 s · ISO 1250">
+                <img data-liten="assets/bilder/web/IMG_3468-liten.jpg" data-stor="assets/bilder/web/IMG_3468-stor.jpg" alt="En person i et mørkt klipperom ser opp på en skjerm med en filmscene, med tidslinjer på to skjermer under.">
+              </button>
+            </div>
+            </div>
+
+            <!-- Veggen. Rammene står i tidsrekkefølge i markupen; hvor de
+                 henger, bestemmes av opphenget i script.js. --r er
+                 bildets eget sideforhold, så rammen kan få riktig bredde
+                 før bildet er hentet.
+
+                 Objektivene er oppgitt med navn, ikke omregnet: 80D-en
+                 har en APS-C-brikke, men navnet på objektivet er det
+                 som står på det. RAW-fila fra munkene er fremkalt rett,
+                 uten Lightroom — den har ikke fått samme behandling som
+                 de andre fem. -->
+            <div class="rom rom--vegg" data-navn="Seks bilder" data-exif="Canon EOS 80D og Sony A7 III">
+              <div class="lysbord-scene vegg-scene">
+                <span class="vegg-mork" aria-hidden="true"></span>
+
+                <button class="ramme" type="button" style="--r: 0.8" data-kamera="Canon EOS 80D" data-objektiv="EF 50 mm f/1.8 STM" data-eksponering="f/1.8 · 1/640 s · ISO 160">
+                  <img data-liten="assets/bilder/web/IMG_1908-liten.jpg" data-stor="assets/bilder/web/IMG_1908-stor.jpg" alt="Utsmykkede bygårder i tegl og stein langs en gate, med en gatelykt og en gyllen svane over en inngang.">
+                </button>
+                <button class="ramme" type="button" style="--r: 0.8" data-kamera="Canon EOS 80D" data-objektiv="EF 24 mm f/1.4L USM" data-eksponering="f/2.8 · 1/250 s · ISO 250">
+                  <img data-liten="assets/bilder/web/IMG_4179-liten.jpg" data-stor="assets/bilder/web/IMG_4179-stor.jpg" alt="En person står alene på et stort, lyst steintak foran en rekke høyhus, under en tung himmel med rosa skyer.">
+                </button>
+                <button class="ramme" type="button" style="--r: 0.8" data-kamera="Sony A7 III" data-objektiv="Sigma 16 mm f/1.4 DC DN" data-eksponering="f/2.8 · 1/500 s · ISO 100">
+                  <img data-liten="assets/bilder/web/Elvina-02av10-liten.jpg" data-stor="assets/bilder/web/Elvina-02av10-stor.jpg" alt="En person i gul jakke fisker fra en kai ved en fjord, under tunge skyer og bratte fjellsider.">
+                </button>
+                <button class="ramme" type="button" style="--r: 0.8" data-kamera="Sony A7 III" data-objektiv="Sigma 16 mm f/1.4 DC DN" data-eksponering="f/2 · 1/2500 s · ISO 125">
+                  <img data-liten="assets/bilder/web/Elvina-02av02-liten.jpg" data-stor="assets/bilder/web/Elvina-02av02-stor.jpg" alt="Et skilt med piler mot Fløyen, Cape Town, Nordkapp og andre steder, mot en grønnblå himmel.">
+                </button>
+                <button class="ramme" type="button" style="--r: 0.6664" data-kamera="Sony A7 III" data-objektiv="FE 85 mm f/1.8" data-eksponering="f/1.8 · 1/800 s · ISO 100">
+                  <img data-liten="assets/bilder/web/DSC02810-liten.jpg" data-stor="assets/bilder/web/DSC02810-stor.jpg" alt="To unge munker i oransje kapper går forbi et hvitt stakittgjerde.">
+                </button>
+                <button class="ramme" type="button" style="--r: 0.8" data-kamera="Sony A7 III" data-objektiv="FE 85 mm f/1.8" data-eksponering="f/1.8 · 1/500 s · ISO 1000">
+                  <img data-liten="assets/bilder/web/Nacpan-01av03-liten.jpg" data-stor="assets/bilder/web/Nacpan-01av03-stor.jpg" alt="Portrett av en mann i blomstrete skjorte på en strand i solnedgang.">
+                </button>
+
+                <!-- Lappen ved siden av rammen som er tatt ned, som på et
+                     museum. Samme opplysninger som i linja nederst, så
+                     den er skjult for skjermlesere. -->
+                <div class="vegglapp" aria-hidden="true">
+                  <p class="lapp-kamera"></p>
+                  <p class="lapp-objektiv"></p>
+                  <p class="lapp-eksponering"></p>
+                </div>
+              </div>
+            </div>
+
+            <div class="lysbord-linje">
+              <p class="lysbord-tekst">
+                <span class="lysbord-navn">Sju bilder</span>
+                <span class="lysbord-exif">Canon PowerShot G7 X Mark II</span>
+              </p>
+              <span class="lysbord-teller" aria-hidden="true"><b>1</b>&thinsp;/&thinsp;<span class="lysbord-sum">7</span></span>
+              <!-- Klikket bobler til kortet, som allerede vet at neste
+                   steg er tekstarket — samme grep som «Se stacken». -->
+              <button class="lysbord-mer" type="button">Om bildene</button>
+            </div>
+          </div>
+
+          <span class="card-label">Foto</span>
+
+          <div class="card-text" tabindex="-1">
+            <div class="card-text-inner">
+              <header class="text-head">
+                <p class="text-kicker">Foto — 08</p>
+                <h2>Foto</h2>
+                <p class="text-sub">Bordet og veggen.</p>
+              </header>
+
+              <section class="text-block">
+                <p>På bordet ligger sju bilder, alle tatt med en Canon PowerShot G7&nbsp;X Mark&nbsp;II — det samme kompaktkameraet som står i ringen under Verktøy.</p>
+                <p>På veggen henger seks, tatt med Canon EOS&nbsp;80D og Sony A7&nbsp;III.</p>
+              </section>
+
+              <section class="text-block">
+                <h3>Rolle</h3>
+                <p class="text-role">Foto · Etterbehandling</p>
+              </section>
+
+              <section class="text-block">
+                <h3>Utstyr</h3>
+                <p class="text-role">Canon PowerShot G7 X Mark II · Canon EOS 80D · Sony A7 III</p>
+              </section>
+            </div>
+          </div>
+        </div>
+      </article>
+
     </div>
 
     <!-- ======== OM MEG (egen «side» i samme viewport) ========
          Figuren har preload="none" som resten av opptakene, men spilles
          aldri av — den scrubbes av scrollen. Derfor ber script.js om den
-         eksplisitt når om-siden åpnes. ======== -->
+         eksplisitt når om-siden åpnes.
+
+         Plakatbildet er første frame i opptaket, og det samme bildet som
+         står på Om meg-kortet i stokken. Uten det sto boksen tom til
+         opptaket var hentet — og det er nettopp den boksen figuren skal
+         gli inn i når man kommer fra kortet. ======== -->
     <section class="about-view" id="om" aria-label="Om meg" tabindex="-1">
       <div class="about-inner">
 
         <div class="about-copy">
-          <p class="text-kicker">Om meg — 05</p>
+          <p class="text-kicker">Om meg — 01</p>
           <p class="about-p"><strong>Jeg liker å finne problemet bak problemet.</strong> Det går igjen i alt jeg har jobbet med: ensomhet blant nye studenter i Oslo, utbrenthet blant unge voksne og gapet mellom det en Sony-bruker ser for seg og det kameraet faktisk leverer. Samme mekanisme, tre ulike sammenhenger.</p>
           <p class="about-p">Jeg studerer <strong>digital markedsføring</strong>, men det jeg liker aller best er skjæringspunktet mellom strategi og kreativ utførelse. Jeg trives med hele reisen fra innsikt og idé til innhold, nettside og måling. To år med <strong>lyddesign</strong> ligger også under videoarbeidet mitt, fordi lyd bærer like mye av følelsen som bildet gjør.</p>
           <p class="about-p">Jeg bygger det jeg vil presentere selv, i stedet for å vente på at noen andre skal gjøre idéen virkelig.</p>
@@ -725,7 +942,7 @@
 
         <div class="about-side">
           <div class="about-media">
-            <video src="assets/figur/kai-figur.mp4" muted playsinline preload="none" aria-label="Animasjon av Kai"></video>
+            <video src="assets/figur/kai-figur.mp4" poster="assets/figur/kai-figur.jpg" muted playsinline preload="none" aria-label="Animasjon av Kai"></video>
           </div>
         </div>
 
@@ -759,12 +976,14 @@
 
     <!-- ======== NAVIGASJON / KONTROLLER ======== -->
     <div class="deck-dots" role="tablist" aria-label="Bla i sider">
-      <button class="dot" data-goto="0" role="tab" aria-label="OsloLut"></button>
-      <button class="dot" data-goto="1" role="tab" aria-label="Knytt"></button>
-      <button class="dot" data-goto="2" role="tab" aria-label="Norges Badstulaug"></button>
-      <button class="dot" data-goto="3" role="tab" aria-label="Kryp"></button>
-      <button class="dot" data-goto="4" role="tab" aria-label="Nettbutikk"></button>
-      <button class="dot" data-goto="5" role="tab" aria-label="Verktøy"></button>
+      <button class="dot" data-goto="0" role="tab" aria-label="Om meg"></button>
+      <button class="dot" data-goto="1" role="tab" aria-label="OsloLut"></button>
+      <button class="dot" data-goto="2" role="tab" aria-label="Knytt"></button>
+      <button class="dot" data-goto="3" role="tab" aria-label="Norges Badstulaug"></button>
+      <button class="dot" data-goto="4" role="tab" aria-label="Kryp"></button>
+      <button class="dot" data-goto="5" role="tab" aria-label="Nettbutikk"></button>
+      <button class="dot" data-goto="6" role="tab" aria-label="Verktøy"></button>
+      <button class="dot" data-goto="7" role="tab" aria-label="Foto"></button>
     </div>
 
     <button class="close-btn" type="button" aria-label="Lukk">

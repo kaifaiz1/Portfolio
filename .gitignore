@@ -17,3 +17,11 @@
 # vises i noen hundre piksler. Nettversjonene ligger ved siden av,
 # nedskalert. Slett originalene når du har dem trygt et annet sted.
 assets/**/DSC*.jpg
+
+# Alt i assets/bilder er originaler — JPG rett fra kameraet, eksporter
+# fra Lightroom og RAW-filer (DNG), 2–22 MB stykket. Foto-kortet bruker
+# nettversjonene i assets/bilder/web. De skal med; resten skal ikke.
+assets/bilder/*
+!assets/bilder/web/
+# DSC-regelen over ville ellers også tatt nettversjonen av RAW-fila
+!assets/bilder/web/*
