@@ -245,7 +245,7 @@ button { font: inherit; color: inherit; background: none; border: none; cursor: 
 
 .widget svg { flex: none; color: currentColor; }
 
-/* Ansiktet på Om meg-knappen. Det trekkes litt ut mot kanten, som et
+/* Ansiktet på CV-knappen. Det trekkes litt ut mot kanten, som et
    avatarmerke, så luften rundt bildet og luften rundt et ikon blir lik
    for øyet. Fotoet har sin egen sirkel med blå bakgrunn malt inn, og
    radiusen her klipper bare bort de gjennomsiktige hjørnene. */
@@ -2669,6 +2669,25 @@ body.lyd-pa .lyd-knapp .lyd-fra { display: inline-flex; }
 .about-note-doc:hover svg,
 .about-note-doc:focus-visible svg { opacity: 1; }
 
+/* --- slutten: CV, e-post og LinkedIn der lesingen slutter. Streken over
+       sier at teksten er ferdig. Knappene er de samme widgetene som
+       øverst, men med navnet framme: her er det plass, og den som har
+       lest ferdig skal ikke måtte gjette på ikonene. Bunnmargen på
+       .about-copy står igjen, og den holder knappene på høyde med
+       underkanten av figuren når siden er rullet helt ned. --- */
+
+.about-slutt {
+  margin-top: 12vh;
+  padding-top: 2.2rem;
+  border-top: 1px solid var(--line);
+}
+
+.about-slutt-knapper {
+  display: flex;
+  flex-wrap: wrap;   /* tre navn får ikke alltid plass på én linje på 360 px */
+  gap: 0.55rem;
+}
+
 .about-side { position: relative; }
 
 /* --- identiteten på om-siden: samme plassering som før navbaren, med
@@ -3617,13 +3636,33 @@ html.port:not(.apnet) .deck-intro > .panel > .card { animation-play-state: pause
 
   .about-note-quote { font-size: 1rem; }
 
+  .about-slutt {
+    margin-top: 8vh;
+    padding-top: 1.8rem;
+  }
+
+  /* Alle andre widgeter krymper til ikon her, men disse står alene på
+     en linje nederst og har plass til navnet. */
+  .about-slutt .widget {
+    width: auto;
+    padding: 0 1rem;
+  }
+
+  .about-slutt .widget-label { display: inline; }
+
+  .about-slutt .widget-ansikt {
+    width: 24px;
+    height: 24px;
+    margin-left: -0.35rem;
+  }
+
   .edge-chip { display: none; } /* touch har ✕ og Esc */
 
   /* 9vw og ikke 12: med det store kortet gikk «nettbutikk.» utenfor
      kanten på begge sider */
   .type-big { font-size: clamp(2rem, 9vw, 4.5rem); }
 
-  /* Om meg-knappen er bare ikon her, og da er ansiktet hele ikonet. */
+  /* CV-knappen er bare ikon her, og da er ansiktet hele ikonet. */
   .widget-ansikt { width: 28px; height: 28px; margin: 0; }
 
   /* --- lysbordet på høykant ---

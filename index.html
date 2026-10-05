@@ -128,16 +128,17 @@
           <span class="widget-label label-sun">Dag</span>
         </button>
 
-        <!-- Om meg står for seg selv, også på mobil. Den lå før inne i
-             menyen bak hodet, og da var den i praksis gjemt — man måtte
-             vite at den fantes for å finne den. -->
-        <!-- Ansiktet i stedet for et person-ikon. Ikonet sa «profil», og
-             det er et ord man har lært å hoppe over; et ansikt sier at
-             det står noen bak. Samme bilde som i nettleserfanen. -->
-        <button class="widget about-toggle" type="button" aria-label="Om meg">
+        <!-- CV står for seg selv, også på mobil, og ikke bak konvolutten:
+             det er den man leter etter. Her sto Om meg før, men den har
+             fått sitt eget kort i stokken, og to veier til samme side
+             var én for mye.
+             Ansiktet i stedet for et dokument-ikon. Et ark sier «fil», et
+             ansikt sier hvem fila handler om. Samme bilde som i
+             nettleserfanen. -->
+        <a class="widget cv-lenke" href="assets/cv/Kai-Faiz-CV-soknad.pdf" target="_blank" rel="noopener" aria-label="CV (PDF) — åpnes i ny fane" title="CV">
           <img class="widget-ansikt" src="assets/favicon/ansikt-96.png" alt="" width="24" height="24">
-          <span class="widget-label">Om meg</span>
-        </button>
+          <span class="widget-label">CV</span>
+        </a>
 
         <!-- Skiller snarveiene på siden fra de to måtene å nå meg på.
              Bare på bred skjerm: i mobilnavbaren er det allerede så
@@ -938,6 +939,31 @@
               </a>
             </figcaption>
           </figure>
+
+          <!-- Slutten på siden. Kontaktene sto bare helt øverst, og den som
+               hadde lest ferdig måtte rulle hele veien opp igjen for å
+               finne dem. Nå står de der lesingen slutter — sammen med
+               CV-en, som ellers bare finnes i navbaren, og den er borte
+               på om-siden. -->
+          <footer class="about-slutt">
+            <p class="text-kicker">Kontakt</p>
+            <div class="about-slutt-knapper">
+              <a class="widget cv-lenke" href="assets/cv/Kai-Faiz-CV-soknad.pdf" target="_blank" rel="noopener" aria-label="CV (PDF) — åpnes i ny fane">
+                <img class="widget-ansikt" src="assets/favicon/ansikt-96.png" alt="" width="24" height="24">
+                <span class="widget-label">CV</span>
+              </a>
+
+              <a class="widget" href="mailto:kai.private@hotmail.com" aria-label="Send e-post">
+                <svg width="15" height="15" viewBox="0 0 15 15" fill="none" aria-hidden="true"><rect x="1.8" y="3" width="11.4" height="9" rx="1.6" stroke="currentColor" stroke-width="1.2"/><path d="m2.4 3.9 5.1 4.2 5.1-4.2" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                <span class="widget-label">E-post</span>
+              </a>
+
+              <a class="widget" href="https://www.linkedin.com/in/kai-faiz-608816343/" target="_blank" rel="noopener" aria-label="LinkedIn — åpnes i ny fane">
+                <svg width="15" height="15" viewBox="0 0 15 15" fill="none" aria-hidden="true"><rect x="1.8" y="1.8" width="11.4" height="11.4" rx="2" stroke="currentColor" stroke-width="1.2"/><path d="M4.9 6.6v3.9M4.9 4.6v.1M7.4 10.5V8.2c0-.9.7-1.6 1.6-1.6s1.6.7 1.6 1.6v2.3" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/></svg>
+                <span class="widget-label">LinkedIn</span>
+              </a>
+            </div>
+          </footer>
         </div>
 
         <div class="about-side">

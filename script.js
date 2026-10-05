@@ -15,7 +15,6 @@
   const dots = Array.from(document.querySelectorAll('.deck-dots .dot'));
   const closeBtn = document.querySelector('.close-btn');
   const chip = document.querySelector('.edge-chip');
-  const aboutToggle = document.querySelector('.about-toggle');
   const aboutView = document.querySelector('.about-view');
   const aboutVideo = document.querySelector('.about-media video');
   const brand = document.querySelector('.brand');
@@ -2080,11 +2079,8 @@
     if (!valgt) settTema(e.matches, false);
   });
 
-  // --- om meg-knappen i navbaren → om-siden, tilbake-knappen der → deck ---
-  if (aboutToggle) {
-    aboutToggle.addEventListener('click', () => setMode('about'));
-  }
-
+  // --- tilbake-knappen på om-siden → deck. Inn kommer man fra Om
+  //     meg-kortet i stokken; navbaren har CV-lenka der knappen sto. ---
   if (aboutBack) {
     aboutBack.addEventListener('click', () => setMode('deck'));
   }
