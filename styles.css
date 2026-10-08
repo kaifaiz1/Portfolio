@@ -1880,6 +1880,12 @@ body.lyd-pa .lyd-knapp .lyd-fra { display: inline-flex; }
   inset: 0;
   container-type: size;
   isolation: isolate;
+  /* Nettleseren får ikke rulle sidestokken når fingeren starter på
+     bordet — script.js tar gesten selv, og blar side bare når den er
+     tydelig loddrett. Klyping for å zoome er fortsatt lov der det
+     støttes; den første linja er reserven der det ikke gjør det. */
+  touch-action: pan-x;
+  touch-action: pan-x pinch-zoom;
 }
 
 /* Lampa over bordet. Et varmt skjær midt på, så kopiene har noe å
@@ -3023,6 +3029,18 @@ html.port:not(.apnet) .deck-intro > .panel > .card { animation-play-state: pause
   .mode-expanded .panel--pages.is-active .reel-item--lysbord { --rbox-h: 1.6; }
   .mode-expanded .panel--pages.is-active .reel-item--ring { --rbox-h: 1.15; }
 
+  /* Høyden følger bredden, og på en iPad på høykant ble sidene i Morro
+     høyere enn kortet: toppen og bunnen forsvant, og bildeteksten havnet
+     under bunnlinja. Her får de et tak — kortets høyde, minus litt luft,
+     så hele siden står inne når den er midt i. Innholdet i alle tre måler
+     seg mot siden, så det krymper med. På en telefon på høykant er taket
+     høyere enn sidene, og ingenting endrer seg. dvh følger
+     nettleserlinjene på mobil; der den ikke finnes, gjelder linja over. */
+  .mode-expanded .panel--pages.is-active :is(.reel-item--spot, .reel-item--lysbord, .reel-item--ring) {
+    height: min(calc(var(--rbox) * var(--rbox-h)), calc(100vh - var(--nav-h) - 3vh - 2.5rem));
+    height: min(calc(var(--rbox) * var(--rbox-h)), calc(100dvh - var(--nav-h) - 3vh - 2.5rem));
+  }
+
   /* Lysbordet på høykant. Ikke plass til en vifte på 360 px: scenen står
      på høykant, én kopi er alltid oppe, og bunkene på hver side stikker
      så vidt inn fra kanten — nok til å si at det er flere å sveipe til.
@@ -3526,8 +3544,7 @@ html.port:not(.apnet) .deck-intro > .panel > .card { animation-play-state: pause
 .spot.spiller .spot-ikon--pause { display: block; }
 
 .spot-hopp:focus-visible,
-.spot-play:focus-visible,
-.spot-mer:focus-visible {
+.spot-play:focus-visible {
   outline: 2px solid rgba(255,255,255,0.75);
   outline-offset: 3px;
 }
@@ -3539,27 +3556,6 @@ html.port:not(.apnet) .deck-intro > .panel > .card { animation-play-state: pause
 }
 
 .spot-status:empty { display: none; }
-
-.spot-mer {
-  display: inline-flex;
-  align-items: center;
-  margin-top: clamp(1.1rem, 3vh, 1.9rem);
-  padding: 0.5rem 1.05rem;
-  border: 1px solid rgba(255,255,255,0.22);
-  border-radius: 99px;
-  background: transparent;
-  color: rgba(255,255,255,0.78);
-  font: inherit;
-  font-size: 0.82rem;
-  cursor: pointer;
-  transition: color 0.25s var(--ease), border-color 0.25s var(--ease), background 0.25s var(--ease);
-}
-
-.spot-mer:hover {
-  color: #fff;
-  border-color: rgba(255,255,255,0.5);
-  background: rgba(255,255,255,0.07);
-}
 
 /* uten lydfil er det ingenting å trykke på — knappene blir stående,
    men slokner, og statuslinjen sier hvorfor */
@@ -3580,7 +3576,7 @@ html.port:not(.apnet) .deck-intro > .panel > .card { animation-play-state: pause
   }
 
   /* 28vh og ikke 32: med tittellinja på fast høyde er kortet et par
-     linjer lavere, og «Om prosjektet» skal ikke stå på kanten */
+     linjer lavere, og kontrollene skal ikke stå på kanten */
   .spot-cover { width: min(72%, 28vh); }
 
   .spot-panel {
@@ -3593,7 +3589,7 @@ html.port:not(.apnet) .deck-intro > .panel > .card { animation-play-state: pause
 }
 
 /* Lav, bred skjerm (mobil på tvers): plakaten tar all høyden, og
-   resten må stramme seg inn for at «Om prosjektet» ikke skal havne
+   resten må stramme seg inn for at kontrollene ikke skal havne
    nedenfor kortkanten. */
 @media (max-width: 860px) and (max-height: 520px) {
   .spot-cover { display: none; }
@@ -3605,10 +3601,9 @@ html.port:not(.apnet) .deck-intro > .panel > .card { animation-play-state: pause
   .spot-kontroller { margin-top: 0.55rem; }
   .spot-play { width: 46px; height: 46px; }
   .spot-hopp { width: 38px; height: 38px; }
-  .spot-mer { margin-top: 0.7rem; padding: 0.4rem 0.9rem; font-size: 0.78rem; }
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .spot, .spot-play, .spot-hopp, .spot-mer, .spot-scrub::-webkit-slider-thumb { transition: none; }
+  .spot, .spot-play, .spot-hopp, .spot-scrub::-webkit-slider-thumb { transition: none; }
   .spot-play:hover { transform: none; }
 }

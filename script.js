@@ -657,15 +657,6 @@
       if (e.key === 'Enter' || e.key === ' ' || e.key === 'Spacebar') e.stopPropagation();
     });
 
-    // «Om prosjektet» går rett til tekstarket. Den kan ikke bare la
-    // klikket boble: på mobil stopper siden i sidestokken trykk på seg
-    // selv, så et bom-trykk ikke åpner teksten i det stille — og da ville
-    // knappen her ikke gjort noe.
-    spot.querySelector('.spot-mer').addEventListener('click', (e) => {
-      e.stopPropagation();
-      if (mode === 'expanded') setMode('text');
-    });
-
     // Klikkene må stoppes her: ellers bobler de opp til kortet, som
     // tolker et trykk i forstørret modus som «vis tekstbeskrivelsen».
     playKnapp.addEventListener('click', (e) => {
@@ -739,7 +730,8 @@
   // er det alltid én kopi oppe.
   //
   // Bordet ligger i en sidestokk, og deler bevegelsene med den: loddrett
-  // hjul og sveip blar mellom sidene, sidelengs blar mellom bildene.
+  // hjul og sveip blar mellom sidene, sidelengs blar mellom bildene. På
+  // touch er loddrett gjort tregere her enn ellers i stokken.
   // ============================================================
 
   const lysbord = document.querySelector('.lysbord');
@@ -966,15 +958,23 @@
       setTimeout(() => { hjulPause = false; }, 520);
     }, { passive: false });
 
-    // Sveip på touch. Retningen låses ved første bevegelse, som i
-    // galleriene: sidelengs blar mellom bildene, loddrett ruller
-    // sidestokken, og det er ikke bordets sak.
+    // Sveip på touch. Bordet tar hele gesten selv — se touch-action i
+    // CSS-en. Lot vi nettleseren rulle sidestokken, gikk et sidelengs
+    // sveip som skled litt på skrå rett videre til siden over eller
+    // under, og det var nettopp der man var for å se på bildene.
+    //
+    // Retningen låses ved første bevegelse, og den heller mot sidelengs:
+    // bare et sveip som er tydelig loddrett teller som loddrett. Det
+    // må dessuten være et godt stykke langt før det blar til neste side.
+    // Sidelengs blar mellom bildene, som før.
+    const SIDELENGS = 40;   // px før et sidelengs sveip blar et bilde
+    const LODDRETT = 90;    // px før et loddrett sveip blar en side
     let sveipX = null;
     let sveipY = null;
     let retning = null;
 
     lysbord.addEventListener('touchstart', (e) => {
-      if (e.touches.length !== 1) return;
+      if (e.touches.length !== 1) { sveipX = null; return; }
       sveipX = e.touches[0].clientX;
       sveipY = e.touches[0].clientY;
       retning = null;
@@ -984,15 +984,26 @@
       if (sveipX === null || retning) return;
       const dx = e.touches[0].clientX - sveipX;
       const dy = e.touches[0].clientY - sveipY;
-      if (Math.abs(dx) + Math.abs(dy) > 10) retning = Math.abs(dx) > Math.abs(dy) ? 'x' : 'y';
+      if (Math.abs(dx) + Math.abs(dy) > 12) retning = Math.abs(dy) > Math.abs(dx) * 1.6 ? 'y' : 'x';
     }, { passive: true });
+
+    lysbord.addEventListener('touchcancel', () => { sveipX = null; }, { passive: true });
 
     lysbord.addEventListener('touchend', (e) => {
       if (sveipX === null) return;
       const dx = e.changedTouches[0].clientX - sveipX;
+      const dy = e.changedTouches[0].clientY - sveipY;
       sveipX = null;
-      if (!fremme() || retning !== 'x' || Math.abs(dx) < 40) return;
-      bla(dx < 0 ? 1 : -1);
+      if (!apen()) return;
+      if (retning === 'y' && Math.abs(dy) >= LODDRETT) {
+        // Gjelder også når siden bare stikker fram nederst eller øverst:
+        // bordet tar gesten uansett, og da må den kunne bla dit.
+        goToReel(bordReel, bordReel.aktiv + (dy < 0 ? 1 : -1));
+      } else if (retning === 'x' && Math.abs(dx) >= SIDELENGS && fremme()) {
+        bla(dx < 0 ? 1 : -1);
+      } else {
+        return;
+      }
       // Nettleseren demper som regel klikket etter et sveip, men ikke
       // alltid. Kommer det likevel, skal det ikke bla én gang til — og
       // kommer det ikke, skal flagget ikke bli stående og spise neste.
