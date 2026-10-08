@@ -771,6 +771,8 @@
 
     function legg() {
       const { smal, b } = maal();
+      const W = scene.clientWidth;
+      const H = scene.clientHeight;
       if (smal) {
         over = null;
         if (valgt === null) valgt = 0;
@@ -828,8 +830,9 @@
           }
         }
 
-        k.style.setProperty('--x', `${x.toFixed(2)}%`);
-        k.style.setProperty('--y', `${y.toFixed(2)}%`);
+        // i piksler, og som transform — se .kopi i CSS-en for hvorfor
+        k.style.setProperty('--x', `${((x / 100) * W).toFixed(1)}px`);
+        k.style.setProperty('--y', `${((y / 100) * H).toFixed(1)}px`);
         k.style.setProperty('--r', `${r.toFixed(2)}deg`);
         k.style.setProperty('--s', s.toFixed(3));
         k.style.setProperty('--z', String(z));
@@ -847,8 +850,8 @@
     function bunke() {
       kopier.forEach((k, i) => {
         k.style.transition = 'none';
-        k.style.setProperty('--x', '50%');
-        k.style.setProperty('--y', '52%');
+        k.style.setProperty('--x', `${(scene.clientWidth * 0.5).toFixed(1)}px`);
+        k.style.setProperty('--y', `${(scene.clientHeight * 0.52).toFixed(1)}px`);
         k.style.setProperty('--r', `${((i % 3) - 1) * 5}deg`);
         k.style.setProperty('--s', '0.82');
         k.style.setProperty('--o', '0');

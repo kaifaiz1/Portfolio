@@ -1927,17 +1927,24 @@ body.lyd-pa .lyd-knapp .lyd-fra { display: inline-flex; }
    liggende kopi på en scene på høykant blir aldri bredere enn 92 % av
    den — samme tak som i script.js.
 
-   Plassen settes med left og top i prosent, ikke med translate i
-   piksler. Prosentene er relative til scenen, og når siden vokser fram
-   endrer de seg ikke, så overgangene starter ikke på nytt for hver
-   frame. Bare et faktisk bytte av plass gir en overgang.
+   Plassen settes med transform — ikke med left og top. Med left og top
+   måtte nettleseren regne ut layout og male alle ti kopiene på nytt i
+   hver eneste frame av overgangen: målt med strupet CPU ble det 276
+   layout-runder og over 600 malinger på seks bildebytter, og det var det
+   som hakket. Nå er det én layout per bytte, og en transform kan
+   skjermkortet flytte alene. Plassen regnes ut i script.js som en andel
+   av scenen og settes i piksler; endres skjermen, regnes den ut på nytt.
+   Før kopiene er delt ut, ligger de midt på scenen (50cqw), usynlige.
+
+   Skyggen skifter uten overgang når en kopi løftes — en skygge som
+   glir, må males på nytt i hver frame, og forskjellen ser man ikke.
 
    Usynlig til den er delt ut: før det ligger alle i en bunke midt på
    bordet, og den skal ikke synes i glipen fra siden over. */
 .kopi {
   position: absolute;
-  left: var(--x, 50%);
-  top: var(--y, 50%);
+  left: 0;
+  top: 0;
   height: min(var(--kh), 92cqw / var(--f));
   aspect-ratio: var(--f);
   padding: 1.5cqh;
@@ -1947,18 +1954,39 @@ body.lyd-pa .lyd-knapp .lyd-fra { display: inline-flex; }
   box-shadow:
     0 26px 44px -20px rgba(0,0,0,0.8),
     0 2px 6px rgba(0,0,0,0.3);
-  transform: translate(-50%, -50%) rotate(var(--r, 0deg)) scale(var(--s, 1));
+  transform:
+    translate(var(--x, 50cqw), var(--y, 50cqh))
+    translate(-50%, -50%)
+    rotate(var(--r, 0deg))
+    scale(var(--s, 1));
   z-index: var(--z, 1);
   opacity: var(--o, 0);
   cursor: pointer;
   -webkit-tap-highlight-color: transparent;
   transition:
-    left 0.75s var(--ease),
-    top 0.75s var(--ease),
     transform 0.75s var(--ease),
-    opacity 0.5s var(--ease),
-    box-shadow 0.5s var(--ease);
+    opacity 0.5s var(--ease);
 }
+
+/* Fokusringen rundt siden. Casekortene tegner den med outline, men her
+   gjorde den at hele siden ble malt på nytt i hver frame mens kopiene
+   gled — nettleseren regner med at en outline kan avhenge av det som
+   ligger inni. Samme ring tegnet som skygge, med luft i sidens egen
+   bakgrunnsfarge, ser lik ut og males bare når siden selv endrer seg. */
+.mode-expanded .panel--pages.is-active .card:focus-visible .reel-item--lysbord[data-pos="0"] {
+  outline: none;
+  box-shadow:
+    0 0 0 6px var(--bg),
+    0 0 0 8px var(--ink),
+    0 42px 80px -24px rgba(0,0,0,0.42),
+    0 16px 32px -14px rgba(0,0,0,0.20);
+}
+
+/* Mens bordet er i bruk, ligger hver kopi i sitt eget lag. Da tegnes de
+   én gang og flyttes som ferdige bilder, i stedet for å tegnes på nytt
+   ved starten av hvert bytte. Bare i åpnet kort: ti lag med store bilder
+   skal ikke ligge og ta minne når ingen ser på dem. */
+.mode-expanded .panel.is-active .kopi { will-change: transform, opacity; }
 
 .kopi img {
   display: block;
