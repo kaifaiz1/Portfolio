@@ -1337,6 +1337,10 @@ body.endrer-storrelse *::after {
 .mode-deck .reel-item--fri {
   background: transparent;
   box-shadow: none;
+  /* Boksen slutter et lite stykke under telefonen, og med klippingen
+     til opptakene ble telefonens myke skygge skåret av i en skarp linje
+     der. Uten boks er det ingenting å klippe til. */
+  overflow: visible;
 }
 
 /* ---- iPhone ----
@@ -2340,7 +2344,7 @@ body.lyd-pa .lyd-knapp .lyd-fra { display: inline-flex; }
   transform: translateY(-50%);
   z-index: 40;
   width: max-content;
-  max-width: calc(100% - var(--pad) * 2); /* «Digital markedsfører × kreativ» på én linje */
+  max-width: calc(100% - var(--pad) * 2); /* «Digital markedsfører» på én linje */
   pointer-events: none; /* scroll går rett gjennom til om-siden */
   visibility: hidden;
   /* opasiteten her styres av scrollen (JS) og har derfor ingen overgang —
