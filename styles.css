@@ -2257,12 +2257,30 @@ body.lyd-pa .lyd-knapp .lyd-fra { display: inline-flex; }
 .about-note-doc:hover svg,
 .about-note-doc:focus-visible svg { opacity: 1; }
 
-/* --- stacken: programvaren, som en rolig rad under teksten. Navnene
-       flyter som løpende tekst med en prikk imellom, i samme grå som
-       resten av siden — ingen bobler og ingen flater, så raden leser som
-       en del av teksten og ikke som et merkesett. --- */
+/* --- stacken: programvaren, delt i fire rader etter hva den brukes
+       til. Navnene flyter som løpende tekst med en prikk imellom, i samme
+       grå som resten av siden — ingen bobler og ingen flater, så radene
+       leser som en del av teksten og ikke som et merkesett. --- */
 
-.about-stack { margin-top: 8vh; }   /* samme luft som over anbefalinga */
+.about-stack { margin-top: 8vh; }   /* samme luft som mellom avsnittene */
+
+/* Etiketten står i en egen kolonne, så verktøyene begynner på samme
+   linje i alle fire radene, og en rad som brekker fortsetter under
+   verktøyene og ikke under etiketten. */
+.about-stack-grupper {
+  display: grid;
+  grid-template-columns: 5.5rem 1fr;
+  row-gap: 0.45rem;
+  font-size: 0.95rem;
+  line-height: 1.8;
+}
+
+.about-stack-rad { display: contents; }
+
+.about-stack-rad dt {
+  color: var(--ink);
+  font-weight: 500;
+}
 
 .about-stack-liste {
   list-style: none;
@@ -2893,14 +2911,17 @@ html.port:not(.apnet) .deck-intro > .panel > .card { animation-play-state: pause
     right: 0;
   }
 
-  /* To knapper i stedet for fire. Da får navnet igjen halve skjermen,
-     og «Digital markedsfører × kreativ» står på én linje. Luften til
+  /* To knapper i stedet for fire. Da får overskriften igjen halve skjermen,
+     og «Innsikt, innhold og analyse.» står på én linje. Luften til
      høyre er knappenes plass, siden de ikke lenger dytter selv. */
   /* Tre knapper skal få stå i fred: 3 × 40 px pluss to mellomrom på
      0,45 rem, og litt luft. Widgetene ligger absolutt plassert i
      hjørnet, så det er denne polstringen som holder navnet unna dem. */
   .brand { padding-right: 9rem; }
-  .logo { font-size: 1.3rem; }
+  /* «Digital markedsfører» er lengre enn navnet som sto her før, og
+     brakk etter første ord på 360–375 px. Den krymper derfor med
+     skjermen, som undertittelen under. */
+  .logo { font-size: clamp(1.05rem, 5vw, 1.3rem); }
   /* Undertittelen skal stå på én linje hele veien ned til de smaleste
      telefonene. Med tre knapper i hjørnet er det ikke plass til 0,92
      rem på 360 px, så den krymper med skjermen i stedet for å brekke. */
