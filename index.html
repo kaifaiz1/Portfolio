@@ -64,7 +64,7 @@
       <li><a href="#knytt">Knytt</a></li>
       <li><a href="#oslolut">OsloLut</a></li>
       <li><a href="#badstulaug">Norges Badstulaug</a></li>
-      <li><a href="#kryp-foto-utstyr">Kryp, foto og utstyr</a></li>
+      <li><a href="#morro">Morro</a></li>
       <li><a href="#om">Om meg</a></li>
       <li><a href="#under-arbeid">Under arbeid</a></li>
     </ul>
@@ -96,20 +96,9 @@
           <h2>Norges Badstulaug</h2>
           <p>Kom inn i varmen.</p>
         </div>
-        <!-- Kryp, Foto og Utstyr deler ett kort, og da er tittelen selve
-             veien mellom dem: tre ord, det du ser på står svart. Den er
-             den eneste overskriften man kan trykke på, og derfor heller
-             ikke skjult for skjermlesere. Undertittelen skrives fra
-             data-sub på knappen som er valgt. -->
-        <div class="case-heading case-heading--faner" data-i="3">
-          <div class="faner" role="group" aria-label="Velg del">
-            <button class="fane" type="button" data-fane="kryp" data-sub="Hørespill — lyddesign." aria-pressed="true">Kryp</button>
-            <span class="fane-skille" aria-hidden="true">/</span>
-            <button class="fane" type="button" data-fane="foto" data-sub="Bordet og veggen." aria-pressed="false">Foto</button>
-            <span class="fane-skille" aria-hidden="true">/</span>
-            <button class="fane" type="button" data-fane="utstyr" data-sub="Klikk videre for avsløringen." aria-pressed="false">Utstyr</button>
-          </div>
-          <p class="fane-sub" aria-hidden="true">Hørespill — lyddesign.</p>
+        <div class="case-heading" data-i="3" aria-hidden="true">
+          <h2>Morro</h2>
+          <p>Hørespill og foto.</p>
         </div>
         <div class="case-heading" data-i="4" aria-hidden="true">
           <h2>Om meg</h2>
@@ -569,267 +558,194 @@
         </div>
       </article>
 
-      <!-- ---- 04: Kryp, Foto og Utstyr ----
-           Tre ting som hver for seg var for tynne til et eget kort, men
-           som hører sammen: et hørespill, bildene, og det de er laget
-           med. De deler ett kort og bytter på det. Tittelen i navbaren
-           er bryteren mellom dem, og den som står fremme, står i
-           data-fane på kortet. CSS-en viser bare det ene laget, og
-           script.js lar bare det ene spille, svare på hjulet og hente
-           bilder.
+      <!-- ---- 04: Morro ----
+           Kryp, bildene og utstyret i ett kort med tre sider. Det er samme
+           sidestokk som casekortene: telleren, «Les om prosjektet»,
+           bunnlinja på mobil, hjulet og piltastene opp og ned virker likt.
+           Lysbordet og ringen tar bare det som går sidelengs. Det eneste
+           som skiller ellers, er forsiden i stokken. Casekortene viser
+           første side der; Morro har sin egen — tre ting på samme bord:
+           plakaten, en papirkopi og kameraet, Sony ZV-E1. Et klikk hvor som
+           helst på den åpner kortet, og det lander alltid på Kryp.
 
-           I stokken er kortet tre ting lagt på samme bord: plakaten, en
-           papirkopi fra bordet i Foto, og kompaktkameraet som tok den.
-           Et klikk på en av dem åpner kortet rett på den delen; et klikk
-           ved siden av åpner det på Kryp.
-
-           Tekstarket har én tekst per del, og viser den som er valgt. -->
-      <article class="panel" id="kryp-foto-utstyr" data-i="3">
-        <div class="card card--samlet" role="button" tabindex="0" aria-label="Kryp, foto og utstyr" data-fane="kryp">
+           Tekstarket har Kryp-teksten og fototeksten under hverandre, siden
+           ett kort har ett ark. -->
+      <article class="panel panel--pages" id="morro" data-i="3">
+        <div class="card card--samlet" role="button" tabindex="0" aria-label="Morro">
           <div class="card-art art--foto" aria-hidden="true"></div>
 
           <div class="samlet-forside" aria-hidden="true">
-            <img class="samlet-ting samlet-plakat" data-fane="kryp" src="assets/kryp/cover/kryp_cover.jpg" alt="" fetchpriority="low" decoding="async">
-            <img class="samlet-ting samlet-kopi" data-fane="foto" src="assets/bilder/web/IMG_1529-liten.jpg" alt="" fetchpriority="low" decoding="async">
-            <span class="samlet-ting samlet-utstyr" data-fane="utstyr"><img src="assets/verktoy/11.png" alt="" fetchpriority="low" decoding="async"></span>
+            <img class="samlet-ting samlet-plakat" src="assets/kryp/cover/kryp_cover.jpg" alt="" fetchpriority="low" decoding="async">
+            <img class="samlet-ting samlet-kopi" src="assets/bilder/web/IMG_1529-liten.jpg" alt="" fetchpriority="low" decoding="async">
+            <span class="samlet-ting samlet-utstyr"><img src="assets/verktoy/1.png" alt="" fetchpriority="low" decoding="async"></span>
           </div>
 
-          <!-- Kryp: avspilleren. Ligger i kortet hele tiden, men er
-               usynlig (og utenfor tabbing) til kortet er forstørret og
-               Kryp er valgt. -->
-          <div class="spot">
-            <div class="spot-glo" aria-hidden="true"></div>
+          <div class="case-reel" tabindex="-1">
+            <!-- Side 1: Kryp-avspilleren, som den var. Den fyller hele
+                 siden og har sin egen bunn. Lyden stopper når siden ikke
+                 lenger står fremme — se updateReel i script.js. -->
+            <figure class="reel-item reel-item--spot" data-r="0">
+              <div class="spot">
+                <div class="spot-glo" aria-hidden="true"></div>
 
-            <div class="spot-inner">
-              <div class="spot-cover">
-                <img src="assets/kryp/cover/kryp_cover.jpg" alt="Plakat for hørespillet Kryp: en mørk gang med et lysrør på veggen, kakerlakker langs gulvlisten og en gammel dreieskivetelefon på et bord." loading="lazy">
-              </div>
+                <div class="spot-inner">
+                  <div class="spot-cover">
+                    <img src="assets/kryp/cover/kryp_cover.jpg" alt="Plakat for hørespillet Kryp: en mørk gang med et lysrør på veggen, kakerlakker langs gulvlisten og en gammel dreieskivetelefon på et bord." loading="lazy">
+                  </div>
 
-              <div class="spot-panel">
-                <p class="spot-kicker">Hørespill</p>
-                <h3 class="spot-tittel">Kryp</h3>
-                <p class="spot-artist">Lyddesign — Kai Faiz &amp; Torje Johannessen</p>
+                  <div class="spot-panel">
+                    <p class="spot-kicker">Hørespill</p>
+                    <h3 class="spot-tittel">Kryp</h3>
+                    <p class="spot-artist">Lyddesign — Kai Faiz &amp; Torje Johannessen</p>
 
-                <div class="spot-linje">
-                  <input class="spot-scrub" type="range" min="0" max="1000" step="1" value="0" aria-label="Søk i lydsporet">
-                  <div class="spot-tid"><span class="spot-na">0:00</span><span class="spot-lengde">--:--</span></div>
+                    <div class="spot-linje">
+                      <input class="spot-scrub" type="range" min="0" max="1000" step="1" value="0" aria-label="Søk i lydsporet">
+                      <div class="spot-tid"><span class="spot-na">0:00</span><span class="spot-lengde">--:--</span></div>
+                    </div>
+
+                    <div class="spot-kontroller">
+                      <button class="spot-hopp" type="button" data-hopp="-15" aria-label="15 sekunder tilbake">
+                        <svg width="27" height="27" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                          <path d="M8.62 5.25a8 8 0 1 0 4.08-.72" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+                          <path d="M13.5 2.3 8.9 4.6l4.6 2.3Z" fill="currentColor"/>
+                          <text x="12" y="14.6" text-anchor="middle" font-size="8.2" font-weight="700" fill="currentColor">15</text>
+                        </svg>
+                      </button>
+
+                      <button class="spot-play" type="button" aria-label="Spill av">
+                        <svg class="spot-ikon spot-ikon--play" width="26" height="26" viewBox="0 0 24 24" aria-hidden="true"><path d="M8.6 5.1 19 12 8.6 18.9Z" fill="currentColor"/></svg>
+                        <svg class="spot-ikon spot-ikon--pause" width="26" height="26" viewBox="0 0 24 24" aria-hidden="true"><rect x="7.4" y="5.4" width="3.3" height="13.2" rx="1.1" fill="currentColor"/><rect x="13.3" y="5.4" width="3.3" height="13.2" rx="1.1" fill="currentColor"/></svg>
+                      </button>
+
+                      <button class="spot-hopp" type="button" data-hopp="15" aria-label="15 sekunder fram">
+                        <svg width="27" height="27" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                          <path d="M15.38 5.25a8 8 0 1 1-4.08-.72" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+                          <path d="M10.5 2.3 15.1 4.6l-4.6 2.3Z" fill="currentColor"/>
+                          <text x="12" y="14.6" text-anchor="middle" font-size="8.2" font-weight="700" fill="currentColor">15</text>
+                        </svg>
+                      </button>
+                    </div>
+
+                    <p class="spot-status" role="status"></p>
+
+                    <button class="spot-mer" type="button">Om prosjektet</button>
+                  </div>
                 </div>
 
-                <div class="spot-kontroller">
-                  <button class="spot-hopp" type="button" data-hopp="-15" aria-label="15 sekunder tilbake">
-                    <svg width="27" height="27" viewBox="0 0 24 24" fill="none" aria-hidden="true">
-                      <path d="M8.62 5.25a8 8 0 1 0 4.08-.72" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
-                      <path d="M13.5 2.3 8.9 4.6l4.6 2.3Z" fill="currentColor"/>
-                      <text x="12" y="14.6" text-anchor="middle" font-size="8.2" font-weight="700" fill="currentColor">15</text>
-                    </svg>
-                  </button>
+                <audio class="spot-lyd" preload="none">
+                  <source src="assets/kryp/lyd/Kryp%20Lyddrama_01.mp3" type="audio/mpeg">
+                </audio>
+              </div>
+              <span class="reel-hint" aria-hidden="true"><span class="reel-hint-label">Les om prosjektet</span><svg class="hint-klikk" width="17" height="17" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.25" stroke-linecap="round" stroke-linejoin="round"><path d="M9.2 11.3V6.2a1.1 1.1 0 0 1 2.2 0v4.3"/><path d="M11.4 10.5V9.3a1.1 1.1 0 0 1 2.2 0v1.3"/><path d="M13.6 10.7V9.9a1.1 1.1 0 0 1 2.2 0v3.3a4 4 0 0 1-4 4h-1.3c-1.1 0-1.9-.35-2.6-1.05l-2.2-2.2a1.1 1.1 0 0 1 1.55-1.55l1.35 1.3"/><path d="M6.1 4.5 4.8 3.2M4.9 7.4 3.1 6.9M7.6 3.3 7.2 1.6"/></svg></span>
+            </figure>
 
-                  <button class="spot-play" type="button" aria-label="Spill av">
-                    <svg class="spot-ikon spot-ikon--play" width="26" height="26" viewBox="0 0 24 24" aria-hidden="true"><path d="M8.6 5.1 19 12 8.6 18.9Z" fill="currentColor"/></svg>
-                    <svg class="spot-ikon spot-ikon--pause" width="26" height="26" viewBox="0 0 24 24" aria-hidden="true"><rect x="7.4" y="5.4" width="3.3" height="13.2" rx="1.1" fill="currentColor"/><rect x="13.3" y="5.4" width="3.3" height="13.2" rx="1.1" fill="currentColor"/></svg>
-                  </button>
+            <!-- Side 2: lysbordet. Alle bildene ligger utover bordet som
+                 en vifte, så man ser alle på en gang. Pekeren over en
+                 kopi løfter den og viser hva den er tatt med; et klikk
+                 legger den opp i stort format, med resten skjøvet til
+                 side i to bunker — de du har sett, og de du har igjen.
+                 Først de fra G7 X-en, så de fra 80D og A7 III.
 
-                  <button class="spot-hopp" type="button" data-hopp="15" aria-label="15 sekunder fram">
-                    <svg width="27" height="27" viewBox="0 0 24 24" fill="none" aria-hidden="true">
-                      <path d="M15.38 5.25a8 8 0 1 1-4.08-.72" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
-                      <path d="M10.5 2.3 15.1 4.6l-4.6 2.3Z" fill="currentColor"/>
-                      <text x="12" y="14.6" text-anchor="middle" font-size="8.2" font-weight="700" fill="currentColor">15</text>
-                    </svg>
+                 Kopiene har hvert sitt format (--f), så ingen av dem blir
+                 beskåret. Bildeteksten nederst skrives fra data-tittel;
+                 står det ingenting der, står det ingenting i linja.
+
+                 På smal skjerm er det ikke plass til vifta. Der er det
+                 alltid ett bilde oppe, og sveip blar. -->
+            <figure class="reel-item reel-item--lysbord" data-r="1">
+              <div class="card-art art--foto" aria-hidden="true"></div>
+              <div class="lysbord" data-navn="Ti bilder">
+                <div class="lysbord-scene">
+                  <button class="kopi" type="button" style="--f: 0.5618" data-tittel="Canon PowerShot G7 X Mark II — 42 mm · f/2.5 · 1/400 s · ISO 125">
+                    <img src="assets/bilder/web/IMG_1529-liten.jpg" srcset="assets/bilder/web/IMG_1529-liten.jpg 427w, assets/bilder/web/IMG_1529-stor.jpg 787w" sizes="(max-width: 860px) 52vw, 270px" alt="Det røde Freia-skiltet med klokke på taket av en bygård i skumringen, med en måke på vingene over." loading="lazy">
+                  </button>
+                  <button class="kopi" type="button" style="--f: 0.5618" data-tittel="Canon PowerShot G7 X Mark II — 86 mm · f/2.8 · 1/320 s · ISO 640">
+                    <img src="assets/bilder/web/IMG_1668-liten.jpg" srcset="assets/bilder/web/IMG_1668-liten.jpg 427w, assets/bilder/web/IMG_1668-stor.jpg 787w" sizes="(max-width: 860px) 52vw, 270px" alt="En bygate i skumringen, med rosa og fiolette skystriper over takene og gatelys som akkurat har tent." loading="lazy">
+                  </button>
+                  <button class="kopi" type="button" style="--f: 0.5618" data-tittel="Canon PowerShot G7 X Mark II — 85 mm · f/2.8 · 1/250 s · ISO 800">
+                    <img src="assets/bilder/web/IMG_1677-liten.jpg" srcset="assets/bilder/web/IMG_1677-liten.jpg 427w, assets/bilder/web/IMG_1677-stor.jpg 787w" sizes="(max-width: 860px) 52vw, 270px" alt="To minareter med blå mosaikk mot en fiolett kveldshimmel, ved siden av en rekke bygårder." loading="lazy">
+                  </button>
+                  <button class="kopi" type="button" style="--f: 0.5618" data-tittel="Canon PowerShot G7 X Mark II — 34 mm · f/2.2 · 1/200 s · ISO 1600">
+                    <img src="assets/bilder/web/IMG_1720-liten.jpg" srcset="assets/bilder/web/IMG_1720-liten.jpg 427w, assets/bilder/web/IMG_1720-stor.jpg 787w" sizes="(max-width: 860px) 52vw, 270px" alt="En silhuett ved en bil med røde baklys, under en himmel som går fra oransje til dyp blå." loading="lazy">
+                  </button>
+                  <button class="kopi" type="button" style="--f: 0.5605" data-tittel="Canon PowerShot G7 X Mark II — 24 mm · f/1.8 · 1/250 s · ISO 200">
+                    <img src="assets/bilder/web/IMG_2317-liten.jpg" srcset="assets/bilder/web/IMG_2317-liten.jpg 426w, assets/bilder/web/IMG_2317-stor.jpg 786w" sizes="(max-width: 860px) 52vw, 269px" alt="Portrett av en mann med skjegg og sixpence foran en grønn vogn med opplyste vinduer." loading="lazy">
+                  </button>
+                  <button class="kopi" type="button" style="--f: 0.8000" data-tittel="Canon EOS 80D — EF 50 mm f/1.8 STM · f/1.8 · 1/640 s · ISO 160">
+                    <img src="assets/bilder/web/IMG_1908-liten.jpg" srcset="assets/bilder/web/IMG_1908-liten.jpg 576w, assets/bilder/web/IMG_1908-stor.jpg 1120w" sizes="(max-width: 860px) 74vw, 384px" alt="Utsmykkede bygårder i tegl og stein langs en gate, med en gatelykt og en gyllen svane over en inngang." loading="lazy">
+                  </button>
+                  <button class="kopi" type="button" style="--f: 0.8000" data-tittel="Canon EOS 80D — EF 24 mm f/1.4L USM · f/2.8 · 1/250 s · ISO 250">
+                    <img src="assets/bilder/web/IMG_4179-liten.jpg" srcset="assets/bilder/web/IMG_4179-liten.jpg 576w, assets/bilder/web/IMG_4179-stor.jpg 1120w" sizes="(max-width: 860px) 74vw, 384px" alt="En person står alene på et stort, lyst steintak foran en rekke høyhus, under en tung himmel med rosa skyer." loading="lazy">
+                  </button>
+                  <button class="kopi" type="button" style="--f: 0.8000" data-tittel="Sony A7 III — Sigma 16 mm f/1.4 DC DN · f/2.8 · 1/500 s · ISO 100">
+                    <img src="assets/bilder/web/Elvina-02av10-liten.jpg" srcset="assets/bilder/web/Elvina-02av10-liten.jpg 576w, assets/bilder/web/Elvina-02av10-stor.jpg 1120w" sizes="(max-width: 860px) 74vw, 384px" alt="En person i gul jakke fisker fra en kai ved en fjord, under tunge skyer og bratte fjellsider." loading="lazy">
+                  </button>
+                  <button class="kopi" type="button" style="--f: 0.8000" data-tittel="Sony A7 III — Sigma 16 mm f/1.4 DC DN · f/2 · 1/2500 s · ISO 125">
+                    <img src="assets/bilder/web/Elvina-02av02-liten.jpg" srcset="assets/bilder/web/Elvina-02av02-liten.jpg 576w, assets/bilder/web/Elvina-02av02-stor.jpg 1120w" sizes="(max-width: 860px) 74vw, 384px" alt="Et skilt med piler mot Fløyen, Cape Town, Nordkapp og andre steder, mot en grønnblå himmel." loading="lazy">
+                  </button>
+                  <button class="kopi" type="button" style="--f: 0.6667" data-tittel="Sony A7 III — FE 85 mm f/1.8 · f/1.8 · 1/800 s · ISO 100">
+                    <img src="assets/bilder/web/DSC02810-liten.jpg" srcset="assets/bilder/web/DSC02810-liten.jpg 480w, assets/bilder/web/DSC02810-stor.jpg 933w" sizes="(max-width: 860px) 62vw, 320px" alt="To unge munker i oransje kapper går forbi et hvitt stakittgjerde." loading="lazy">
                   </button>
                 </div>
-
-                <p class="spot-status" role="status"></p>
-
-                <button class="spot-mer" type="button">Om prosjektet</button>
               </div>
-            </div>
+              <figcaption>Ti bilder</figcaption>
+              <span class="reel-hint" aria-hidden="true"><span class="reel-hint-label">Les om prosjektet</span><svg class="hint-klikk" width="17" height="17" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.25" stroke-linecap="round" stroke-linejoin="round"><path d="M9.2 11.3V6.2a1.1 1.1 0 0 1 2.2 0v4.3"/><path d="M11.4 10.5V9.3a1.1 1.1 0 0 1 2.2 0v1.3"/><path d="M13.6 10.7V9.9a1.1 1.1 0 0 1 2.2 0v3.3a4 4 0 0 1-4 4h-1.3c-1.1 0-1.9-.35-2.6-1.05l-2.2-2.2a1.1 1.1 0 0 1 1.55-1.55l1.35 1.3"/><path d="M6.1 4.5 4.8 3.2M4.9 7.4 3.1 6.9M7.6 3.3 7.2 1.6"/></svg></span>
+            </figure>
 
-            <audio class="spot-lyd" preload="none">
-              <source src="assets/kryp/lyd/Kryp%20Lyddrama_01.mp3" type="audio/mpeg">
-            </audio>
-          </div>
-
-          <!-- Foto: to sett bilder i to formater, og formatet er det som
-               skiller dem: løse kopier og innrammet arbeid. Lysbordet er
-               derfor to rom.
-
-               Bordet: sju bilder, alle tatt med kompaktkameraet som står i
-               ringen under Utstyr — utstyret og det utstyret har laget
-               ligger i samme kort. 9:16, kornete, rett fra lomma. De
-               ligger løst, som papirkopier.
-
-               Veggen: seks bilder, tatt med speilrefleks og fastobjektiv
-               og ferdigbehandlet i Lightroom. 4:5 og 2:3. De henger
-               innrammet, i et salongoppheng — der er det nettopp de ulike
-               formatene som gjør veggen levende.
-
-               Veggen henger over bordet. Bryteren øverst bytter rom, og
-               rullehjulet gjør det samme: ruller man opp fra bordet, ser
-               man opp på veggen.
-
-               Velger du Foto, spres kopiene utover bordet som en vifte.
-               Holder du pekeren over en, løfter den seg og forteller hva
-               kameraet sto på. Klikker du, kommer den opp i stort format,
-               med resten skjøvet til side i to bunker: de du har sett, og
-               de du har igjen. På veggen tas rammen ned i stedet, lyset i
-               rommet dempes, og en lapp ved siden av forteller det samme
-               som på et museum.
-
-               På smal skjerm er det ikke plass til vifta. Der er det
-               alltid ett bilde oppe på bordet, og sveip blar.
-
-               Kopiene og rammene har ingen src i markupen. De ligger
-               skjult til Foto velges, og skal ikke hentes ned for alle som
-               aldri gjør det — script.js legger inn den lille versjonen
-               først og bytter til den store når den er klar. -->
-          <div class="lysbord">
-
-            <!-- To knapper, ikke en bryter av/på: det er to steder, og
-                 begge skal kunne nås direkte. aria-pressed sier hvilket
-                 rom man står i. -->
-            <div class="rom-bryter" role="group" aria-label="Velg rom">
-              <span class="rom-markor" aria-hidden="true"></span>
-              <button type="button" data-rom="bord" aria-pressed="true">Bordet</button>
-              <button type="button" data-rom="vegg" aria-pressed="false">Veggen</button>
-            </div>
-
-          <!-- EXIF-dataene er lest rett ut av originalfilene. Brennvidden
-               er oppgitt som 35 mm-ekvivalent — G7 X-en har en 1-tommers
-               brikke, så de faktiske 8,8–36,8 mm sier lite til noen som
-               tenker i fullformat. Når bildene er tatt, står ikke her: det
-               er kameraet og innstillingene som er poenget, ikke datoen.
-               Kameraet er det samme for alle sju, så det står på rommet. -->
-            <div class="rom rom--bord" data-navn="Sju bilder" data-exif="Canon PowerShot G7 X Mark II" data-kamera="Canon PowerShot G7 X Mark II">
-            <div class="lysbord-scene">
-              <button class="kopi" type="button" data-exif="42 mm · f/2.5 · 1/400 s · ISO 125">
-                <img data-liten="assets/bilder/web/IMG_1529-liten.jpg" data-stor="assets/bilder/web/IMG_1529-stor.jpg" alt="Det røde Freia-skiltet med klokke på taket av en bygård i skumringen, med en måke på vingene over.">
-              </button>
-              <button class="kopi" type="button" data-exif="86 mm · f/2.8 · 1/320 s · ISO 640">
-                <img data-liten="assets/bilder/web/IMG_1668-liten.jpg" data-stor="assets/bilder/web/IMG_1668-stor.jpg" alt="En bygate i skumringen, med rosa og fiolette skystriper over takene og gatelys som akkurat har tent.">
-              </button>
-              <button class="kopi" type="button" data-exif="85 mm · f/2.8 · 1/250 s · ISO 800">
-                <img data-liten="assets/bilder/web/IMG_1677-liten.jpg" data-stor="assets/bilder/web/IMG_1677-stor.jpg" alt="To minareter med blå mosaikk mot en fiolett kveldshimmel, ved siden av en rekke bygårder.">
-              </button>
-              <button class="kopi" type="button" data-exif="34 mm · f/2.2 · 1/200 s · ISO 1600">
-                <img data-liten="assets/bilder/web/IMG_1720-liten.jpg" data-stor="assets/bilder/web/IMG_1720-stor.jpg" alt="En silhuett ved en bil med røde baklys, under en himmel som går fra oransje til dyp blå.">
-              </button>
-              <button class="kopi" type="button" data-exif="24 mm · f/1.8 · 1/250 s · ISO 200">
-                <img data-liten="assets/bilder/web/IMG_2317-liten.jpg" data-stor="assets/bilder/web/IMG_2317-stor.jpg" alt="Portrett av en mann med skjegg og sixpence foran en grønn vogn med opplyste vinduer.">
-              </button>
-              <button class="kopi" type="button" data-exif="56 mm · f/2.8 · 1/125 s · ISO 125">
-                <img data-liten="assets/bilder/web/IMG_2761-liten.jpg" data-stor="assets/bilder/web/IMG_2761-stor.jpg" alt="Speilbilde i en forgylt ramme: en person i leopardskjorte og caps holder et kompaktkamera foran ansiktet.">
-              </button>
-              <button class="kopi" type="button" data-exif="24 mm · f/2 · 1/50 s · ISO 1250">
-                <img data-liten="assets/bilder/web/IMG_3468-liten.jpg" data-stor="assets/bilder/web/IMG_3468-stor.jpg" alt="En person i et mørkt klipperom ser opp på en skjerm med en filmscene, med tidslinjer på to skjermer under.">
-              </button>
-            </div>
-            </div>
-
-            <!-- Veggen. Rammene står i tidsrekkefølge i markupen; hvor de
-                 henger, bestemmes av opphenget i script.js. --r er
-                 bildets eget sideforhold, så rammen kan få riktig bredde
-                 før bildet er hentet.
-
-                 Objektivene er oppgitt med navn, ikke omregnet: 80D-en
-                 har en APS-C-brikke, men navnet på objektivet er det
-                 som står på det. RAW-fila fra munkene er fremkalt rett,
-                 uten Lightroom — den har ikke fått samme behandling som
-                 de andre fem. -->
-            <div class="rom rom--vegg" data-navn="Seks bilder" data-exif="Canon EOS 80D og Sony A7 III">
-              <div class="lysbord-scene vegg-scene">
-                <span class="vegg-mork" aria-hidden="true"></span>
-
-                <button class="ramme" type="button" style="--r: 0.8" data-kamera="Canon EOS 80D" data-objektiv="EF 50 mm f/1.8 STM" data-eksponering="f/1.8 · 1/640 s · ISO 160">
-                  <img data-liten="assets/bilder/web/IMG_1908-liten.jpg" data-stor="assets/bilder/web/IMG_1908-stor.jpg" alt="Utsmykkede bygårder i tegl og stein langs en gate, med en gatelykt og en gyllen svane over en inngang.">
-                </button>
-                <button class="ramme" type="button" style="--r: 0.8" data-kamera="Canon EOS 80D" data-objektiv="EF 24 mm f/1.4L USM" data-eksponering="f/2.8 · 1/250 s · ISO 250">
-                  <img data-liten="assets/bilder/web/IMG_4179-liten.jpg" data-stor="assets/bilder/web/IMG_4179-stor.jpg" alt="En person står alene på et stort, lyst steintak foran en rekke høyhus, under en tung himmel med rosa skyer.">
-                </button>
-                <button class="ramme" type="button" style="--r: 0.8" data-kamera="Sony A7 III" data-objektiv="Sigma 16 mm f/1.4 DC DN" data-eksponering="f/2.8 · 1/500 s · ISO 100">
-                  <img data-liten="assets/bilder/web/Elvina-02av10-liten.jpg" data-stor="assets/bilder/web/Elvina-02av10-stor.jpg" alt="En person i gul jakke fisker fra en kai ved en fjord, under tunge skyer og bratte fjellsider.">
-                </button>
-                <button class="ramme" type="button" style="--r: 0.8" data-kamera="Sony A7 III" data-objektiv="Sigma 16 mm f/1.4 DC DN" data-eksponering="f/2 · 1/2500 s · ISO 125">
-                  <img data-liten="assets/bilder/web/Elvina-02av02-liten.jpg" data-stor="assets/bilder/web/Elvina-02av02-stor.jpg" alt="Et skilt med piler mot Fløyen, Cape Town, Nordkapp og andre steder, mot en grønnblå himmel.">
-                </button>
-                <button class="ramme" type="button" style="--r: 0.6664" data-kamera="Sony A7 III" data-objektiv="FE 85 mm f/1.8" data-eksponering="f/1.8 · 1/800 s · ISO 100">
-                  <img data-liten="assets/bilder/web/DSC02810-liten.jpg" data-stor="assets/bilder/web/DSC02810-stor.jpg" alt="To unge munker i oransje kapper går forbi et hvitt stakittgjerde.">
-                </button>
-                <button class="ramme" type="button" style="--r: 0.8" data-kamera="Sony A7 III" data-objektiv="FE 85 mm f/1.8" data-eksponering="f/1.8 · 1/500 s · ISO 1000">
-                  <img data-liten="assets/bilder/web/Nacpan-01av03-liten.jpg" data-stor="assets/bilder/web/Nacpan-01av03-stor.jpg" alt="Portrett av en mann i blomstrete skjorte på en strand i solnedgang.">
-                </button>
-
-                <!-- Lappen ved siden av rammen som er tatt ned, som på et
-                     museum. Samme opplysninger som i linja nederst, så
-                     den er skjult for skjermlesere. -->
-                <div class="vegglapp" aria-hidden="true">
-                  <p class="lapp-kamera"></p>
-                  <p class="lapp-objektiv"></p>
-                  <p class="lapp-eksponering"></p>
+            <!-- Side 3: utstyret, i ring rundt midten. Ringen ligger flatt
+                 og går rundt av seg selv; pekeren over en gjenstand
+                 bremser den og viser navn og modell. Selve ringen er
+                 dekorativ, så lista like under bærer det samme i tekst,
+                 og utstyret finnes ikke bare som bilder som beveger seg. -->
+            <figure class="reel-item reel-item--lys reel-item--ring" data-r="2">
+              <div class="orbit" aria-hidden="true">
+                <div class="orbit-flate"></div>
+                <div class="orbit-ring">
+                  <div class="orbit-ting" data-navn="Kamera" data-modell="Sony ZV-E1"><img src="assets/verktoy/1.png" alt="" loading="lazy"></div>
+                  <div class="orbit-ting" data-navn="Objektiv" data-modell="Thypoch 24–50 mm f/2.8"><img src="assets/verktoy/2.png" alt="" loading="lazy"></div>
+                  <div class="orbit-ting" data-navn="Objektiv" data-modell="AF 14 mm f/4"><img src="assets/verktoy/3.png" alt="" loading="lazy"></div>
+                  <div class="orbit-ting" data-navn="Objektiv" data-modell="Sony FE 50 mm f/1.8"><img src="assets/verktoy/4.png" alt="" loading="lazy"></div>
+                  <div class="orbit-ting" data-navn="Objektiv" data-modell="Sony FE 20 mm f/1.8 G"><img src="assets/verktoy/13.png" alt="" loading="lazy"></div>
+                  <div class="orbit-ting" data-navn="Filter" data-modell="K&amp;F Concept Black Diffusion 1/8"><img src="assets/verktoy/5.png" alt="" loading="lazy"></div>
+                  <div class="orbit-ting" data-navn="Filter" data-modell="Variabelt ND-filter"><img src="assets/verktoy/6.png" alt="" loading="lazy"></div>
+                  <div class="orbit-ting" data-navn="Maskin" data-modell="MacBook Pro"><img src="assets/verktoy/7.png" alt="" loading="lazy"></div>
+                  <div class="orbit-ting" data-navn="Lagring" data-modell="Samsung T7"><img src="assets/verktoy/8.png" alt="" loading="lazy"></div>
+                  <div class="orbit-ting" data-navn="Mikrofon" data-modell="DJI Mic"><img src="assets/verktoy/9.png" alt="" loading="lazy"></div>
+                  <div class="orbit-ting" data-navn="Telefon" data-modell="iPhone 15 Pro"><img src="assets/verktoy/10.png" alt="" loading="lazy"></div>
+                  <div class="orbit-ting" data-navn="Kompaktkamera" data-modell="Canon PowerShot G7 X Mark II"><img src="assets/verktoy/11.png" alt="" loading="lazy"></div>
+                  <div class="orbit-ting" data-navn="Hodetelefoner" data-modell="AirPods Max"><img src="assets/verktoy/12.png" alt="" loading="lazy"></div>
+                </div>
+                <div class="orbit-tekst">
+                  <p class="orbit-navn"></p>
+                  <p class="orbit-modell"></p>
                 </div>
               </div>
-            </div>
 
-            <div class="lysbord-linje">
-              <p class="lysbord-tekst">
-                <span class="lysbord-navn">Sju bilder</span>
-                <span class="lysbord-exif">Canon PowerShot G7 X Mark II</span>
-              </p>
-              <span class="lysbord-teller" aria-hidden="true"><b>1</b>&thinsp;/&thinsp;<span class="lysbord-sum">7</span></span>
-              <!-- Klikket bobler til kortet, som allerede vet at neste
-                   steg er tekstarket — samme grep som «Se stacken». -->
-              <button class="lysbord-mer" type="button">Om bildene</button>
-            </div>
+              <ul class="sr-only">
+                <li>Kamera — Sony ZV-E1</li>
+                <li>Objektiv — Thypoch 24–50 mm f/2.8</li>
+                <li>Objektiv — AF 14 mm f/4</li>
+                <li>Objektiv — Sony FE 50 mm f/1.8</li>
+                <li>Objektiv — Sony FE 20 mm f/1.8 G</li>
+                <li>Filter — K&amp;F Concept Black Diffusion 1/8</li>
+                <li>Filter — Variabelt ND-filter</li>
+                <li>Maskin — MacBook Pro</li>
+                <li>Lagring — Samsung T7</li>
+                <li>Mikrofon — DJI Mic</li>
+                <li>Telefon — iPhone 15 Pro</li>
+                <li>Kompaktkamera — Canon PowerShot G7 X Mark II</li>
+                <li>Hodetelefoner — AirPods Max</li>
+              </ul>
+              <span class="reel-hint" aria-hidden="true"><span class="reel-hint-label">Les om prosjektet</span><svg class="hint-klikk" width="17" height="17" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.25" stroke-linecap="round" stroke-linejoin="round"><path d="M9.2 11.3V6.2a1.1 1.1 0 0 1 2.2 0v4.3"/><path d="M11.4 10.5V9.3a1.1 1.1 0 0 1 2.2 0v1.3"/><path d="M13.6 10.7V9.9a1.1 1.1 0 0 1 2.2 0v3.3a4 4 0 0 1-4 4h-1.3c-1.1 0-1.9-.35-2.6-1.05l-2.2-2.2a1.1 1.1 0 0 1 1.55-1.55l1.35 1.3"/><path d="M6.1 4.5 4.8 3.2M4.9 7.4 3.1 6.9M7.6 3.3 7.2 1.6"/></svg></span>
+            </figure>
           </div>
 
-          <!-- Utstyr: det fysiske utstyret, i ring rundt midten. Navn og
-               modell kommer fram når pekeren står på noe. Selve ringen er
-               dekorativ; lista like under bærer det samme innholdet i
-               tekst, så utstyret ikke bare finnes som bilder som beveger
-               seg. -->
-          <div class="orbit" aria-hidden="true">
-            <div class="orbit-flate"></div>
-            <div class="orbit-ring">
-              <div class="orbit-ting" data-navn="Kamera" data-modell="Sony ZV-E1"><img src="assets/verktoy/1.png" alt="" loading="lazy"></div>
-              <div class="orbit-ting" data-navn="Objektiv" data-modell="Thypoch 24–50 mm f/2.8"><img src="assets/verktoy/2.png" alt="" loading="lazy"></div>
-              <div class="orbit-ting" data-navn="Objektiv" data-modell="AF 14 mm f/4"><img src="assets/verktoy/3.png" alt="" loading="lazy"></div>
-              <div class="orbit-ting" data-navn="Objektiv" data-modell="Sony FE 50 mm f/1.8"><img src="assets/verktoy/4.png" alt="" loading="lazy"></div>
-              <div class="orbit-ting" data-navn="Objektiv" data-modell="Sony FE 20 mm f/1.8 G"><img src="assets/verktoy/13.png" alt="" loading="lazy"></div>
-              <div class="orbit-ting" data-navn="Filter" data-modell="K&amp;F Concept Black Diffusion 1/8"><img src="assets/verktoy/5.png" alt="" loading="lazy"></div>
-              <div class="orbit-ting" data-navn="Filter" data-modell="Variabelt ND-filter"><img src="assets/verktoy/6.png" alt="" loading="lazy"></div>
-              <div class="orbit-ting" data-navn="Maskin" data-modell="MacBook Pro"><img src="assets/verktoy/7.png" alt="" loading="lazy"></div>
-              <div class="orbit-ting" data-navn="Lagring" data-modell="Samsung T7"><img src="assets/verktoy/8.png" alt="" loading="lazy"></div>
-              <div class="orbit-ting" data-navn="Mikrofon" data-modell="DJI Mic"><img src="assets/verktoy/9.png" alt="" loading="lazy"></div>
-              <div class="orbit-ting" data-navn="Telefon" data-modell="iPhone 15 Pro"><img src="assets/verktoy/10.png" alt="" loading="lazy"></div>
-              <div class="orbit-ting" data-navn="Kompaktkamera" data-modell="Canon PowerShot G7 X Mark II"><img src="assets/verktoy/11.png" alt="" loading="lazy"></div>
-              <div class="orbit-ting" data-navn="Hodetelefoner" data-modell="AirPods Max"><img src="assets/verktoy/12.png" alt="" loading="lazy"></div>
-            </div>
-            <div class="orbit-tekst">
-              <p class="orbit-navn"></p>
-              <p class="orbit-modell"></p>
-              <button class="orbit-mer" type="button">Se stacken</button>
-            </div>
-          </div>
+          <span class="reel-count" aria-hidden="true"><b>1</b>&thinsp;/&thinsp;3</span>
 
-          <ul class="sr-only">
-            <li>Kamera — Sony ZV-E1</li>
-            <li>Objektiv — Thypoch 24–50 mm f/2.8</li>
-            <li>Objektiv — AF 14 mm f/4</li>
-            <li>Objektiv — Sony FE 50 mm f/1.8</li>
-            <li>Objektiv — Sony FE 20 mm f/1.8 G</li>
-            <li>Filter — K&amp;F Concept Black Diffusion 1/8</li>
-            <li>Filter — Variabelt ND-filter</li>
-            <li>Maskin — MacBook Pro</li>
-            <li>Lagring — Samsung T7</li>
-            <li>Mikrofon — DJI Mic</li>
-            <li>Telefon — iPhone 15 Pro</li>
-            <li>Kompaktkamera — Canon PowerShot G7 X Mark II</li>
-            <li>Hodetelefoner — AirPods Max</li>
-          </ul>
-
-          <span class="card-label">Kryp · Foto · Utstyr</span>
+          <span class="card-label">Morro</span>
 
           <div class="card-text" tabindex="-1">
-            <div class="card-text-inner" data-fane="kryp">
+            <div class="card-text-inner">
               <header class="text-head">
                 <p class="text-kicker">Utvalgt arbeid — 04</p>
                 <h2>Kryp</h2>
@@ -850,18 +766,14 @@
                 <h3>Medvirkende</h3>
                 <p class="text-role">Manus og regi: Daniel Jørgensen · Jens Jonsen · Helle Eia<br>Skuespillere: Ida Nilsen · Filip Fedøy · Tuva Holen · Aurora Ovanger</p>
               </section>
-            </div>
 
-            <div class="card-text-inner" data-fane="foto">
               <header class="text-head">
                 <p class="text-kicker">Foto — 04</p>
                 <h2>Foto</h2>
-                <p class="text-sub">Bordet og veggen.</p>
               </header>
 
               <section class="text-block">
-                <p>På bordet ligger sju bilder, alle tatt med en Canon PowerShot G7&nbsp;X Mark&nbsp;II — det samme kompaktkameraet som står i ringen under Utstyr.</p>
-                <p>På veggen henger seks, tatt med Canon EOS&nbsp;80D og Sony A7&nbsp;III.</p>
+                <p>De ti bildene er tatt med Canon PowerShot G7&nbsp;X Mark&nbsp;II, Canon EOS&nbsp;80D og Sony A7&nbsp;III.</p>
               </section>
 
               <section class="text-block">
@@ -872,39 +784,6 @@
               <section class="text-block">
                 <h3>Utstyr</h3>
                 <p class="text-role">Canon PowerShot G7 X Mark II · Canon EOS 80D · Sony A7 III</p>
-              </section>
-            </div>
-
-            <div class="card-text-inner" data-fane="utstyr">
-              <header class="text-head">
-                <p class="text-kicker">Utstyr — 04</p>
-                <h2>Stacken min</h2>
-              </header>
-
-              <section class="text-block">
-                <ul class="tool-chips">
-                  <li>Claude</li>
-                  <li>GPT</li>
-                  <li>Notion</li>
-                  <li>DaVinci Resolve</li>
-                  <li>Premiere Pro</li>
-                  <li>Audition</li>
-                  <li>Soundly</li>
-                  <li>Lightroom</li>
-                  <li>Canva</li>
-                  <li>Higgsfield</li>
-                  <li>Figma</li>
-                  <li>VS Code</li>
-                  <li>GitHub</li>
-                  <li>Vercel</li>
-                  <li>WordPress</li>
-                  <li>Gumroad</li>
-                  <li>Google Analytics</li>
-                  <li>Meta Ads</li>
-                  <li>Instagram Insights</li>
-                  <li>TikTok Analytics</li>
-                  <li>Meta Business Suite <span class="chip-merk">&mdash; under arbeid</span></li>
-                </ul>
               </section>
             </div>
           </div>
@@ -980,6 +859,36 @@
             </figcaption>
           </figure>
 
+          <!-- Programvaren, som en rolig rad under teksten. Den sto før
+               i et eget tekstark i kortstokken. Analyse og annonser først,
+               så resten. -->
+          <section class="about-stack" aria-labelledby="stack-tittel">
+            <p class="text-kicker" id="stack-tittel">Stacken min</p>
+            <ul class="about-stack-liste">
+              <li>Google Analytics</li>
+              <li>Meta Ads</li>
+              <li>Meta Business Suite &mdash; under arbeid</li>
+              <li>Instagram Insights</li>
+              <li>TikTok Analytics</li>
+              <li>Claude</li>
+              <li>GPT</li>
+              <li>Notion</li>
+              <li>DaVinci Resolve</li>
+              <li>Premiere Pro</li>
+              <li>Audition</li>
+              <li>Soundly</li>
+              <li>Lightroom</li>
+              <li>Canva</li>
+              <li>Higgsfield</li>
+              <li>Figma</li>
+              <li>VS Code</li>
+              <li>GitHub</li>
+              <li>Vercel</li>
+              <li>WordPress</li>
+              <li>Gumroad</li>
+            </ul>
+          </section>
+
           <!-- Slutten på siden. Kontaktene sto bare helt øverst, og den som
                hadde lest ferdig måtte rulle hele veien opp igjen for å
                finne dem. Nå står de der lesingen slutter — sammen med
@@ -1045,7 +954,7 @@
       <button class="dot" data-goto="0" role="tab" aria-label="Knytt"></button>
       <button class="dot" data-goto="1" role="tab" aria-label="OsloLut"></button>
       <button class="dot" data-goto="2" role="tab" aria-label="Norges Badstulaug"></button>
-      <button class="dot" data-goto="3" role="tab" aria-label="Kryp, foto og utstyr"></button>
+      <button class="dot" data-goto="3" role="tab" aria-label="Morro"></button>
       <button class="dot" data-goto="4" role="tab" aria-label="Om meg"></button>
       <button class="dot" data-goto="5" role="tab" aria-label="Under arbeid"></button>
     </div>

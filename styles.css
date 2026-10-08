@@ -74,8 +74,7 @@
 body,
 .widget,
 .close-btn,
-.edge-chip,
-.tool-chips li {
+.edge-chip {
   transition: background-color 0.45s var(--ease), color 0.45s var(--ease);
 }
 
@@ -213,67 +212,6 @@ button { font: inherit; color: inherit; background: none; border: none; cursor: 
   opacity: 1;
   transform: none;
   transition-delay: 0.25s;
-}
-
-/* --- tittelen som er en bryter: Kryp / Foto / Utstyr ---
-   Samme størrelse og vekt som de andre titlene, så den leser som en
-   tittel først. Det som er valgt står i blekk, de to andre i grått, som
-   undertittelen — og pekeren over et grått ord gjør det svart.
-
-   Denne tittelen har knapper, og da holder ikke opasitet alene: den må
-   være borte for tabben også når den ikke vises. Synligheten slipper
-   først når den har tonet helt ut. */
-.case-heading--faner {
-  visibility: hidden;
-  transition-property: opacity, transform, visibility;
-  transition-duration: 0.55s, 0.55s, 0s;
-  transition-timing-function: var(--ease), var(--ease), linear;
-  transition-delay: 0s, 0s, 0.55s;
-}
-
-.mode-expanded .case-heading--faner.is-current,
-.mode-text .case-heading--faner.is-current {
-  visibility: visible;
-  pointer-events: auto;
-}
-
-.faner {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: baseline;
-  column-gap: 0.3em;
-  font-size: clamp(1.35rem, 2.1vw, 1.7rem);
-  font-weight: 600;
-  letter-spacing: -0.03em;
-  line-height: 1.15;
-}
-
-/* Polstringen gir en treffflate på høyde med en fingertupp; den negative
-   margen tar den tilbake, så linja står der en vanlig tittel står. */
-.fane {
-  padding: 0.2em 0;
-  margin: -0.2em 0;
-  letter-spacing: inherit;
-  color: var(--grey);
-  transition: color 0.3s var(--ease);
-}
-
-.fane:hover,
-.fane[aria-pressed="true"] { color: var(--ink); }
-
-.fane[aria-pressed="true"] { cursor: default; }
-
-.fane:focus { outline: none; }
-
-.fane:focus-visible {
-  outline: 2px solid var(--ink);
-  outline-offset: 2px;
-  border-radius: 4px;
-}
-
-.fane-skille {
-  color: var(--grey-soft);
-  font-weight: 400;
 }
 
 /* ============ WIDGETS ØVERST TIL HØYRE ============ */
@@ -583,11 +521,13 @@ button { font: inherit; color: inherit; background: none; border: none; cursor: 
   padding: clamp(2.2rem, 7vh, 5rem) clamp(1.4rem, 4vw, 3rem) 4.5rem;
 }
 
-/* Det samlede kortet har én tekst for hver del, og arket viser den som
-   er valgt i tittelen. */
-.card--samlet[data-fane="kryp"] .card-text-inner:not([data-fane="kryp"]),
-.card--samlet[data-fane="foto"] .card-text-inner:not([data-fane="foto"]),
-.card--samlet[data-fane="utstyr"] .card-text-inner:not([data-fane="utstyr"]) { display: none; }
+/* Morro har to tekster i samme ark, Kryp og Foto, under hverandre. Den
+   andre får en strek over seg, så de leser som to og ikke som én lang. */
+.text-block + .text-head {
+  margin-top: 4.5rem;
+  padding-top: 3rem;
+  border-top: 1px solid var(--line);
+}
 
 .text-kicker {
   font-size: 0.75rem;
@@ -639,26 +579,6 @@ button { font: inherit; color: inherit; background: none; border: none; cursor: 
 }
 
 .text-liste li:last-child { padding-bottom: 0; }
-
-.tool-chips {
-  list-style: none;
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.55rem;
-}
-
-.tool-chips li {
-  padding: 0.5rem 1.05rem;
-  background: var(--surface);
-  border-radius: 999px;
-  font-size: 0.95rem;
-  box-shadow: 0 1px 2px rgba(0,0,0,0.05);
-}
-
-/* «under arbeid» er en fotnote inne i chipen, ikke en del av navnet:
-   samme grå som annen metadata på sida, så verktøyet leser først og
-   forbeholdet etterpå. */
-.tool-chips .chip-merk { color: var(--grey); }
 
 /* ============ ANIMERTE GRADIENTER PÅ KORTENE ============ */
 
@@ -1675,180 +1595,6 @@ body.lyd-pa .lyd-knapp .lyd-fra { display: inline-flex; }
   color: rgba(255,255,255,0.94);
 }
 
-/* ============ UTSTYRSRINGEN: UTSTYR I DET SAMLEDE KORTET ============
-
-   Velger du Utstyr, kommer det fysiske utstyret opp og går rundt i ring.
-   Ringen ligger flatt og er vippet mot deg, så det du ser av den er en
-   halvsirkel: det som er nærmest ligger lavt og stort, det som er bak
-   ligger høyt, lite og nesten borte.
-
-   Ingen 3D-transformer. Bildene er flate utklipp, og med rotateY ville de
-   stått på kant og forsvunnet i sidene. I stedet regnes hver plass ut på
-   sirkelen og settes som translate + scale, så motivet alltid vender rett
-   mot deg. Regnestykket ligger i script.js.
-
-   Flaten under er lys i begge temaer. Utstyret er svart på svart — kamera,
-   objektiver, filtre — og på det mørke kortet ble alt sammen silhuetter.
-   Dette er et fotobord, ikke en UI-flate, og da er lyst det eneste som
-   virker. I nattmodus er den dempet et hakk så den ikke blender. */
-
-.orbit {
-  position: absolute;
-  inset: 0;
-  border-radius: inherit;
-  overflow: hidden;
-  /* Gjenstandene får z-index fra JS for å ligge riktig i forhold til
-     hverandre. Uten en egen stablekontekst her gjelder de tallene hele
-     kortet, og utstyret la seg oppå tekstarket — programvarelista fikk
-     kameraer og objektiver tvers gjennom seg. Isolasjonen holder
-     rekkefølgen innenfor ringen, der den hører hjemme. */
-  isolation: isolate;
-  /* Et lag i det samlede kortet, som avspilleren og lysbordet: usynlig
-     (og utenfor tabbing) til kortet er åpnet med Utstyr valgt. */
-  opacity: 0;
-  visibility: hidden;
-  transition: opacity 0.5s var(--ease), visibility 0s linear 0.5s;
-}
-
-.mode-expanded .panel.is-active [data-fane="utstyr"] > .orbit {
-  opacity: 1;
-  visibility: visible;
-  transition: opacity 0.6s var(--ease) 0.12s;
-}
-
-.orbit-flate {
-  position: absolute;
-  inset: 0;
-  background: radial-gradient(115% 85% at 50% 34%, #fcfcfd 0%, #ededf0 52%, #dedee3 100%);
-}
-
-:root[data-theme="dark"] .orbit-flate {
-  background: radial-gradient(115% 85% at 50% 34%, #e4e4e9 0%, #d2d2d8 52%, #bebec6 100%);
-}
-
-.orbit-ring {
-  position: absolute;
-  left: 0;
-  right: 0;
-  /* Buen sitter litt over midten og teksten rett under, så de to leser
-     som én gruppe. Står ringen i midten blir det en tom halvdel under. */
-  top: 3%;
-  height: 78%;
-}
-
-.orbit-ting {
-  position: absolute;
-  left: 50%;
-  top: 50%;
-  /* Fast boks. Det åpnede kortet har ulik størrelse fra skjerm til
-     skjerm, så den virkelige størrelsen ganges inn i skalaen fra JS.
-     Boksen er satt større enn den noen gang tegnes, slik at transformen
-     bare krymper — forstørring av et ferdig opptegnet bilde blir
-     uskarpt. */
-  width: 230px;
-  height: 230px;
-  cursor: default;
-  /* transform settes hvert bilde fra JS; her står bare utgangspunktet,
-     så ingenting blinker i toppstilling før første runde i løkka */
-  transform: translate(-50%, -50%) scale(0.4);
-  opacity: 0;
-  will-change: transform, opacity;
-}
-
-.orbit-ting img {
-  width: 100%;
-  height: 100%;
-  object-fit: contain;
-  /* skyggen gir gjenstandene noe å hvile på; uten den svever de */
-  filter: drop-shadow(0 14px 18px rgba(24,20,16,0.28));
-}
-
-/* --- teksten under ringen ---
-   Ingen egen synlighet her: den følger laget. En egen «visibility:
-   visible» ville trumfet det skjulte laget rundt, og knappen kunne blitt
-   tabbet til fra stokken. */
-
-.orbit-tekst {
-  position: absolute;
-  left: 0;
-  right: 0;
-  top: 74%;
-  text-align: center;
-  padding: 0 1.5rem;
-  /* To rader. Navn og modell ligger oppå hverandre i den øverste, som
-     har fast høyde — da flytter ingenting seg når du går fra én
-     gjenstand til en annen, eller når raden står tom. Knappen under blir
-     stående i ro uansett. */
-  display: grid;
-  grid-template-rows: 3.4rem auto;
-  row-gap: 0.7rem;
-  justify-items: center;
-}
-
-.orbit-navn,
-.orbit-modell { grid-area: 1 / 1; transition: opacity 0.3s var(--ease); }
-
-.orbit-navn {
-  align-self: start;
-  font-size: 0.72rem;
-  font-weight: 500;
-  letter-spacing: 0.14em;
-  text-transform: uppercase;
-  color: #8b8b93;
-}
-
-.orbit-modell {
-  align-self: end;
-  margin-top: 1.5rem;
-  font-size: clamp(1.05rem, 2vw, 1.5rem);
-  font-weight: 500;
-  letter-spacing: -0.02em;
-  color: #1a1a1a;
-}
-
-/* navn og modell står tomme til noe er valgt */
-.orbit-navn,
-.orbit-modell { opacity: 0; }
-
-.orbit.har-valg .orbit-navn,
-.orbit.har-valg .orbit-modell { opacity: 1; }
-
-/* Veien videre til programvaren. Uten den er det ingenting som røper at
-   kortet har en side til — utstyret ser ut som hele historien.
-   Klikket får boble til kortet, som allerede vet hva neste steg er.
-   Fargene er faste og ikke temastyrte: flaten under er lys i begge
-   temaer, så knappen må være mørk i begge. */
-.orbit-mer {
-  grid-row: 2;
-  display: inline-flex;
-  align-items: center;
-  padding: 0.5rem 1.05rem;
-  border: 1px solid rgba(26,26,26,0.18);
-  border-radius: 99px;
-  background: transparent;
-  color: #3a3a40;
-  font: inherit;
-  font-size: 0.82rem;
-  cursor: pointer;
-  transition: color 0.25s var(--ease), border-color 0.25s var(--ease), background 0.25s var(--ease);
-}
-
-.orbit-mer:hover {
-  color: #111;
-  border-color: rgba(26,26,26,0.42);
-  background: rgba(255,255,255,0.72);
-}
-
-.orbit-mer:focus-visible {
-  outline: 2px solid #1a1a1a;
-  outline-offset: 3px;
-}
-
-@media (max-width: 860px) {
-  .orbit-ring { top: 8%; height: 72%; }
-  .orbit-hint { font-size: 0.78rem; }
-}
-
 /* ============ KORT UNDER ARBEID ============
 
    Kortet er med i stokken, men har ingenting å åpne. Det har derfor
@@ -1926,7 +1672,7 @@ body.lyd-pa .lyd-knapp .lyd-fra { display: inline-flex; }
    — se «flyFiguren» i script.js.
 
    Kortet holder seg lyst i begge temaer. Det er et foto med lys grå
-   bakgrunn, ikke en UI-flate, akkurat som fotobordet under Utstyr. */
+   bakgrunn, ikke en UI-flate. */
 
 .card--om { background: #e3e3e3; }
 
@@ -1992,9 +1738,9 @@ body.lyd-pa .lyd-knapp .lyd-fra { display: inline-flex; }
 .mode-about.figur-flyr .about-view,
 .mode-about.figur-flyr .about-media video { transition: none; }
 
-/* ============ KRYP, FOTO OG UTSTYR: FORSIDEN OG LYSBORDET ============
+/* ============ MORRO: FORSIDEN OG SIDENE ============
 
-   Kortet er blåtimen fra Foto, ikke svart. Bildene er nesten alle tatt
+   Kortet er blåtimen fra bildene, ikke svart. Bildene er nesten alle tatt
    i overgangen mellom dag og kveld, og kortet låner fargen fra himmelen
    i dem. Det er mørkt nok til at de lyse kantene på kopiene står fram,
    og blått nok til at det ikke forveksles med OsloLut. */
@@ -2003,9 +1749,9 @@ body.lyd-pa .lyd-knapp .lyd-fra { display: inline-flex; }
 :root[data-theme="dark"] .art--foto { --art-bg: #23263a; }
 
 /* --- forsiden i stokken: tre ting på samme bord ---
-   Én for hver del: plakaten til Kryp, en papirkopi fra bordet i Foto, og
-   kompaktkameraet som tok den. Hver av dem er en dør — script.js åpner
-   kortet på den delen man klikket på.
+   Plakaten til Kryp, en papirkopi fra fotosiden, og kameraet fra
+   ringen på side 3, Sony ZV-E1. Hele kortet er én flate å klikke på: det
+   åpner på side 1, som alle de andre kortene.
 
    De ligger på skrå over hverandre, ikke på rekke: plakaten øverst til
    venstre så tittelen står fri, kopien til høyre, og kameraet foran og
@@ -2033,7 +1779,7 @@ body.lyd-pa .lyd-knapp .lyd-fra { display: inline-flex; }
     0 18px 32px -14px rgba(0,0,0,0.75),
     0 2px 5px rgba(0,0,0,0.3);
   transform: translate(-50%, -50%) rotate(var(--r));
-  transition: transform 0.7s var(--ease), scale 0.4s var(--ease);
+  transition: transform 0.7s var(--ease);
 }
 
 /* Plakaten. Ringen er der fordi ytterkanten på plakaten er nesten svart:
@@ -2073,8 +1819,9 @@ body.lyd-pa .lyd-knapp .lyd-fra { display: inline-flex; }
   border-radius: 3px;
 }
 
-/* Kameraet ligger på et lyst produktark, samme flate som ringen under
-   Utstyr. Rett på det mørke bordet ble det svarte kameraet en silhuett. */
+/* Kameraet ligger på et lyst produktark. Rett på det mørke bordet ble
+   det svarte kameraet en silhuett. I nattmodus dempes arket et hakk, så
+   det ikke blender. */
 .samlet-utstyr {
   --x: 41%;
   --y: 63%;
@@ -2097,85 +1844,47 @@ body.lyd-pa .lyd-knapp .lyd-fra { display: inline-flex; }
   filter: drop-shadow(0 6px 8px rgba(24,20,16,0.25));
 }
 
-/* Pekeren over kortet sprer tingene litt, som når noen tar i dem, og den
-   man står på løfter seg — det er den et klikk åpner. Bare der det finnes
-   en peker å holde over noe med, og bare på kortet som står fremme — et
-   nabokort skal ikke røre seg før det er valgt. */
+/* Pekeren over kortet sprer tingene litt, som når noen tar i dem. Bare
+   der det finnes en peker å holde over noe med, og bare på kortet som
+   står fremme — et nabokort skal ikke røre seg før det er valgt. */
 @media (hover: hover) {
   .mode-deck .panel.is-active .card--samlet:hover .samlet-plakat { transform: translate(-50%, -50%) translate(-7%, -4%) rotate(-10deg); }
   .mode-deck .panel.is-active .card--samlet:hover .samlet-kopi { transform: translate(-50%, -50%) translate(9%, -3%) rotate(9deg); }
   .mode-deck .panel.is-active .card--samlet:hover .samlet-utstyr { transform: translate(-50%, -50%) translate(-2%, 5%) rotate(-4deg); }
-  .mode-deck .panel.is-active .samlet-ting:hover { scale: 1.05; }
 }
 
-/* --- lysbordet: Foto valgt ---
+/* --- sidene i åpnet kort ---
+   Morro er et kort med sider, som casekortene, og arver alt derfra:
+   boksene, telleren, hintet, bunnlinja på mobil, hjulet og piltastene
+   opp og ned. Det eneste som skiller ellers, er forsiden. Casekortene viser første side i
+   stokken; Morro har bordet sitt, så sidestokken holder seg skjult til
+   kortet er åpnet. */
+.card--samlet > .case-reel { visibility: hidden; }
+.mode-expanded .panel.is-active .card--samlet > .case-reel { visibility: visible; }
 
-   Samme grep som avspilleren i Kryp: et eget lag som toner inn når
-   kortet forstørres med Foto valgt, mens forsiden toner ut. Hvor hver
-   kopi ligger, regnes ut i script.js og settes som --x, --y, --r og
-   --s. */
+/* Side 1: avspilleren fyller hele boksen. Boksen får samme burgunder
+   som den, så det ikke blinker grått før avspilleren har tonet inn. */
+.mode-expanded .panel--pages.is-active .reel-item--spot { background: #4a1522; }
 
+/* --- side 2: lysbordet ---
+   Laget fyller hele siden og er sin egen container, så scenen inni kan
+   måle seg mot det. Stripa øverst og linja nederst, der bildeteksten og
+   hintet står, holdes fri; scenen tar det som er imellom. Egen
+   stablekontekst, så kopiene ligger riktig i forhold til hverandre uten
+   å legge seg over bildeteksten. Hvor hver kopi ligger, regnes ut i
+   script.js og settes som --x, --y, --r og --s. */
 .lysbord {
-  position: absolute;
-  inset: 0;
-  border-radius: inherit;
-  overflow: hidden;
-  /* Høyden på linja nederst, der kamera og eksponering står, og på stripa
-     øverst, der rombryteren står. Scenen tar det som er imellom. */
-  --linje-h: 5.6rem;
-  --topp-h: 4rem;
-  opacity: 0;
-  visibility: hidden;
-  transition: opacity 0.5s var(--ease), visibility 0s linear 0.5s;
-}
-
-.mode-expanded .panel.is-active [data-fane="foto"] > .lysbord {
-  opacity: 1;
-  visibility: visible;
-  transition: opacity 0.6s var(--ease) 0.12s;
-}
-
-/* --- de to rommene ---
-   Begge fyller hele kortet og ligger oppå hverandre. Det som ikke er i
-   bruk, er skjøvet ut av synsfeltet i den retningen det ligger: veggen
-   henger over bordet, så den venter oppe, og bordet venter nede. Å bytte
-   rom er altså å løfte eller senke blikket.
-
-   Hvert rom er sin egen container, så scenen inni kan måle seg mot det. */
-.rom {
+  --topp-h: 1.4rem;
+  --linje-h: 3.8rem;
   position: absolute;
   inset: 0;
   container-type: size;
-  transition:
-    transform 0.85s var(--ease),
-    opacity 0.6s var(--ease),
-    visibility 0s linear 0.85s;
+  isolation: isolate;
 }
-
-.lysbord:not(.pa-veggen) .rom--vegg {
-  transform: translateY(-36%);
-  opacity: 0;
-  visibility: hidden;
-}
-
-.lysbord.pa-veggen .rom--bord {
-  transform: translateY(36%);
-  opacity: 0;
-  visibility: hidden;
-}
-
-.lysbord:not(.pa-veggen) .rom--bord,
-.lysbord.pa-veggen .rom--vegg {
-  transition: transform 0.85s var(--ease), opacity 0.6s var(--ease);
-}
-
-/* Når kortet åpnes på nytt, skal man stå ved bordet uten å se veggen
-   gli bort — script.js setter denne i det ene øyeblikket byttet skjer. */
-.lysbord.uten-overgang .rom { transition: none; }
 
 /* Lampa over bordet. Et varmt skjær midt på, så kopiene har noe å
    ligge i og ikke bare svever på en flat farge. */
-.rom--bord::before {
+.lysbord::before {
   content: "";
   position: absolute;
   inset: 0;
@@ -2185,14 +1894,13 @@ body.lyd-pa .lyd-knapp .lyd-fra { display: inline-flex; }
 
 /* Scenen har fast sideforhold, og det er hele poenget med den. Kopiene
    plasseres i prosent av den, og hadde de vært plassert i prosent av
-   selve kortet, ville vifta strukket seg ulikt på hver eneste skjerm —
-   kortet er 1,2 ganger så bredt som høyt på én maskin og 1,8 på en
-   annen. Scenen er det største 3:2-feltet som får plass mellom
-   rombryteren og linja.
+   selve siden, ville vifta strukket seg ulikt på hver eneste skjerm.
+   Scenen er det største feltet i sitt format som får plass mellom
+   stripa og linja.
 
-   Den er også en egen container, så kanten på kopiene og rammene kan
-   settes i forhold til høyden på den (cqh) og dermed alltid står i samme
-   forhold til bildet. */
+   Den er også en egen container, så kanten på kopiene kan settes i
+   forhold til høyden på den (cqh) og dermed alltid står i samme forhold
+   til bildet. */
 .lysbord-scene {
   --a: 1.5;     /* sideforholdet — leses også av script.js */
   --kh: 70%;    /* høyden på en kopi, i prosent av scenen — likeså */
@@ -2205,17 +1913,27 @@ body.lyd-pa .lyd-knapp .lyd-fra { display: inline-flex; }
   container-type: size;
 }
 
-/* Én papirkopi. Plassen settes med left og top i prosent — ikke med
-   translate i piksler. Prosentene er relative til scenen, og når kortet
-   vokser fram endrer de seg ikke, så overgangene starter ikke på nytt for
-   hver frame kortet blir større. Bare et faktisk bytte av plass gir en
-   overgang. */
+/* Én papirkopi: en lys kant rundt, ikke en ramme. Kanten er polstring
+   med bakgrunnsfarge, så den skalerer med kopien. Fargen er papir, ikke
+   hvit — rent hvitt lyser for hardt mot blåtimen.
+
+   Formatet er kopiens eget (--f), så ingen av bildene blir beskåret. En
+   liggende kopi på en scene på høykant blir aldri bredere enn 92 % av
+   den — samme tak som i script.js.
+
+   Plassen settes med left og top i prosent, ikke med translate i
+   piksler. Prosentene er relative til scenen, og når siden vokser fram
+   endrer de seg ikke, så overgangene starter ikke på nytt for hver
+   frame. Bare et faktisk bytte av plass gir en overgang.
+
+   Usynlig til den er delt ut: før det ligger alle i en bunke midt på
+   bordet, og den skal ikke synes i glipen fra siden over. */
 .kopi {
   position: absolute;
   left: var(--x, 50%);
   top: var(--y, 50%);
-  height: var(--kh);
-  aspect-ratio: 9 / 16;
+  height: min(var(--kh), 92cqw / var(--f));
+  aspect-ratio: var(--f);
   padding: 1.5cqh;
   border: 0;
   border-radius: 3px;
@@ -2225,7 +1943,7 @@ body.lyd-pa .lyd-knapp .lyd-fra { display: inline-flex; }
     0 2px 6px rgba(0,0,0,0.3);
   transform: translate(-50%, -50%) rotate(var(--r, 0deg)) scale(var(--s, 1));
   z-index: var(--z, 1);
-  opacity: var(--o, 1);
+  opacity: var(--o, 0);
   cursor: pointer;
   -webkit-tap-highlight-color: transparent;
   transition:
@@ -2244,14 +1962,9 @@ body.lyd-pa .lyd-knapp .lyd-fra { display: inline-flex; }
   border-radius: 1px;
 }
 
-/* Uten src viser Chrome alt-teksten der bildet skulle stått. Den lille
-   versjonen legges inn i det kortet åpnes, så dette er bare de første
-   millisekundene — men det er nok til å se. */
-.kopi img:not([src]) { visibility: hidden; }
-
 /* Bunkene til siden i stort format trekker seg tilbake i mørket.
    Et lag oppå, ikke et filter: filter tvinger fram en ny opptegning av
-   bildet for hver frame det flytter seg, og her flytter alle sju seg på
+   bildet for hver frame det flytter seg, og her flytter alle seg på
    en gang. */
 .kopi::after {
   content: "";
@@ -2279,328 +1992,129 @@ body.lyd-pa .lyd-knapp .lyd-fra { display: inline-flex; }
   outline-offset: 5px;
 }
 
-/* --- linja nederst: kamera, eksponering og veien videre --- */
+/* --- side 3: utstyrsringen ---
 
-.lysbord-linje {
+   Det fysiske utstyret går rundt i ring. Ringen ligger flatt og er vippet mot deg, så det du ser av den er en
+   halvsirkel: det som er nærmest ligger lavt og stort, det som er bak
+   ligger høyt, lite og nesten borte.
+
+   Ingen 3D-transformer. Bildene er flate utklipp, og med rotateY ville de
+   stått på kant og forsvunnet i sidene. I stedet regnes hver plass ut på
+   sirkelen og settes som translate + scale, så motivet alltid vender rett
+   mot deg. Regnestykket ligger i script.js.
+
+   Flaten under er lys i begge temaer. Utstyret er svart på svart — kamera,
+   objektiver, filtre — og på det mørke kortet ble alt sammen silhuetter.
+   Dette er et fotobord, ikke en UI-flate, og da er lyst det eneste som
+   virker. I nattmodus er den dempet et hakk så den ikke blender. */
+
+.orbit {
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  overflow: hidden;
+  /* Gjenstandene får z-index fra JS for å ligge riktig i forhold til
+     hverandre. Uten en egen stablekontekst her gjelder de tallene hele
+     kortet, og utstyret la seg oppå tekstarket — programvarelista fikk
+     kameraer og objektiver tvers gjennom seg. Isolasjonen holder
+     rekkefølgen innenfor ringen, der den hører hjemme. */
+  isolation: isolate;
+}
+
+.orbit-flate {
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(115% 85% at 50% 34%, #fcfcfd 0%, #ededf0 52%, #dedee3 100%);
+}
+
+:root[data-theme="dark"] .orbit-flate {
+  background: radial-gradient(115% 85% at 50% 34%, #e4e4e9 0%, #d2d2d8 52%, #bebec6 100%);
+}
+
+.orbit-ring {
   position: absolute;
   left: 0;
   right: 0;
-  bottom: 0;
-  height: var(--linje-h);
-  display: flex;
-  align-items: center;
-  gap: 1rem;
-  padding: 0 clamp(1.4rem, 3.2vw, 2.6rem) 0.4rem;
+  /* Buen sitter litt over midten og teksten rett under, så de to leser
+     som én gruppe. Står ringen i midten blir det en tom halvdel under. */
+  top: 3%;
+  height: 78%;
 }
 
-.lysbord-tekst {
-  flex: 1 1 auto;
-  min-width: 0;
-  display: flex;
-  flex-direction: column;
-  gap: 0.1rem;
-  line-height: 1.3;
-}
-
-.lysbord-navn {
-  font-size: 0.95rem;
-  font-weight: 500;
-  letter-spacing: -0.01em;
-  color: #f1ede4;
-}
-
-/* Ikke tabulære tall her: i denne skrifta gjelder det også punktumet,
-   og «f/1.8» ble til «f/1 . 8». */
-.lysbord-exif {
-  font-size: 0.82rem;
-  color: rgba(241,237,228,0.55);
-}
-
-.lysbord-teller {
-  flex: none;
-  font-size: 0.82rem;
-  color: rgba(241,237,228,0.5);
-  font-variant-numeric: tabular-nums;
+.orbit-ting {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  /* Fast boks. Det åpnede kortet har ulik størrelse fra skjerm til
+     skjerm, så den virkelige størrelsen ganges inn i skalaen fra JS.
+     Boksen er satt større enn den noen gang tegnes, slik at transformen
+     bare krymper — forstørring av et ferdig opptegnet bilde blir
+     uskarpt. */
+  width: 230px;
+  height: 230px;
+  cursor: default;
+  /* transform settes hvert bilde fra JS; her står bare utgangspunktet,
+     så ingenting blinker i toppstilling før første runde i løkka */
+  transform: translate(-50%, -50%) scale(0.4);
   opacity: 0;
-  transition: opacity 0.4s var(--ease);
+  will-change: transform, opacity;
 }
 
-.lysbord-teller b { color: #f1ede4; font-weight: 600; }
-
-/* telleren gir bare mening når det er ett bilde oppe — i vifta ser man
-   alle sju */
-.lysbord.lupe .lysbord-teller { opacity: 1; }
-
-.lysbord-mer {
-  flex: none;
-  display: inline-flex;
-  align-items: center;
-  padding: 0.5rem 1.05rem;
-  border: 1px solid rgba(241,237,228,0.24);
-  border-radius: 99px;
-  background: transparent;
-  color: rgba(241,237,228,0.8);
-  font: inherit;
-  font-size: 0.82rem;
-  cursor: pointer;
-  transition: color 0.25s var(--ease), border-color 0.25s var(--ease), background 0.25s var(--ease);
-}
-
-.lysbord-mer:hover {
-  color: #fff;
-  border-color: rgba(241,237,228,0.5);
-  background: rgba(241,237,228,0.07);
-}
-
-.lysbord-mer:focus-visible {
-  outline: 2px solid rgba(241,237,228,0.75);
-  outline-offset: 3px;
-}
-
-.lysbord-navn,
-.lysbord-exif,
-.lysbord-teller,
-.lysbord-teller b,
-.lysbord-mer { transition: color 0.5s var(--ease), border-color 0.5s var(--ease), opacity 0.4s var(--ease); }
-
-/* --- veggen ---
-   Puss, ikke hvitt, og lyset kommer ovenfra: tre spotter i taket som
-   tegner hver sin bue nedover veggen. Rammene kaster skyggen sin nedover
-   av samme grunn. Veggen er lys i begge temaer — det er et rom, ikke en
-   UI-flate — men dempes et hakk i nattmodus, som fotobordet under
-   Utstyr. */
-.rom--vegg {
-  --puss-bunn: #d6cfc3;
-  background:
-    radial-gradient(24% 62% at 17% 0%, rgba(255,251,243,0.85) 0%, rgba(255,251,243,0) 100%),
-    radial-gradient(24% 62% at 50% 0%, rgba(255,251,243,0.9) 0%, rgba(255,251,243,0) 100%),
-    radial-gradient(24% 62% at 83% 0%, rgba(255,251,243,0.85) 0%, rgba(255,251,243,0) 100%),
-    linear-gradient(#e4dfd5, var(--puss-bunn));
-}
-
-:root[data-theme="dark"] .rom--vegg {
-  --puss-bunn: #b6afa3;
-  background:
-    radial-gradient(24% 62% at 17% 0%, rgba(255,247,232,0.45) 0%, rgba(255,247,232,0) 100%),
-    radial-gradient(24% 62% at 50% 0%, rgba(255,247,232,0.5) 0%, rgba(255,247,232,0) 100%),
-    radial-gradient(24% 62% at 83% 0%, rgba(255,247,232,0.45) 0%, rgba(255,247,232,0) 100%),
-    linear-gradient(#c9c3b8, var(--puss-bunn));
-}
-
-/* Veggen fortsetter et stykke under rommet. Den kommer ovenfra når man
-   ser opp, og uten dette fulgte underkanten med nedover som en skarp
-   stripe mot det mørke bordet. Ferdig på plass ligger forlengelsen
-   utenfor kortet og synes ikke. */
-.rom--vegg::after {
-  content: "";
-  position: absolute;
-  left: 0;
-  right: 0;
-  top: 100%;
-  height: 45%;
-  background: var(--puss-bunn);
-  pointer-events: none;
-}
-
-/* En ramme: svart list, hvitt passepartout, bildet inni. Alle målene er
-   brøkdeler av rammens egen høyde (--h, i prosent av scenen), så en liten
-   ramme har en smal list og en stor ramme en bred — slik ekte rammer er.
-   Bredden regnes ut av det samme: passepartout og list på begge sider, og
-   bildet i sitt eget sideforhold (--r) imellom. */
-.ramme {
-  --kant: calc(var(--h, 30) * 0.014cqh);
-  --matt: calc(var(--h, 30) * 0.06cqh);
-  position: absolute;
-  left: var(--x, 50%);
-  top: var(--y, 50%);
-  height: calc(var(--h, 30) * 1%);
-  width: calc(var(--h, 30) * 1cqh * (0.852 * var(--r) + 0.148));
-  padding: var(--matt);
-  border: var(--kant) solid #1b1a19;
-  border-radius: 1px;
-  background: #f8f6f1;
-  box-shadow:
-    0 calc(var(--h, 30) * 0.035cqh) calc(var(--h, 30) * 0.05cqh) calc(var(--h, 30) * -0.012cqh) rgba(46,34,20,0.42),
-    0 1px 2px rgba(0,0,0,0.18);
-  transform: translate(-50%, var(--ty, -50%)) scale(var(--s, 1));
-  z-index: var(--z, 10);
-  cursor: pointer;
-  -webkit-tap-highlight-color: transparent;
-  transition:
-    left 0.8s var(--ease),
-    top 0.8s var(--ease),
-    transform 0.8s var(--ease),
-    box-shadow 0.5s var(--ease);
-}
-
-/* Bildet ligger en anelse inn i passepartoutet, som i et skåret vindu:
-   en tynn skyggekant oppe og til venstre, der lyset ikke når ned. */
-.ramme img {
-  display: block;
+.orbit-ting img {
   width: 100%;
   height: 100%;
-  object-fit: cover;
-  box-shadow: 0 0 0 1px rgba(0,0,0,0.06);
+  object-fit: contain;
+  /* skyggen gir gjenstandene noe å hvile på; uten den svever de */
+  filter: drop-shadow(0 14px 18px rgba(24,20,16,0.28));
 }
 
-.ramme img:not([src]) { visibility: hidden; }
+/* --- teksten under ringen ---
+   Ingen egen synlighet her: den følger laget. En egen «visibility:
+   visible» ville trumfet det skjulte laget rundt, og knappen kunne blitt
+   tabbet til fra stokken. */
 
-.ramme.er-oppe {
-  box-shadow:
-    0 calc(var(--h, 30) * 0.06cqh) calc(var(--h, 30) * 0.1cqh) calc(var(--h, 30) * -0.02cqh) rgba(0,0,0,0.6),
-    0 2px 6px rgba(0,0,0,0.3);
-}
-
-.ramme:focus { outline: none; }
-
-.ramme:focus-visible {
-  outline: 2px solid #1b1a19;
-  outline-offset: 5px;
-}
-
-/* Lyset dempes i rommet når en ramme er tatt ned, bortsett fra der den
-   står — en spot på det ene bildet. Laget ligger i scenen, under rammen
-   som er oppe og over resten, og strekker seg langt utenfor scenen så
-   hele veggen blir mørk. Hullet står fast: det som er tatt ned, står
-   alltid på samme sted. */
-.vegg-mork {
-  --hx: 44%;
+.orbit-tekst {
   position: absolute;
-  inset: -60%;
-  z-index: 50;
-  background: radial-gradient(
-    ellipse 26% 40% at calc((60% + var(--hx)) / 2.2) 50%,
-    rgba(16,14,12,0.18) 0%,
-    rgba(16,14,12,0.72) 100%
-  );
-  opacity: 0;
-  pointer-events: none;
-  transition: opacity 0.6s var(--ease);
+  left: 0;
+  right: 0;
+  top: 74%;
+  text-align: center;
+  padding: 0 1.5rem;
+  /* Navn og modell ligger oppå hverandre i én rad med fast høyde — da
+     flytter ingenting seg når du går fra én gjenstand til en annen,
+     eller når raden står tom. */
+  display: grid;
+  grid-template-rows: 3.4rem;
+  justify-items: center;
 }
 
-.lysbord.pa-veggen.lupe .vegg-mork { opacity: 1; }
+.orbit-navn,
+.orbit-modell { grid-area: 1 / 1; transition: opacity 0.3s var(--ease); }
 
-/* Lappen ved siden av, som på et museum: ingen tittel, bare det bildet
-   faktisk er laget med. Står med underkanten på linje med rammens. */
-.vegglapp {
-  position: absolute;
-  left: var(--lx, 72%);
-  top: var(--ly, 80%);
-  z-index: 61;
-  width: max-content;
-  max-width: 24%;
-  padding: 0.75rem 0.9rem 0.8rem;
-  border-radius: 2px;
-  background: #fbfaf6;
-  color: #3a3733;
-  font-size: 0.74rem;
-  line-height: 1.5;
-  box-shadow: 0 8px 18px -8px rgba(0,0,0,0.45);
-  transform: translateY(-100%);
-  opacity: 0;
-  translate: 0 8px;
-  pointer-events: none;
-  transition: opacity 0.35s var(--ease), translate 0.5s var(--ease);
-}
-
-.lysbord.pa-veggen.lupe .vegglapp {
-  opacity: 1;
-  translate: 0 0;
-  transition: opacity 0.5s var(--ease) 0.4s, translate 0.6s var(--ease) 0.4s;
-}
-
-.lapp-kamera {
-  margin-bottom: 0.3rem;
-  font-weight: 600;
-  color: #141312;
-}
-
-/* --- linja og bryteren på den lyse veggen ---
-   Teksten blir mørk mot pussen. Men når en ramme er tatt ned, er veggen
-   dempet, og da gjelder de lyse fargene fra bordet igjen — derfor
-   «:not(.lupe)». */
-.lysbord.pa-veggen:not(.lupe) .lysbord-navn { color: #1d1b18; }
-.lysbord.pa-veggen:not(.lupe) .lysbord-exif { color: rgba(29,27,24,0.58); }
-.lysbord.pa-veggen:not(.lupe) .lysbord-teller { color: rgba(29,27,24,0.5); }
-.lysbord.pa-veggen:not(.lupe) .lysbord-teller b { color: #1d1b18; }
-
-.lysbord.pa-veggen:not(.lupe) .lysbord-mer {
-  border-color: rgba(29,27,24,0.22);
-  color: rgba(29,27,24,0.78);
-}
-
-.lysbord.pa-veggen:not(.lupe) .lysbord-mer:hover {
-  border-color: rgba(29,27,24,0.45);
-  background: rgba(29,27,24,0.05);
-  color: #1d1b18;
-}
-
-/* Lappen sier det samme som linja, og står rett ved bildet. To steder med
-   samme tekst er ett for mye. */
-.lysbord.pa-veggen.lupe .lysbord-tekst { opacity: 0; }
-
-/* --- rombryteren ---
-   To knapper i en pille, og en markør som glir mellom dem. Den
-   bytter farge med rommet: lys på bordet, mørk på veggen. */
-.rom-bryter {
-  position: absolute;
-  top: 1.45rem;
-  left: 50%;
-  translate: -50% 0;
-  z-index: 5;
-  display: inline-grid;
-  grid-auto-flow: column;
-  grid-auto-columns: 1fr;
-  padding: 3px;
-  border-radius: 99px;
-  background: rgba(241,237,228,0.08);
-  box-shadow: inset 0 0 0 1px rgba(241,237,228,0.14);
-  transition: background 0.5s var(--ease), box-shadow 0.5s var(--ease);
-}
-
-.rom-markor {
-  position: absolute;
-  top: 3px;
-  bottom: 3px;
-  left: 3px;
-  width: calc(50% - 3px);
-  border-radius: 99px;
-  background: #f1ede4;
-  transition: transform 0.5s var(--ease), background 0.5s var(--ease);
-}
-
-.lysbord.pa-veggen .rom-markor { transform: translateX(100%); }
-
-.rom-bryter button {
-  position: relative;
-  padding: 0.42rem 1rem 0.46rem;
-  border-radius: 99px;
-  font-size: 0.8rem;
+.orbit-navn {
+  align-self: start;
+  font-size: 0.72rem;
   font-weight: 500;
-  white-space: nowrap;
-  color: rgba(241,237,228,0.66);
-  transition: color 0.4s var(--ease);
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: #8b8b93;
 }
 
-.rom-bryter button[aria-pressed="true"] { color: #1f2133; }
-
-.rom-bryter button:focus { outline: none; }
-
-.rom-bryter button:focus-visible {
-  outline: 2px solid rgba(241,237,228,0.75);
-  outline-offset: 2px;
+.orbit-modell {
+  align-self: end;
+  margin-top: 1.5rem;
+  font-size: clamp(1.05rem, 2vw, 1.5rem);
+  font-weight: 500;
+  letter-spacing: -0.02em;
+  color: #1a1a1a;
 }
 
-.lysbord.pa-veggen:not(.lupe) .rom-bryter {
-  background: rgba(29,27,24,0.05);
-  box-shadow: inset 0 0 0 1px rgba(29,27,24,0.12);
-}
+/* navn og modell står tomme til noe er valgt */
+.orbit-navn,
+.orbit-modell { opacity: 0; }
 
-.lysbord.pa-veggen:not(.lupe) .rom-markor { background: #1d1b18; }
-.lysbord.pa-veggen:not(.lupe) .rom-bryter button { color: rgba(29,27,24,0.62); }
-.lysbord.pa-veggen:not(.lupe) .rom-bryter button[aria-pressed="true"] { color: #f4f1ea; }
-
-.lysbord.pa-veggen.lupe .rom-bryter button[aria-pressed="true"] { color: #1d1b18; }
+.orbit.har-valg .orbit-navn,
+.orbit.har-valg .orbit-modell { opacity: 1; }
 
 /* ============ OM MEG-SIDEN ============ */
 
@@ -2708,6 +2222,35 @@ body.lyd-pa .lyd-knapp .lyd-fra { display: inline-flex; }
 
 .about-note-doc:hover svg,
 .about-note-doc:focus-visible svg { opacity: 1; }
+
+/* --- stacken: programvaren, som en rolig rad under teksten. Navnene
+       flyter som løpende tekst med en prikk imellom, i samme grå som
+       resten av siden — ingen bobler og ingen flater, så raden leser som
+       en del av teksten og ikke som et merkesett. --- */
+
+.about-stack { margin-top: 8vh; }   /* samme luft som over anbefalinga */
+
+.about-stack-liste {
+  list-style: none;
+  font-size: 0.95rem;
+  line-height: 1.8;
+  color: var(--grey);
+}
+
+/* Et navn brekker aldri over to linjer, og prikken henger på slutten av
+   navnet før den — da er det bare etter prikken linja kan brekke, og
+   ingen linje begynner med en. Mellomrommet i markupen er luften etter
+   den; margen gir like mye luft foran. */
+.about-stack-liste li {
+  display: inline;
+  white-space: nowrap;
+}
+
+.about-stack-liste li:not(:last-child)::after {
+  content: "·";
+  margin: 0 0.22em 0 0.5em;
+  color: var(--grey-soft);
+}
 
 /* --- slutten: CV, e-post og LinkedIn der lesingen slutter. Streken over
        sier at teksten er ferdig. Knappene er de samme widgetene som
@@ -3274,10 +2817,9 @@ html.port:not(.apnet) .deck-intro > .panel > .card { animation-play-state: pause
   .gal-slide, .gal-dot { transition: none; }
   /* bryteren vipper uten glidning, men sier fortsatt fra at den er på */
   .inngang, .bryter-spor, .bryter-knott { transition: none; }
-  /* kopiene bytter plass uten å gli, og tingene på forsiden sprer seg
-     ikke under pekeren */
-  .kopi, .kopi::after, .samlet-ting, .om-hei, .lysbord, .orbit,
-  .rom, .ramme, .vegg-mork, .vegglapp, .rom-markor { transition: none; }
+  /* kopiene bytter plass uten å gli, og tingene på Morro-forsiden sprer
+     seg ikke under pekeren */
+  .kopi, .kopi::after, .samlet-ting, .om-hei { transition: none; }
 }
 
 /* ============ RESPONSIVT ============ */
@@ -3423,8 +2965,7 @@ html.port:not(.apnet) .deck-intro > .panel > .card { animation-play-state: pause
     padding-right: 3.6rem;   /* lukkeknappen står i hjørnet */
   }
 
-  .case-heading h2,
-  .faner { font-size: 1.3rem; }
+  .case-heading h2 { font-size: 1.3rem; }
 
   /* to linjer er taket — Knytt-teksten sto på fem og rakk ned i sidene */
   .case-heading p {
@@ -3473,6 +3014,28 @@ html.port:not(.apnet) .deck-intro > .panel > .card { animation-play-state: pause
   .mode-expanded .panel--pages.is-active .gal-boks--reise .gal-label { display: block; }
 
   .mode-expanded .panel--pages.is-active .reel-item--foto { --rbox-h: 1.4; }
+
+  /* Avspilleren i Morro står på høykant her, med plakaten over
+     kontrollene, og trenger en høy side — som telefonene i Knytt. */
+  .mode-expanded .panel--pages.is-active .reel-item--spot { --rbox-h: 1.75; }
+
+  /* Lysbordet og ringen trenger også en høyere side enn opptakene. */
+  .mode-expanded .panel--pages.is-active .reel-item--lysbord { --rbox-h: 1.6; }
+  .mode-expanded .panel--pages.is-active .reel-item--ring { --rbox-h: 1.15; }
+
+  /* Lysbordet på høykant. Ikke plass til en vifte på 360 px: scenen står
+     på høykant, én kopi er alltid oppe, og bunkene på hver side stikker
+     så vidt inn fra kanten — nok til å si at det er flere å sveipe til.
+     Linja nederst har bildeteksten over to linjer. */
+  .lysbord { --topp-h: 1rem; --linje-h: 4rem; }
+
+  .lysbord-scene {
+    --a: 0.6;
+    --kh: 80%;
+    width: min(100cqw - 1.6rem, (100cqh - var(--topp-h) - var(--linje-h) - 0.6rem) * var(--a));
+  }
+
+  .orbit-ring { top: 8%; height: 72%; }
 
   .mode-expanded .panel--pages.is-active .reel-item--foto .reel-gallery {
     aspect-ratio: auto;
@@ -3559,8 +3122,7 @@ html.port:not(.apnet) .deck-intro > .panel > .card { animation-play-state: pause
      samme sted som den nettopp slapp. ✕-en oppe i hjørnet blir stående
      — den lukker helt, som før — men den er lang vei på en telefon.
 
-     Gjelder alle kortene, ikke bare de med sider: Kryp og Utstyr har
-     samme tekstark og hadde samme blindvei. */
+     Gjelder alle kortene med tekstark. */
   .tilbake-knapp { display: none; }
 
   .mode-text .bunn-teller,
@@ -3678,6 +3240,8 @@ html.port:not(.apnet) .deck-intro > .panel > .card { animation-play-state: pause
 
   .about-note-quote { font-size: 1rem; }
 
+  .about-stack { margin-top: 5vh; }
+
   .about-slutt {
     margin-top: 8vh;
     padding-top: 1.8rem;
@@ -3703,58 +3267,6 @@ html.port:not(.apnet) .deck-intro > .panel > .card { animation-play-state: pause
   /* CV-knappen er bare ikon her, og da er ansiktet hele ikonet. */
   .widget-ansikt { width: 28px; height: 28px; margin: 0; }
 
-  /* --- lysbordet på høykant ---
-     Ikke plass til en vifte på 360 px. Scenen står på høykant, én kopi
-     er alltid oppe, og bunkene på hver side stikker så vidt inn fra
-     kanten — nok til å si at det er flere å sveipe til.
-
-     Teller og «Om bildene» flytter ned i bunnlinja, der de står for alle
-     kortene man blar i på mobil. Linja i kortet beholder bare kamera og
-     eksponering, og må holde seg over bunnlinja som flyter oppå. */
-  .lysbord { --linje-h: 6.8rem; --topp-h: 3.5rem; }
-
-  .lysbord-scene {
-    --a: 0.6;
-    --kh: 80%;
-    width: min(100cqw - 1.6rem, (100cqh - var(--topp-h) - var(--linje-h) - 0.6rem) * var(--a));
-  }
-
-  .rom-bryter { top: 0.95rem; }
-  .rom-bryter button { padding: 0.38rem 0.85rem 0.42rem; font-size: 0.76rem; }
-
-  /* Veggen på høykant: det som er tatt ned, står midt i rommet, og det er
-     ikke plass til lappen ved siden av. Linja nederst sier det samme. */
-  .vegg-mork { --hx: 50%; }
-  .vegglapp { display: none; }
-  .lysbord.pa-veggen.lupe .lysbord-tekst { opacity: 1; }
-
-  .lysbord-linje {
-    align-items: flex-start;
-    justify-content: center;
-    padding: 0.3rem 1.2rem 0;
-    text-align: center;
-  }
-
-  .lysbord-tekst { align-items: center; }
-  .lysbord-navn { font-size: 0.9rem; }
-  .lysbord-exif { font-size: 0.76rem; }
-
-  .lysbord-teller,
-  .lysbord-mer { display: none; }
-}
-
-/* Telefon på tvers: scenen legger seg ned igjen, og da er det plass til
-   vifta. Skriptet leser sideforholdet herfra og velger oppsett etter
-   det, ikke etter skjermbredden. */
-@media (max-width: 860px) and (max-height: 520px) {
-  .lysbord { --linje-h: 5.2rem; --topp-h: 2.9rem; }
-  .lysbord-scene { --a: 2.1; --kh: 78%; }
-  .rom-bryter { top: 0.6rem; }
-
-  /* Kortet er knapt 300 px høyt her, og bunnlinja flyter over den
-     nederste tredjedelen av linja. Det er bare plass til kameraet over
-     den — eksponeringen ville lagt seg bak knappene. */
-  .lysbord-exif { display: none; }
 }
 
 @media (max-width: 520px) {
@@ -3766,13 +3278,22 @@ html.port:not(.apnet) .deck-intro > .panel > .card { animation-play-state: pause
 @media (max-width: 860px) and (max-height: 520px) {
   :root { --nav-h: 5.4rem; }
 
+  /* Plakaten i avspilleren er borte her, og kontrollene alene får plass
+     i en lav side. Lysbordet og ringen legger seg ned igjen, og der er
+     det plass til vifta. Skriptet leser sideforholdet til scenen og
+     velger oppsett etter det, ikke etter skjermbredden. */
+  .mode-expanded .panel--pages.is-active .reel-item--spot { --rbox-h: 0.75; }
+  .mode-expanded .panel--pages.is-active .reel-item--lysbord { --rbox-h: 0.7; }
+  .mode-expanded .panel--pages.is-active .reel-item--ring { --rbox-h: 0.75; }
+  .lysbord-scene { --a: 2.1; --kh: 78%; }
+
   .case-heading p { -webkit-line-clamp: 1; }
 }
 
-/* ============ KRYP: AVSPILLEREN I DET SAMLEDE KORTET ============
+/* ============ KRYP: AVSPILLEREN, SIDE 1 I MORRO ============
 
-   Velger du Kryp, blir kortet en avspiller: plakaten til venstre, tittel
-   og kontroller til høyre — satt opp som en strømmetjeneste. Det eneste
+   Første side i Morro er en avspiller: plakaten til venstre, tittel og
+   kontroller til høyre — satt opp som en strømmetjeneste. Det eneste
    som slipper til av farge er et uskarpt gjenskinn av plakaten, samme
    grep som de uskarpe kopiene bak bildene i karusellene.
 
@@ -3786,18 +3307,17 @@ html.port:not(.apnet) .deck-intro > .panel > .card { animation-play-state: pause
   overflow: hidden;
   /* Dyp burgunder, ikke kortets blåtime: den plukker opp rødt fra
      tittelen i plakaten, og er mørk nok til at den mørke kanten på
-     plakaten fortsatt har noe å hvile mot. Laget har sin egen bunn, så
-     den følger med når man bytter del. */
+     plakaten fortsatt har noe å hvile mot. */
   background: #4a1522;
   opacity: 0;
   visibility: hidden;
   transition: opacity 0.5s var(--ease), visibility 0s linear 0.5s;
 }
 
-/* Bare i forstørret modus, og bare med Kryp valgt. I tekstmodus ligger
-   arket oppå, og en spiller man ikke ser skal man heller ikke kunne
-   tabbe seg inn i — visibility tar både fokus og skjermleser med seg. */
-.mode-expanded .panel.is-active [data-fane="kryp"] > .spot {
+/* Bare i forstørret modus. I tekstmodus ligger arket oppå, og en
+   spiller man ikke ser skal man heller ikke kunne tabbe seg inn i —
+   visibility tar både fokus og skjermleser med seg. */
+.mode-expanded .panel.is-active .reel-item > .spot {
   opacity: 1;
   visibility: visible;
   transition: opacity 0.7s var(--ease) 0.2s;
