@@ -2053,6 +2053,11 @@ body.lyd-pa .lyd-knapp .lyd-fra { display: inline-flex; }
      kameraer og objektiver tvers gjennom seg. Isolasjonen holder
      rekkefølgen innenfor ringen, der den hører hjemme. */
   isolation: isolate;
+  /* Som på lysbordet: nettleseren får ikke rulle sidestokken når
+     fingeren starter på ringen. script.js tar gesten selv, og blar side
+     bare når den er tydelig loddrett. */
+  touch-action: pan-x;
+  touch-action: pan-x pinch-zoom;
 }
 
 .orbit-flate {

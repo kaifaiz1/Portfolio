@@ -1120,6 +1120,7 @@
       el.addEventListener('click', (e) => {
         if (!ringFremme()) return;
         e.stopPropagation();
+        if (sveipet) { sveipet = false; return; }
         valgt = valgt === i ? null : i;   // på touch er trykk det eneste «hold over»
       });
     });
@@ -1138,32 +1139,57 @@
     // Med en finger tar man i selve ringen, og da må den følge fingeren:
     // drar du mot venstre, skal det som står fremst gå mot venstre. Det
     // er motsatt vei av hjulet, og det er med vilje — der tar man ikke i
-    // noe. Retningen låses ved første bevegelse, så et loddrett drag
-    // ruller sidestokken og lar ringen være.
-    let sveipX = null;
-    let sveipY = null;
+    // noe.
+    //
+    // Ringen tar hele gesten selv, som lysbordet — se touch-action i
+    // CSS-en. Lot vi nettleseren rulle sidestokken, gikk et drag som skled
+    // litt på skrå rett tilbake til bildene på side 2. Retningen låses ved
+    // første bevegelse og heller mot sidelengs, og et loddrett sveip må
+    // være et godt stykke langt før det blar side.
+    const LODDRETT = 90;   // px før et loddrett sveip blar en side
+    let startX = null;
+    let startY = null;
+    let forrigeX = null;
     let retning = null;
+    let sveipet = false;
 
     orbit.addEventListener('touchstart', (e) => {
-      sveipX = e.touches[0].clientX;
-      sveipY = e.touches[0].clientY;
+      if (e.touches.length !== 1) { startX = null; return; }
+      startX = forrigeX = e.touches[0].clientX;
+      startY = e.touches[0].clientY;
       retning = null;
     }, { passive: true });
 
     orbit.addEventListener('touchmove', (e) => {
-      if (sveipX === null || !ringFremme()) return;
+      if (startX === null) return;
       const x = e.touches[0].clientX;
       const y = e.touches[0].clientY;
       if (!retning) {
-        if (Math.abs(x - sveipX) + Math.abs(y - sveipY) <= 10) return;
-        retning = Math.abs(x - sveipX) > Math.abs(y - sveipY) ? 'x' : 'y';
+        const dx = Math.abs(x - startX);
+        const dy = Math.abs(y - startY);
+        if (dx + dy <= 12) return;
+        retning = dy > dx * 1.6 ? 'y' : 'x';
       }
-      if (retning !== 'x') return;
-      fart = Math.max(-0.055, Math.min(0.055, fart + (x - sveipX) * 0.0004));
-      sveipX = x;
+      if (retning !== 'x' || !ringFremme()) return;
+      fart = Math.max(-0.055, Math.min(0.055, fart + (x - forrigeX) * 0.0004));
+      forrigeX = x;
     }, { passive: true });
 
-    orbit.addEventListener('touchend', () => { sveipX = null; }, { passive: true });
+    orbit.addEventListener('touchcancel', () => { startX = null; }, { passive: true });
+
+    orbit.addEventListener('touchend', (e) => {
+      if (startX === null) return;
+      const dy = e.changedTouches[0].clientY - startY;
+      startX = null;
+      if (!ringApen() || retning !== 'y' || Math.abs(dy) < LODDRETT) return;
+      // Gjelder også når siden bare stikker fram: ringen tar gesten
+      // uansett, og da må den kunne bla dit.
+      goToReel(ringReel, ringReel.aktiv + (dy < 0 ? 1 : -1));
+      // Et trykk som slipper gjennom etter sveipet, skal ikke velge
+      // gjenstanden fingeren tilfeldigvis slapp over.
+      sveipet = true;
+      setTimeout(() => { sveipet = false; }, 400);
+    }, { passive: true });
 
     orbitTikk = () => {
       // En ring man ikke ser koster ingenting. Den står stille med
