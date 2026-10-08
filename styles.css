@@ -215,6 +215,67 @@ button { font: inherit; color: inherit; background: none; border: none; cursor: 
   transition-delay: 0.25s;
 }
 
+/* --- tittelen som er en bryter: Kryp / Foto / Utstyr ---
+   Samme størrelse og vekt som de andre titlene, så den leser som en
+   tittel først. Det som er valgt står i blekk, de to andre i grått, som
+   undertittelen — og pekeren over et grått ord gjør det svart.
+
+   Denne tittelen har knapper, og da holder ikke opasitet alene: den må
+   være borte for tabben også når den ikke vises. Synligheten slipper
+   først når den har tonet helt ut. */
+.case-heading--faner {
+  visibility: hidden;
+  transition-property: opacity, transform, visibility;
+  transition-duration: 0.55s, 0.55s, 0s;
+  transition-timing-function: var(--ease), var(--ease), linear;
+  transition-delay: 0s, 0s, 0.55s;
+}
+
+.mode-expanded .case-heading--faner.is-current,
+.mode-text .case-heading--faner.is-current {
+  visibility: visible;
+  pointer-events: auto;
+}
+
+.faner {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  column-gap: 0.3em;
+  font-size: clamp(1.35rem, 2.1vw, 1.7rem);
+  font-weight: 600;
+  letter-spacing: -0.03em;
+  line-height: 1.15;
+}
+
+/* Polstringen gir en treffflate på høyde med en fingertupp; den negative
+   margen tar den tilbake, så linja står der en vanlig tittel står. */
+.fane {
+  padding: 0.2em 0;
+  margin: -0.2em 0;
+  letter-spacing: inherit;
+  color: var(--grey);
+  transition: color 0.3s var(--ease);
+}
+
+.fane:hover,
+.fane[aria-pressed="true"] { color: var(--ink); }
+
+.fane[aria-pressed="true"] { cursor: default; }
+
+.fane:focus { outline: none; }
+
+.fane:focus-visible {
+  outline: 2px solid var(--ink);
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+
+.fane-skille {
+  color: var(--grey-soft);
+  font-weight: 400;
+}
+
 /* ============ WIDGETS ØVERST TIL HØYRE ============ */
 
 .nav-widgets {
@@ -394,9 +455,8 @@ button { font: inherit; color: inherit; background: none; border: none; cursor: 
    Ned tar fortsatt sin tid: det kortet som forlater midten skal gli
    rolig ut, ikke slukke. */
 .panel.is-active > .card > .card-art,
-.panel.is-active > .card > .card-cover,
 .panel.is-active > .card > .om-figur,
-.panel.is-active > .card > .foto-bunke,
+.panel.is-active > .card > .samlet-forside,
 .panel.is-active > .card > .type-face { transition-duration: 0.18s; }
 
 .card-label {
@@ -440,12 +500,10 @@ button { font: inherit; color: inherit; background: none; border: none; cursor: 
    gjennomsiktig og bare har en telefon oppå. */
 .panel.is-left > .card > .card-art,
 .panel.is-right > .card > .card-art,
-.panel.is-left > .card > .card-cover,
-.panel.is-right > .card > .card-cover,
 .panel.is-left > .card > .om-figur,
 .panel.is-right > .card > .om-figur,
-.panel.is-left > .card > .foto-bunke,
-.panel.is-right > .card > .foto-bunke,
+.panel.is-left > .card > .samlet-forside,
+.panel.is-right > .card > .samlet-forside,
 .panel.is-left > .card > .type-face,
 .panel.is-right > .card > .type-face { opacity: var(--cf-o1); }
 
@@ -525,6 +583,12 @@ button { font: inherit; color: inherit; background: none; border: none; cursor: 
   padding: clamp(2.2rem, 7vh, 5rem) clamp(1.4rem, 4vw, 3rem) 4.5rem;
 }
 
+/* Det samlede kortet har én tekst for hver del, og arket viser den som
+   er valgt i tittelen. */
+.card--samlet[data-fane="kryp"] .card-text-inner:not([data-fane="kryp"]),
+.card--samlet[data-fane="foto"] .card-text-inner:not([data-fane="foto"]),
+.card--samlet[data-fane="utstyr"] .card-text-inner:not([data-fane="utstyr"]) { display: none; }
+
 .text-kicker {
   font-size: 0.75rem;
   font-weight: 500;
@@ -563,6 +627,18 @@ button { font: inherit; color: inherit; background: none; border: none; cursor: 
   padding-top: 0.9rem;
   border-top: 1px solid var(--line);
 }
+
+/* Utfall i punkter, ett funn per linje. Ingen kulepunkter: samme tynne
+   strek som over «Rolle» skiller dem, så lista leser som en del av arket
+   og ikke som et dokument limt inn i det. */
+.text-liste { list-style: none; }
+
+.text-liste li {
+  padding: 0.75rem 0;
+  border-top: 1px solid var(--line);
+}
+
+.text-liste li:last-child { padding-bottom: 0; }
 
 .tool-chips {
   list-style: none;
@@ -669,8 +745,8 @@ body.endrer-storrelse *::after {
    over flere øyeblikk mens driften gikk. Kortene beholder altså kuløren
    sin — det er bevegelsen og dybden som er borte.
 
-   Nettbutikk er den eneste som fortsatt har gradient. Der er silken
-   selve poenget: kortet har ingenting annet å vise. */
+   Kortet under arbeid er det eneste som fortsatt har gradient. Der er
+   silken selve poenget: kortet har ingenting annet å vise. */
 
 /* --- OsloLut: svart. #08090c og ikke rent #000 — det er den samme
        nesten-svarte bunnen kortet ble bygget på, og den holder et
@@ -692,48 +768,7 @@ body.endrer-storrelse *::after {
 /* --- Knytt: den lyse blå --- */
 .art--knytt { --art-bg: #79aed9; }
 
-/* --- Kryp: dyp burgunder. Kortet har ingen flekker i det hele tatt —
-       ikke bare usynlige, men fjernet fra markupen, så det ikke ligger
-       fem elementer og animerer noe man uansett ikke ser. Fargen er
-       bare underlaget plakaten legger seg på, og det som står igjen de
-       første millisekundene før den er lastet. Den plukker opp rødt
-       fra tittelen i plakaten, og er mørk nok til at den mørke kanten
-       på plakaten fortsatt har noe å hvile mot. --- */
-.art--snart { --art-bg: #4a1522; }
-
-/* Plakaten som kortforside. Den fyller ikke kortet, men ligger som en
-   egen flate midt i det — 78 % er nøyaktig samme bredde som opptakene
-   i OsloLut- og Badstulaug-kortene får av «padding: 0 11%» i
-   sidestokken, så luften rundt er den samme på tvers av stokken.
-
-   Ringen er der fordi plakatens ytterkant er nesten svart og kortet
-   under er helt svart: uten den forsvinner hjørnene i bakgrunnen, og
-   luften rundt blir umulig å se. */
-/* 18 px og ikke 9: plakaten har sine egne, slitte hjørner malt inn i
-   bildefila — tre av dem. Det fjerde, nederst til høyre, er helt
-   skarpt. Med en liten radius er det kunstverkets egen kurve som leser
-   som hjørnet på de tre gode, og da stakk det fjerde ut som spisst.
-   En radius som er større enn kunstverkets egen kurve tar over på alle
-   fire, og da er de like. */
-.card-cover {
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  translate: -50% -50%;
-  width: 78%;
-  aspect-ratio: 1;
-  object-fit: cover;
-  border-radius: 18px;
-  box-shadow:
-    0 18px 40px -18px rgba(0,0,0,0.85),
-    0 0 0 1px rgba(255,255,255,0.07);
-  transition: opacity 0.6s var(--ease);
-}
-
-/* Dette kortet har ingen etikett. Plakaten sier selv hva den er, og
-   alt annet ville lagt seg oppå enten tittelen eller rulleteksten. */
-
-/* --- Nettbutikk: brun og beige silke. De andre kortene har runde
+/* --- Under arbeid: brun og beige silke. De andre kortene har runde
        flekker; her er de samme fem elementene strukket til brede, lave
        bånd og lagt på hver sin vinkel. Screen-blandingen gjør
        krysningene lysere, og det er de lysningene som leser som folder
@@ -1626,7 +1661,8 @@ body.lyd-pa .lyd-knapp .lyd-fra { display: inline-flex; }
 
 .reel-gallery--tap { cursor: pointer; }
 
-/* ============ TYPOGRAFISKE KORTFORSIDER ============ */
+/* ============ KORTFORSIDE UTEN BILDE ============
+   Bare lastelinjen i kortet under arbeid, midt på silken. */
 
 .type-face {
   position: absolute;
@@ -1639,28 +1675,12 @@ body.lyd-pa .lyd-knapp .lyd-fra { display: inline-flex; }
   color: rgba(255,255,255,0.94);
 }
 
-/* En firedel av det den var. Sporingen måtte følge med ned: -0.04em er
-   satt for display-grader, der bokstavene ellers driver fra hverandre.
-   På 28 px strammer den samme verdien ordet til en klump, så den er
-   lettet til nesten nøytralt. */
-.type-big {
-  font-size: clamp(0.85rem, 2vw, 1.75rem);
-  font-weight: 600;
-  letter-spacing: -0.015em;
-  line-height: 1;
-}
+/* ============ UTSTYRSRINGEN: UTSTYR I DET SAMLEDE KORTET ============
 
-.type-small {
-  font-size: 0.95rem;
-  color: var(--grey);
-}
-
-/* ============ UTSTYRSRINGEN I VERKTØYKORTET ============
-
-   Kortet sier «verktøy.» i stokken. Åpner du det, kommer det fysiske
-   utstyret opp og går rundt i ring. Ringen ligger flatt og er vippet mot
-   deg, så det du ser av den er en halvsirkel: det som er nærmest ligger
-   lavt og stort, det som er bak ligger høyt, lite og nesten borte.
+   Velger du Utstyr, kommer det fysiske utstyret opp og går rundt i ring.
+   Ringen ligger flatt og er vippet mot deg, så det du ser av den er en
+   halvsirkel: det som er nærmest ligger lavt og stort, det som er bak
+   ligger høyt, lite og nesten borte.
 
    Ingen 3D-transformer. Bildene er flate utklipp, og med rotateY ville de
    stått på kant og forsvunnet i sidene. I stedet regnes hver plass ut på
@@ -1683,12 +1703,18 @@ body.lyd-pa .lyd-knapp .lyd-fra { display: inline-flex; }
      kameraer og objektiver tvers gjennom seg. Isolasjonen holder
      rekkefølgen innenfor ringen, der den hører hjemme. */
   isolation: isolate;
+  /* Et lag i det samlede kortet, som avspilleren og lysbordet: usynlig
+     (og utenfor tabbing) til kortet er åpnet med Utstyr valgt. */
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 0.5s var(--ease), visibility 0s linear 0.5s;
 }
 
-/* Naboene i stokken dempes på innholdet, ikke på kortet — samme regel
-   som gradientene og plakaten får lenger oppe. */
-.panel.is-left > .card > .orbit,
-.panel.is-right > .card > .orbit { opacity: var(--cf-o1); }
+.mode-expanded .panel.is-active [data-fane="utstyr"] > .orbit {
+  opacity: 1;
+  visibility: visible;
+  transition: opacity 0.6s var(--ease) 0.12s;
+}
 
 .orbit-flate {
   position: absolute;
@@ -1714,16 +1740,14 @@ body.lyd-pa .lyd-knapp .lyd-fra { display: inline-flex; }
   position: absolute;
   left: 50%;
   top: 50%;
-  /* Fast boks. Kortet er lite i stokken og stort når det er åpnet, så
-     den virkelige størrelsen ganges inn i skalaen fra JS. Boksen er satt
-     større enn den noen gang tegnes, slik at transformen bare krymper —
-     forstørring av et ferdig opptegnet bilde blir uskarpt. */
+  /* Fast boks. Det åpnede kortet har ulik størrelse fra skjerm til
+     skjerm, så den virkelige størrelsen ganges inn i skalaen fra JS.
+     Boksen er satt større enn den noen gang tegnes, slik at transformen
+     bare krymper — forstørring av et ferdig opptegnet bilde blir
+     uskarpt. */
   width: 230px;
   height: 230px;
   cursor: default;
-  /* i stokken er kortet én stor klikkflate; ringen tar først imot
-     pekeren når kortet er åpnet */
-  pointer-events: none;
   /* transform settes hvert bilde fra JS; her står bare utgangspunktet,
      så ingenting blinker i toppstilling før første runde i løkka */
   transform: translate(-50%, -50%) scale(0.4);
@@ -1739,17 +1763,12 @@ body.lyd-pa .lyd-knapp .lyd-fra { display: inline-flex; }
   filter: drop-shadow(0 14px 18px rgba(24,20,16,0.28));
 }
 
-/* --- teksten under ringen --- */
+/* --- teksten under ringen ---
+   Ingen egen synlighet her: den følger laget. En egen «visibility:
+   visible» ville trumfet det skjulte laget rundt, og knappen kunne blitt
+   tabbet til fra stokken. */
 
-.mode-expanded .panel.is-active .orbit-ting { pointer-events: auto; }
-
-/* Navn og hjelpetekst hører til den åpne visningen. I stokken er kortet
-   for lite til å lese dem, og de ville uansett ikke hatt noe å si — der
-   kan man ikke holde pekeren over noe. */
 .orbit-tekst {
-  opacity: 0;
-  visibility: hidden;   /* knappen skal ikke kunne tabbes til fra stokken */
-  transition: opacity 0.5s var(--ease), visibility 0s linear 0.5s;
   position: absolute;
   left: 0;
   right: 0;
@@ -1764,12 +1783,6 @@ body.lyd-pa .lyd-knapp .lyd-fra { display: inline-flex; }
   grid-template-rows: 3.4rem auto;
   row-gap: 0.7rem;
   justify-items: center;
-}
-
-.mode-expanded .panel.is-active .orbit-tekst {
-  opacity: 1;
-  visibility: visible;
-  transition: opacity 0.5s var(--ease) 0.15s;
 }
 
 .orbit-navn,
@@ -1838,17 +1851,12 @@ body.lyd-pa .lyd-knapp .lyd-fra { display: inline-flex; }
 
 /* ============ KORT UNDER ARBEID ============
 
-   Nettbutikk-kortet er med i stokken, men har ingenting å åpne. Det
-   har derfor ingen pekerhånd når det står fremme — bare naboene, der
-   klikket fortsatt betyr «ta meg hit». Lastelinjen sier resten. */
+   Kortet er med i stokken, men har ingenting å åpne. Det har derfor
+   ingen pekerhånd når det står fremme — bare naboene, der klikket
+   fortsatt betyr «ta meg hit». Hva som kommer, står ikke på det:
+   etiketten sier «Under arbeid», og lastelinjen sier resten. */
 
 .panel.is-active .card--laast { cursor: default; }
-
-/* De andre typografiske kortene står på en jevn mørk flate. Silken er
-   lys noen steder og mørk andre, og flytter seg, så hvit tekst kan ikke
-   regne med underlaget sitt — skyggen er det som holder den lesbar når
-   en lys fold glir forbi bak den. */
-.card--laast .type-big { text-shadow: 0 1px 16px rgba(48,29,15,0.6); }
 
 /* Sporet er mørkt, ikke lyst. Silken bak driver mellom nesten hvitt og
    mørk brun, så et lyst spor forsvant hver gang en lys fold gled forbi.
@@ -1858,7 +1866,7 @@ body.lyd-pa .lyd-knapp .lyd-fra { display: inline-flex; }
   position: relative;
   width: clamp(6.5rem, 13vw, 11rem);
   height: 4px;
-  margin: 0.9rem auto 0;
+  margin: 0 auto;   /* alene midt på kortet, ikke under et ord */
   border-radius: 99px;
   background: rgba(46,28,16,0.45);
   overflow: hidden;
@@ -1918,7 +1926,7 @@ body.lyd-pa .lyd-knapp .lyd-fra { display: inline-flex; }
    — se «flyFiguren» i script.js.
 
    Kortet holder seg lyst i begge temaer. Det er et foto med lys grå
-   bakgrunn, ikke en UI-flate, akkurat som fotobordet i verktøykortet. */
+   bakgrunn, ikke en UI-flate, akkurat som fotobordet under Utstyr. */
 
 .card--om { background: #e3e3e3; }
 
@@ -1984,96 +1992,128 @@ body.lyd-pa .lyd-knapp .lyd-fra { display: inline-flex; }
 .mode-about.figur-flyr .about-view,
 .mode-about.figur-flyr .about-media video { transition: none; }
 
-/* ============ FOTO: BUNKEN OG LYSBORDET ============
+/* ============ KRYP, FOTO OG UTSTYR: FORSIDEN OG LYSBORDET ============
 
-   Blåtimen, ikke svart. Bildene er nesten alle tatt i overgangen mellom
-   dag og kveld, og kortet låner fargen fra himmelen i dem. Det er mørkt
-   nok til at de lyse kantene på kopiene står fram, og blått nok til at
-   det ikke forveksles med OsloLut, to kort lenger bort. */
+   Kortet er blåtimen fra Foto, ikke svart. Bildene er nesten alle tatt
+   i overgangen mellom dag og kveld, og kortet låner fargen fra himmelen
+   i dem. Det er mørkt nok til at de lyse kantene på kopiene står fram,
+   og blått nok til at det ikke forveksles med OsloLut. */
 
 .art--foto { --art-bg: #1f2133; }
 :root[data-theme="dark"] .art--foto { --art-bg: #23263a; }
 
-/* --- bunken: kortforsiden i stokken --- */
+/* --- forsiden i stokken: tre ting på samme bord ---
+   Én for hver del: plakaten til Kryp, en papirkopi fra bordet i Foto, og
+   kompaktkameraet som tok den. Hver av dem er en dør — script.js åpner
+   kortet på den delen man klikket på.
 
-.foto-bunke {
+   De ligger på skrå over hverandre, ikke på rekke: plakaten øverst til
+   venstre så tittelen står fri, kopien til høyre, og kameraet foran og
+   lavere, der det dekker rulleteksten på plakaten og et hjørne av kopien
+   — ikke det som er poenget med noen av dem. Nederste femdel står tom,
+   til etiketten. */
+
+.samlet-forside {
   position: absolute;
   inset: 0;
   transition: opacity 0.6s var(--ease);
 }
 
-/* Papirkopier: en lys kant rundt, ikke en ramme. Kanten er polstring med
-   bakgrunnsfarge, så den skalerer med kopien. Fargen er papir, ikke hvit
-   — rent hvitt lyser for hardt mot blåtimen. */
-.foto-bunke > img {
+.mode-expanded .panel.is-active .samlet-forside,
+.mode-text .panel.is-active .samlet-forside {
+  opacity: 0;
+  pointer-events: none;
+}
+
+.samlet-ting {
   position: absolute;
-  left: 50%;
-  top: 57%;
-  height: 60%;
-  width: auto;
-  aspect-ratio: 9 / 16;
-  object-fit: cover;
-  padding: 1.9%;
-  background: #f1ede4;
-  border-radius: 3px;
+  left: var(--x);
+  top: var(--y);
   box-shadow:
     0 18px 32px -14px rgba(0,0,0,0.75),
     0 2px 5px rgba(0,0,0,0.3);
-  transition: transform 0.7s var(--ease);
+  transform: translate(-50%, -50%) rotate(var(--r));
+  transition: transform 0.7s var(--ease), scale 0.4s var(--ease);
 }
 
-.foto-bunke > img:nth-of-type(1) { transform: translate(-50%, -50%) translateX(-36%) translateY(2%) rotate(-10deg); }
-.foto-bunke > img:nth-of-type(2) { transform: translate(-50%, -50%) translateX(36%) translateY(3%) rotate(8deg); }
-.foto-bunke > img:nth-of-type(3) { transform: translate(-50%, -50%) rotate(-1.5deg); }
+/* Plakaten. Ringen er der fordi ytterkanten på plakaten er nesten svart:
+   uten den forsvinner hjørnene i det mørke bordet.
 
-/* Pekeren over bunken sprer den litt, som når noen tar i den. Bare der
-   det finnes en peker å holde over noe med, og bare på kortet som står
-   fremme — et nabokort skal ikke røre seg før det er valgt. */
-@media (hover: hover) {
-  .mode-deck .panel.is-active .card--foto:hover .foto-bunke > img:nth-of-type(1) { transform: translate(-50%, -50%) translateX(-58%) translateY(1%) rotate(-14deg); }
-  .mode-deck .panel.is-active .card--foto:hover .foto-bunke > img:nth-of-type(2) { transform: translate(-50%, -50%) translateX(58%) translateY(2%) rotate(12deg); }
-  .mode-deck .panel.is-active .card--foto:hover .foto-bunke > img:nth-of-type(3) { transform: translate(-50%, -54%) rotate(0deg) scale(1.03); }
-}
-
-/* Nederst i bunken: en innrammet kopi, tatt ned fra veggen og lagt på
-   bordet. Den er det eneste i stokken som sier at kortet har to rom.
-   Den stikker fram over kopiene, svart ramme og hvitt passepartout. */
-.bunke-ramme {
-  position: absolute;
-  left: 50%;
-  top: 36%;
-  height: 52%;
-  aspect-ratio: 4 / 5;
-  padding: 2.4%;
-  border: 5px solid #191919;
-  border-radius: 2px;
-  background: #f7f5f0;
+   Radiusen er i prosent og ikke i piksler. Plakaten har sine egne, slitte
+   hjørner malt inn i bildefila — tre av dem. Det fjerde, nederst til
+   høyre, er helt skarpt. Med for liten radius er det kunstverkets egen
+   kurve som leser som hjørnet på de tre gode, og da stikker det fjerde ut
+   som spisst. En radius større enn kunstverkets kurve tar over på alle
+   fire, og den kurven vokser og krymper med plakaten. */
+.samlet-plakat {
+  --x: 31%;
+  --y: 31%;
+  --r: -7deg;
+  width: 42%;
+  aspect-ratio: 1;
+  object-fit: cover;
+  border-radius: 5.5%;
   box-shadow:
-    0 18px 34px -14px rgba(0,0,0,0.7),
-    0 2px 5px rgba(0,0,0,0.3);
-  transform: translate(-50%, -50%) translateX(8%) rotate(4deg);
-  transition: transform 0.7s var(--ease);
+    0 18px 32px -14px rgba(0,0,0,0.85),
+    0 0 0 1px rgba(255,255,255,0.08);
 }
 
-.bunke-ramme img {
-  display: block;
+/* Papirkopien: en lys kant rundt, ikke en ramme. Kanten er polstring med
+   bakgrunnsfarge, så den skalerer med kopien. Fargen er papir, ikke hvit
+   — rent hvitt lyser for hardt mot blåtimen. */
+.samlet-kopi {
+  --x: 71%;
+  --y: 38%;
+  --r: 6deg;
+  height: 50%;
+  aspect-ratio: 9 / 16;
+  object-fit: cover;
+  padding: 1.6%;
+  background: #f1ede4;
+  border-radius: 3px;
+}
+
+/* Kameraet ligger på et lyst produktark, samme flate som ringen under
+   Utstyr. Rett på det mørke bordet ble det svarte kameraet en silhuett. */
+.samlet-utstyr {
+  --x: 41%;
+  --y: 63%;
+  --r: -3deg;
+  width: 44%;
+  aspect-ratio: 4 / 3;
+  padding: 3% 4%;
+  border-radius: 5px;
+  background: radial-gradient(115% 85% at 50% 34%, #fcfcfd 0%, #ededf0 52%, #dedee3 100%);
+}
+
+:root[data-theme="dark"] .samlet-utstyr {
+  background: radial-gradient(115% 85% at 50% 34%, #e4e4e9 0%, #d2d2d8 52%, #bebec6 100%);
+}
+
+.samlet-utstyr img {
   width: 100%;
   height: 100%;
-  object-fit: cover;
+  object-fit: contain;
+  filter: drop-shadow(0 6px 8px rgba(24,20,16,0.25));
 }
 
+/* Pekeren over kortet sprer tingene litt, som når noen tar i dem, og den
+   man står på løfter seg — det er den et klikk åpner. Bare der det finnes
+   en peker å holde over noe med, og bare på kortet som står fremme — et
+   nabokort skal ikke røre seg før det er valgt. */
 @media (hover: hover) {
-  .mode-deck .panel.is-active .card--foto:hover .bunke-ramme { transform: translate(-50%, -50%) translate(10%, -6%) rotate(6deg); }
+  .mode-deck .panel.is-active .card--samlet:hover .samlet-plakat { transform: translate(-50%, -50%) translate(-7%, -4%) rotate(-10deg); }
+  .mode-deck .panel.is-active .card--samlet:hover .samlet-kopi { transform: translate(-50%, -50%) translate(9%, -3%) rotate(9deg); }
+  .mode-deck .panel.is-active .card--samlet:hover .samlet-utstyr { transform: translate(-50%, -50%) translate(-2%, 5%) rotate(-4deg); }
+  .mode-deck .panel.is-active .samlet-ting:hover { scale: 1.05; }
 }
 
-.mode-expanded .panel.is-active .foto-bunke,
-.mode-text .panel.is-active .foto-bunke { opacity: 0; }
+/* --- lysbordet: Foto valgt ---
 
-/* --- lysbordet: kortet åpnet ---
-
-   Samme grep som spilleren i Kryp-kortet: et eget lag som toner inn når
-   kortet forstørres, mens forsiden toner ut. Hvor hver kopi ligger,
-   regnes ut i script.js og settes som --x, --y, --r og --s. */
+   Samme grep som avspilleren i Kryp: et eget lag som toner inn når
+   kortet forstørres med Foto valgt, mens forsiden toner ut. Hvor hver
+   kopi ligger, regnes ut i script.js og settes som --x, --y, --r og
+   --s. */
 
 .lysbord {
   position: absolute;
@@ -2089,7 +2129,7 @@ body.lyd-pa .lyd-knapp .lyd-fra { display: inline-flex; }
   transition: opacity 0.5s var(--ease), visibility 0s linear 0.5s;
 }
 
-.mode-expanded .panel.is-active .lysbord {
+.mode-expanded .panel.is-active [data-fane="foto"] > .lysbord {
   opacity: 1;
   visibility: visible;
   transition: opacity 0.6s var(--ease) 0.12s;
@@ -2327,8 +2367,8 @@ body.lyd-pa .lyd-knapp .lyd-fra { display: inline-flex; }
    Puss, ikke hvitt, og lyset kommer ovenfra: tre spotter i taket som
    tegner hver sin bue nedover veggen. Rammene kaster skyggen sin nedover
    av samme grunn. Veggen er lys i begge temaer — det er et rom, ikke en
-   UI-flate — men dempes et hakk i nattmodus, som fotobordet i
-   verktøykortet. */
+   UI-flate — men dempes et hakk i nattmodus, som fotobordet under
+   Utstyr. */
 .rom--vegg {
   --puss-bunn: #d6cfc3;
   background:
@@ -3234,8 +3274,9 @@ html.port:not(.apnet) .deck-intro > .panel > .card { animation-play-state: pause
   .gal-slide, .gal-dot { transition: none; }
   /* bryteren vipper uten glidning, men sier fortsatt fra at den er på */
   .inngang, .bryter-spor, .bryter-knott { transition: none; }
-  /* kopiene bytter plass uten å gli, og bunken sprer seg ikke under pekeren */
-  .kopi, .kopi::after, .foto-bunke > img, .bunke-ramme, .om-hei, .lysbord,
+  /* kopiene bytter plass uten å gli, og tingene på forsiden sprer seg
+     ikke under pekeren */
+  .kopi, .kopi::after, .samlet-ting, .om-hei, .lysbord, .orbit,
   .rom, .ramme, .vegg-mork, .vegglapp, .rom-markor { transition: none; }
 }
 
@@ -3382,7 +3423,8 @@ html.port:not(.apnet) .deck-intro > .panel > .card { animation-play-state: pause
     padding-right: 3.6rem;   /* lukkeknappen står i hjørnet */
   }
 
-  .case-heading h2 { font-size: 1.3rem; }
+  .case-heading h2,
+  .faner { font-size: 1.3rem; }
 
   /* to linjer er taket — Knytt-teksten sto på fem og rakk ned i sidene */
   .case-heading p {
@@ -3517,7 +3559,7 @@ html.port:not(.apnet) .deck-intro > .panel > .card { animation-play-state: pause
      samme sted som den nettopp slapp. ✕-en oppe i hjørnet blir stående
      — den lukker helt, som før — men den er lang vei på en telefon.
 
-     Gjelder alle kortene, ikke bare de med sider: Kryp og Verktøy har
+     Gjelder alle kortene, ikke bare de med sider: Kryp og Utstyr har
      samme tekstark og hadde samme blindvei. */
   .tilbake-knapp { display: none; }
 
@@ -3658,10 +3700,6 @@ html.port:not(.apnet) .deck-intro > .panel > .card { animation-play-state: pause
 
   .edge-chip { display: none; } /* touch har ✕ og Esc */
 
-  /* 9vw og ikke 12: med det store kortet gikk «nettbutikk.» utenfor
-     kanten på begge sider */
-  .type-big { font-size: clamp(2rem, 9vw, 4.5rem); }
-
   /* CV-knappen er bare ikon her, og da er ansiktet hele ikonet. */
   .widget-ansikt { width: 28px; height: 28px; margin: 0; }
 
@@ -3731,14 +3769,12 @@ html.port:not(.apnet) .deck-intro > .panel > .card { animation-play-state: pause
   .case-heading p { -webkit-line-clamp: 1; }
 }
 
-/* ============ KRYP: AVSPILLEREN I «KOMMER SNART»-KORTET ============
+/* ============ KRYP: AVSPILLEREN I DET SAMLEDE KORTET ============
 
-   I kortstokken er kortet fortsatt bare svart med «kommer snart.».
-   Åpner du det, blir den samme svarte flaten en avspiller: plakaten
-   til venstre, tittel og kontroller til høyre — satt opp som en
-   strømmetjeneste. Bakgrunnen får ligge svart. Det eneste som slipper
-   til er et uskarpt gjenskinn av plakaten, samme grep som de uskarpe
-   kopiene bak bildene i karusellene.
+   Velger du Kryp, blir kortet en avspiller: plakaten til venstre, tittel
+   og kontroller til høyre — satt opp som en strømmetjeneste. Det eneste
+   som slipper til av farge er et uskarpt gjenskinn av plakaten, samme
+   grep som de uskarpe kopiene bak bildene i karusellene.
 
    Det er ett hørespill, ikke en spilleliste, så knappene rundt play
    hopper 15 sekunder i stedet for å bla til neste spor. ============ */
@@ -3748,25 +3784,24 @@ html.port:not(.apnet) .deck-intro > .panel > .card { animation-play-state: pause
   inset: 0;
   border-radius: inherit;
   overflow: hidden;
+  /* Dyp burgunder, ikke kortets blåtime: den plukker opp rødt fra
+     tittelen i plakaten, og er mørk nok til at den mørke kanten på
+     plakaten fortsatt har noe å hvile mot. Laget har sin egen bunn, så
+     den følger med når man bytter del. */
+  background: #4a1522;
   opacity: 0;
   visibility: hidden;
   transition: opacity 0.5s var(--ease), visibility 0s linear 0.5s;
 }
 
-/* Bare i forstørret modus. I tekstmodus ligger arket oppå, og en
-   spiller man ikke ser skal man heller ikke kunne tabbe seg inn i —
-   visibility tar både fokus og skjermleser med seg. */
-.mode-expanded .panel.is-active .spot {
+/* Bare i forstørret modus, og bare med Kryp valgt. I tekstmodus ligger
+   arket oppå, og en spiller man ikke ser skal man heller ikke kunne
+   tabbe seg inn i — visibility tar både fokus og skjermleser med seg. */
+.mode-expanded .panel.is-active [data-fane="kryp"] > .spot {
   opacity: 1;
   visibility: visible;
   transition: opacity 0.7s var(--ease) 0.2s;
 }
-
-/* Kortforsiden viker for spilleren, som har sin egen plakat i mindre
-   format. Uten dette ligger den gamle forsiden i full bredde bak og
-   lyser gjennom. */
-.mode-expanded .panel.is-active .card--snart .card-cover,
-.mode-text .panel.is-active .card--snart .card-cover { opacity: 0; }
 
 /* Gjenskinnet: plakaten selv, blåst opp og ute av fokus. Lav opasitet,
    så det leser som farget lys på svart og ikke som et bilde. */
@@ -3801,7 +3836,9 @@ html.port:not(.apnet) .deck-intro > .panel > .card { animation-play-state: pause
 
 .spot-cover {
   aspect-ratio: 1;
-  border-radius: 18px;   /* samme grunn som på .card-cover lenger oppe */
+  /* Stor nok til å ta over de slitte hjørnene som er malt inn i
+     plakaten — se .samlet-plakat lenger oppe. */
+  border-radius: 18px;
   overflow: hidden;
   background: #000;
   /* plakaten skal se ut som den ligger oppå flaten, ikke som en rute

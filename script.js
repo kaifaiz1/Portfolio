@@ -38,12 +38,13 @@
   const bunnTeller = document.querySelector('.bunn-teller');
   const n = panels.length;
 
-  // OsloLut møter deg først. Her sto verktøykortet før, fordi det er
-  // det eneste uten opptak og dermed virker uansett hva nettleseren
-  // mener om autoplay. Det argumentet holder ikke lenger: porten på
-  // mobil kaller start() inne i selve trykket, og det er den samme
-  // håndsopprekningen et sveip ville gitt. På maskin er opptakene
-  // dempet og playsinline, som nettleserne slipper gjennom av seg selv.
+  // Knytt møter deg først, med telefonen som spiller invitasjonen. Her
+  // sto verktøykortet en gang, fordi det var det eneste uten opptak og
+  // dermed virket uansett hva nettleseren mener om autoplay. Det
+  // argumentet holder ikke lenger: porten på mobil kaller start() inne i
+  // selve trykket, og det er den samme håndsopprekningen et sveip ville
+  // gitt. På maskin er opptakene dempet og playsinline, som nettleserne
+  // slipper gjennom av seg selv.
   //
   // Sier de likevel nei — strømsparing på iOS, datasparing på Android —
   // blir kortet stående på plakatbildet til første trykk, og da spør
@@ -51,7 +52,7 @@
   //
   // Slås opp på id og ikke som et tall, så rekkefølgen i stokken kan
   // endres uten at dette går i stykker.
-  let active = Math.max(0, panels.findIndex((p) => p.id === 'oslolut'));
+  let active = Math.max(0, panels.findIndex((p) => p.id === 'knytt'));
 
   // 860 px er samme bredde som CSS-en bruker for å gå over til mobil-
   // oppsettet — bunnlinja med «Om prosjektet»-knappen dukker opp der.
@@ -64,9 +65,15 @@
   let coolingDown = false;
   let spotSync = null;   // settes av Kryp-avspilleren lenger ned
   let orbitTikk = null;  // settes av utstyrsringen lenger ned
-  let fotoSync = null;   // settes av lysbordet i Foto-kortet lenger ned
+  let fotoSync = null;   // settes av lysbordet i Foto lenger ned
   let fotoTast = null;   // ...og det samme lysbordet sine taster
+  let samletSync = null; // settes av bryteren mellom de tre lenger ned
   let figurFly = null;   // figuren på vei fra Om meg-kortet til om-siden
+
+  // Kryp, Foto og Utstyr deler ett kort, og bare én av dem står fremme
+  // om gangen. Avspilleren, lysbordet og ringen spør om denne før de
+  // spiller, svarer på hjulet eller henter bilder. Se «Tre i ett kort».
+  let fane = 'kryp';   // 'kryp' | 'foto' | 'utstyr'
 
   // Når intro-animasjonene er ferdige må klassene bort, ellers låser
   // «animation-fill-mode: forwards» opasiteten og modusbyttene får ikke
@@ -226,9 +233,13 @@
 
     headings.forEach((h, i) => h.classList.toggle('is-current', i === active));
 
+    // Før alt som spør om «fane»: åpnes det samlede kortet nå, er det
+    // her det bestemmes hvilken av de tre det åpner på.
+    if (samletSync) samletSync();
+
     // bunnlinja på mobil hører til et åpnet kort man blar i — kortene
-    // med sider, og lysbordet i Foto. Kryp og verktøyet har sin egen
-    // knapp videre inne i kortet.
+    // med sider, og lysbordet når Foto er valgt. Kryp og Utstyr har sin
+    // egen knapp videre inne i kortet.
     document.body.classList.toggle(
       'sider-fremme',
       mode === 'expanded' && panels[active].matches('.panel--pages, .panel--bunnlinje'),
@@ -560,13 +571,14 @@
   });
 
   // ============================================================
-  // Kryp — avspilleren i «kommer snart»-kortet
-  // Kortet er svart i stokken og blir en avspiller når det åpnes.
+  // Kryp — avspilleren
+  // Den første av de tre delene i det samlede kortet.
   // Ett hørespill, ikke en spilleliste: knappene rundt play hopper
   // 15 sekunder i stedet for å bla til neste spor.
   //
-  // Lyden slutter når kortet lukkes. Alternativet — å la den gå videre
-  // bak tekstarket eller ute i kortstokken — ville betydd lyd fra et
+  // Lyden slutter når kortet lukkes, og når man går over til Foto
+  // eller Utstyr. Alternativet — å la den gå videre bak tekstarket,
+  // bak en annen del eller ute i kortstokken — ville betydd lyd fra et
   // sted man ikke lenger ser, uten noe å trykke pause på.
   // ============================================================
 
@@ -705,13 +717,13 @@
     });
 
     spotSync = () => {
-      const fremme = mode === 'expanded' && spotPanel.classList.contains('is-active');
+      const fremme = mode === 'expanded' && fane === 'kryp' && spotPanel.classList.contains('is-active');
       if (!fremme && !lyd.paused) lyd.pause();
     };
   }
 
   // ============================================================
-  // Utstyrsringen i verktøykortet
+  // Utstyrsringen — Utstyr i det samlede kortet
   // Gjenstandene ligger på en sirkel som er vippet mot deg. For hver
   // plass regnes sinus ut til hvor langt til siden den står, og cosinus
   // til hvor nær den er. Nærhet styrer alt annet: størrelse, klarhet og
@@ -722,10 +734,9 @@
   // kant og blitt usynlige i sidene, så her flyttes de bare i planet og
   // vender alltid rett mot deg.
   //
-  // Ringen ER kortforsiden. Den går allerede mens kortet ligger i
-  // stokken, og fortsetter i samme runde når kortet åpnes — ingen
-  // omstart, ingen ny animasjon. Navn, hjelpetekst og pekeren er det
-  // eneste som kommer til i forstørret visning.
+  // Ringen går bare når Utstyr er valgt i et åpnet kort. Ellers står
+  // den stille der den slapp, og plukker opp igjen i samme runde neste
+  // gang — ingen omstart, ingen ny animasjon.
   //
   // Rullehjulet dytter på farten; den siger tilbake til grunnfarten av
   // seg selv. Holder du pekeren over noe, bremser ringen ned og stopper.
@@ -770,9 +781,7 @@
     // virke uansett hvor i ringen pekeren står. Klikk får fortsatt boble
     // videre til kortet, som tar deg til programvarelista.
     orbit.addEventListener('wheel', (e) => {
-      // Bare i åpnet kort. I stokken er hjulet stokkens eget — der blar
-      // det til neste prosjekt, og skal ikke også sette fart på ringen.
-      if (!ringInteraktiv()) return;
+      if (!ringFremme()) return;
       e.preventDefault();
       const d = Math.abs(e.deltaX) > Math.abs(e.deltaY) ? e.deltaX : e.deltaY;
       // taket hindrer at én hard rulling sender ringen i spinn
@@ -787,30 +796,27 @@
     let sveipX = null;
     orbit.addEventListener('touchstart', (e) => { sveipX = e.touches[0].clientX; }, { passive: true });
     orbit.addEventListener('touchmove', (e) => {
-      if (sveipX === null || !ringInteraktiv()) return;
+      if (sveipX === null || !ringFremme()) return;
       const x = e.touches[0].clientX;
       fart = Math.max(-0.055, Math.min(0.055, fart + (x - sveipX) * 0.0004));
       sveipX = x;
     }, { passive: true });
     orbit.addEventListener('touchend', () => { sveipX = null; }, { passive: true });
 
-    // pekeren og hjulet virker bare i åpnet kort
-    function ringInteraktiv() {
-      return mode === 'expanded' && orbitPanel.classList.contains('is-active');
-    }
-
-    // ...men selve rotasjonen går også i stokken, så lenge kortet er
-    // synlig. Kortet som er parkert bak midten er det ikke.
-    function ringSynlig() {
-      return (mode === 'deck' || mode === 'expanded')
-        && !orbitPanel.classList.contains('is-back');
+    // Pekeren, hjulet og selve rotasjonen gjelder bare når ringen faktisk
+    // vises: kortet åpnet, med Utstyr valgt.
+    function ringFremme() {
+      return mode === 'expanded' && fane === 'utstyr' && orbitPanel.classList.contains('is-active');
     }
 
     orbitTikk = () => {
-      // Et kort man ikke ser koster ingenting. Ringen står stille med
+      // En ring man ikke ser koster ingenting. Den står stille med
       // gjenstandene der de var, og plukker opp igjen der den slapp.
-      if (!ringSynlig()) return;
-      if (!ringInteraktiv()) valgt = null;   // ellers blir ringen stående frosset
+      // Valget slippes, ellers kommer den tilbake bremset til stopp.
+      if (!ringFremme()) {
+        valgt = null;
+        return;
+      }
 
       if (valgt !== null) fart *= 0.78;                       // bremser til stopp
       else fart += (GRUNNFART - fart) * 0.045;                // siger tilbake
@@ -857,9 +863,9 @@
   }
 
   // ============================================================
-  // Lysbordet i Foto-kortet — bordet og veggen
+  // Lysbordet — Foto i det samlede kortet: bordet og veggen
   //
-  // To rom i samme kort. Hvor hver kopi og hver ramme er, regnes ut her
+  // To rom i samme lag. Hvor hver kopi og hver ramme er, regnes ut her
   // og settes som egenskaper CSS-en leser (--x, --y, --s og så videre).
   // CSS-en tar seg av overgangen mellom to plasser, så alt denne koden
   // gjør er å bestemme hvor ting skal være.
@@ -907,12 +913,12 @@
     let over = null;       // kopien pekeren står på i vifta
     let tatt = null;       // rammen som er tatt ned fra veggen
     let veggOver = null;   // rammen pekeren står på
-    let apnet = false;     // er kortet åpnet siden det sist lå i stokken
+    let apnet = false;     // er Foto valgt siden kortet sist lå i stokken
     let sveipet = false;
     const hentet = new Set();   // rommene som har fått bildene sine
 
     function fremme() {
-      return mode === 'expanded' && fotoPanel.classList.contains('is-active');
+      return mode === 'expanded' && fane === 'foto' && fotoPanel.classList.contains('is-active');
     }
 
     // Scenen sier selv hvilket format den har. Det står i CSS-en og
@@ -1380,15 +1386,16 @@
       if (rom === 'bord') legg(); else heng();
     }, { passive: true });
 
-    // Kalles fra render(). Åpnes kortet fra stokken, begynner man ved
-    // bordet med vifta. Kommer man tilbake fra tekstarket, er alt der man
+    // Kalles fra render(). Første gang Foto vises etter at kortet er
+    // åpnet fra stokken, begynner man ved bordet med vifta. Kommer man
+    // tilbake fra tekstarket eller fra Kryp og Utstyr, er alt der man
     // forlot det.
     fotoSync = () => {
       if (!fotoPanel.classList.contains('is-active') || mode === 'deck' || mode === 'about') {
         apnet = false;
         return;
       }
-      if (mode !== 'expanded') return;
+      if (!fremme()) return;
       if (!apnet) {
         apnet = true;
         valgt = null;
@@ -1432,6 +1439,80 @@
       if (rom === 'vegg') blaVegg(frem ? 1 : -1);
       else bla(frem ? 1 : -1);
       return true;
+    };
+  }
+
+  // ============================================================
+  // Tre i ett kort — Kryp, Foto og Utstyr
+  //
+  // Hver for seg var de for tynne til et eget kort i stokken. Nå deler
+  // de ett, og tittelen i navbaren er bryteren: tre ord, og det som
+  // står svart er det du ser på. Valget står i data-fane på kortet, og
+  // CSS-en viser bare det ene laget og den ene teksten i tekstarket.
+  //
+  // Åpnes kortet fra stokken, begynner det på Kryp — eller på den av de
+  // tre tingene på forsiden man klikket på. Kommer man tilbake fra
+  // tekstarket, står man der man var. I tekstarket bytter bryteren
+  // tekst, og arket begynner fra toppen.
+  // ============================================================
+
+  const samlet = document.querySelector('.card--samlet');
+  if (samlet) {
+    const samletPanel = samlet.closest('.panel');
+    const faneKnapper = Array.from(document.querySelectorAll('.faner .fane'));
+    const faneSub = document.querySelector('.fane-sub');
+    const tekstark = samlet.querySelector('.card-text');
+    let apen = false;         // står kortet åpent nå
+    let fraForsiden = null;   // tingen på forsiden som ble klikket
+
+    // Bare tilstanden. render() kaller denne selv, så her kan den ikke
+    // kalles tilbake.
+    function velgFane(ny) {
+      fane = ny;
+      samlet.dataset.fane = ny;
+      // Bunnlinja på mobil hører til lysbordet: der står telleren og
+      // veien til teksten. Kryp og Utstyr har sin egen knapp i laget.
+      samletPanel.classList.toggle('panel--bunnlinje', ny === 'foto');
+      faneKnapper.forEach((k) => {
+        const valgt = k.dataset.fane === ny;
+        k.setAttribute('aria-pressed', valgt ? 'true' : 'false');
+        if (valgt && faneSub) faneSub.textContent = k.dataset.sub;
+      });
+    }
+
+    faneKnapper.forEach((k) => {
+      k.addEventListener('click', () => {
+        if (k.dataset.fane === fane) return;
+        velgFane(k.dataset.fane);
+        if (tekstark) tekstark.scrollTop = 0;
+        render();
+      });
+    });
+
+    // Tingene på forsiden er dører: plakaten åpner Kryp, kopien Foto og
+    // kameraet Utstyr. Klikket bobler videre til kortet, som åpner det
+    // — her merkes det bare hvor. Et nabokort skal bare hentes inn til
+    // midten, så det teller ikke.
+    samlet.querySelectorAll('.samlet-ting').forEach((ting) => {
+      ting.addEventListener('click', () => {
+        if (mode === 'deck' && samletPanel.classList.contains('is-active')) {
+          fraForsiden = ting.dataset.fane;
+        }
+      });
+    });
+
+    samletSync = () => {
+      const her = samletPanel.classList.contains('is-active') && (mode === 'expanded' || mode === 'text');
+      if (!her) {
+        apen = false;
+        fraForsiden = null;
+        return;
+      }
+      if (!apen) {
+        apen = true;
+        velgFane(fraForsiden || 'kryp');
+        fraForsiden = null;
+      }
     };
   }
 

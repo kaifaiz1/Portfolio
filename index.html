@@ -61,14 +61,12 @@
 
   <nav class="sr-only" aria-label="Innhold">
     <ul>
-      <li><a href="#om">Om meg</a></li>
-      <li><a href="#oslolut">OsloLut</a></li>
       <li><a href="#knytt">Knytt</a></li>
+      <li><a href="#oslolut">OsloLut</a></li>
       <li><a href="#badstulaug">Norges Badstulaug</a></li>
-      <li><a href="#kryp">Kryp</a></li>
-      <li><a href="#nettbutikk">Nettbutikk</a></li>
-      <li><a href="#verktoy">Verktøy</a></li>
-      <li><a href="#foto">Foto</a></li>
+      <li><a href="#kryp-foto-utstyr">Kryp, foto og utstyr</a></li>
+      <li><a href="#om">Om meg</a></li>
+      <li><a href="#under-arbeid">Under arbeid</a></li>
     </ul>
   </nav>
 
@@ -87,36 +85,39 @@
              det må stå én for hvert kort — også for Om meg, som aldri
              forstørres og derfor aldri viser sin. -->
         <div class="case-heading" data-i="0" aria-hidden="true">
-          <h2>Om meg</h2>
-          <p>Digital markedsfører × kreativ</p>
+          <h2>Knytt</h2>
+          <p>Studentdrevet initiativ som gjør det lettere å finne tilhørighet i en ny by.</p>
         </div>
         <div class="case-heading" data-i="1" aria-hidden="true">
           <h2>OsloLut</h2>
           <p>One LUT. One identity.</p>
         </div>
         <div class="case-heading" data-i="2" aria-hidden="true">
-          <h2>Knytt</h2>
-          <p>Studentdrevet initiativ som gjør det lettere å finne tilhørighet i en ny by.</p>
-        </div>
-        <div class="case-heading" data-i="3" aria-hidden="true">
           <h2>Norges Badstulaug</h2>
           <p>Kom inn i varmen.</p>
         </div>
+        <!-- Kryp, Foto og Utstyr deler ett kort, og da er tittelen selve
+             veien mellom dem: tre ord, det du ser på står svart. Den er
+             den eneste overskriften man kan trykke på, og derfor heller
+             ikke skjult for skjermlesere. Undertittelen skrives fra
+             data-sub på knappen som er valgt. -->
+        <div class="case-heading case-heading--faner" data-i="3">
+          <div class="faner" role="group" aria-label="Velg del">
+            <button class="fane" type="button" data-fane="kryp" data-sub="Hørespill — lyddesign." aria-pressed="true">Kryp</button>
+            <span class="fane-skille" aria-hidden="true">/</span>
+            <button class="fane" type="button" data-fane="foto" data-sub="Bordet og veggen." aria-pressed="false">Foto</button>
+            <span class="fane-skille" aria-hidden="true">/</span>
+            <button class="fane" type="button" data-fane="utstyr" data-sub="Klikk videre for avsløringen." aria-pressed="false">Utstyr</button>
+          </div>
+          <p class="fane-sub" aria-hidden="true">Hørespill — lyddesign.</p>
+        </div>
         <div class="case-heading" data-i="4" aria-hidden="true">
-          <h2>Kryp</h2>
-          <p>Hørespill — lyddesign.</p>
+          <h2>Om meg</h2>
+          <p>Digital markedsfører × kreativ</p>
         </div>
         <div class="case-heading" data-i="5" aria-hidden="true">
-          <h2>Nettbutikk</h2>
-          <p>Under arbeid — ikke klar for visning ennå.</p>
-        </div>
-        <div class="case-heading" data-i="6" aria-hidden="true">
-          <h2>Verktøy</h2>
-          <p>Klikk videre for avsløringen.</p>
-        </div>
-        <div class="case-heading" data-i="7" aria-hidden="true">
-          <h2>Foto</h2>
-          <p>Bordet og veggen.</p>
+          <h2>Under arbeid</h2>
+          <p>Ikke klar for visning ennå.</p>
         </div>
       </div>
 
@@ -171,85 +172,8 @@
     <!-- ======== KORTSTOKKEN (horisontal) ======== -->
     <div class="deck deck-intro">
 
-      <!-- ---- 01: Om meg ----
-           Om-siden lå bare bak en knapp i navbaren, og den er lett å gå
-           forbi: det er stokken man ser, og i stokken fantes det ingen.
-           Nå ligger den der som et kort blant de andre — først i rekka,
-           og siden stokken looper og OsloLut står fremme, betyr det rett
-           til venstre for OsloLut. Prosjektet møter deg fortsatt først,
-           men med et ansikt ved siden av.
-
-           Kortet har ingen forstørret visning. Om-siden ER den visningen,
-           så klikket går rett dit, og figuren glir fra kortet over til
-           plassen sin der. Det er samme bilde i samme størrelse — se
-           «flyFiguren» i script.js. -->
-      <article class="panel" id="meg" data-i="0">
-        <div class="card card--om" role="button" tabindex="0" aria-label="Om meg">
-          <img class="om-figur" src="assets/figur/kai-figur.jpg" alt="" aria-hidden="true">
-          <span class="om-hei" aria-hidden="true">Hei, jeg er Kai</span>
-          <span class="card-label card-label--ink">Om meg</span>
-        </div>
-      </article>
-
-      <!-- ---- 02: OsloLut ---- -->
-      <article class="panel panel--pages" id="oslolut" data-i="1">
-        <div class="card" role="button" tabindex="0" aria-label="OsloLut">
-          <div class="card-art art--oslolut" aria-hidden="true"></div>
-          <div class="case-reel" tabindex="-1">
-            <figure class="reel-item" data-r="0">
-              <div class="card-art art--oslolut" aria-hidden="true"></div>
-              <!-- Ingen «autoplay» her. Vi prøvde det, og der nettleseren
-                   nekter, tegner den en play-knapp oppå opptaket i stedet
-                   — og den knappen hører ikke hjemme i kortet. Avspilling
-                   startes fra script.js, og verktøykortet møter deg først
-                   nettopp for at det aldri skal bli nødvendig å be om lov
-                   før du har rørt skjermen. -->
-              <video poster="assets/oslolut/page_1/oslolut_page1.jpg" src="assets/oslolut/page_1/oslolut_page1.mp4#t=0.1" muted loop playsinline preload="none"></video>
-              <figcaption>Forsiden — filmisk anslag og én tydelig oppfordring, så poenget sitter med en gang.</figcaption>
-              <span class="reel-hint" aria-hidden="true"><span class="reel-hint-label">Les om prosjektet</span><svg class="hint-klikk" width="17" height="17" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.25" stroke-linecap="round" stroke-linejoin="round"><path d="M9.2 11.3V6.2a1.1 1.1 0 0 1 2.2 0v4.3"/><path d="M11.4 10.5V9.3a1.1 1.1 0 0 1 2.2 0v1.3"/><path d="M13.6 10.7V9.9a1.1 1.1 0 0 1 2.2 0v3.3a4 4 0 0 1-4 4h-1.3c-1.1 0-1.9-.35-2.6-1.05l-2.2-2.2a1.1 1.1 0 0 1 1.55-1.55l1.35 1.3"/><path d="M6.1 4.5 4.8 3.2M4.9 7.4 3.1 6.9M7.6 3.3 7.2 1.6"/></svg></span>
-            </figure>
-            <figure class="reel-item" data-r="1">
-              <div class="card-art art--oslolut" aria-hidden="true"></div>
-              <video poster="assets/oslolut/pag_2/page_2.jpg" src="assets/oslolut/pag_2/page_2.mp4#t=0.1" muted loop playsinline preload="none"></video>
-              <figcaption>LUT-en i aksjon — graden lagt på S-Log 3 i DaVinci Resolve.</figcaption>
-              <span class="reel-hint" aria-hidden="true"><span class="reel-hint-label">Les om prosjektet</span><svg class="hint-klikk" width="17" height="17" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.25" stroke-linecap="round" stroke-linejoin="round"><path d="M9.2 11.3V6.2a1.1 1.1 0 0 1 2.2 0v4.3"/><path d="M11.4 10.5V9.3a1.1 1.1 0 0 1 2.2 0v1.3"/><path d="M13.6 10.7V9.9a1.1 1.1 0 0 1 2.2 0v3.3a4 4 0 0 1-4 4h-1.3c-1.1 0-1.9-.35-2.6-1.05l-2.2-2.2a1.1 1.1 0 0 1 1.55-1.55l1.35 1.3"/><path d="M6.1 4.5 4.8 3.2M4.9 7.4 3.1 6.9M7.6 3.3 7.2 1.6"/></svg></span>
-            </figure>
-            <figure class="reel-item" data-r="2">
-              <div class="card-art art--oslolut" aria-hidden="true"></div>
-              <video poster="assets/oslolut/page_3/page_3.jpg" src="assets/oslolut/page_3/page_3.mp4#t=0.1" muted loop playsinline preload="none"></video>
-              <figcaption>Kjøpsreisen — fra produktseksjon til kasse, med sporing hele veien.</figcaption>
-              <span class="reel-hint" aria-hidden="true"><span class="reel-hint-label">Les om prosjektet</span><svg class="hint-klikk" width="17" height="17" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.25" stroke-linecap="round" stroke-linejoin="round"><path d="M9.2 11.3V6.2a1.1 1.1 0 0 1 2.2 0v4.3"/><path d="M11.4 10.5V9.3a1.1 1.1 0 0 1 2.2 0v1.3"/><path d="M13.6 10.7V9.9a1.1 1.1 0 0 1 2.2 0v3.3a4 4 0 0 1-4 4h-1.3c-1.1 0-1.9-.35-2.6-1.05l-2.2-2.2a1.1 1.1 0 0 1 1.55-1.55l1.35 1.3"/><path d="M6.1 4.5 4.8 3.2M4.9 7.4 3.1 6.9M7.6 3.3 7.2 1.6"/></svg></span>
-            </figure>
-          </div>
-
-          <span class="reel-count" aria-hidden="true"><b>1</b>&thinsp;/&thinsp;3</span>
-
-          <span class="card-label">OsloLut</span>
-
-          <div class="card-text" tabindex="-1">
-            <div class="card-text-inner">
-              <header class="text-head">
-                <p class="text-kicker">Utvalgt arbeid — 02</p>
-                <h2>OsloLut</h2>
-                <p class="text-sub">One LUT. One identity.</p>
-              </header>
-
-              <section class="text-block">
-                <p>OsloLut er et kreativt fargeverktøy for Sony S-Log 3, utviklet for filmskapere som vil gi opptakene en tydelig og gjenkjennelig look uten å bruke timer på fargearbeid. Produktet samler en LUT og en PowerGrade for DaVinci Resolve i en enkel løsning som gir en filmisk start og mer rom til selve fortellingen.</p>
-                <p>Jeg tok OsloLut fra idé til lansering og hadde ansvar for merkevare, produkt, nettside, foto, video og måling. Jeg formet et uttrykk inspirert av nordisk lys og bygget et kjøpsløp med tydelig veiledning, demonstrasjoner og strukturert sporing.</p>
-              </section>
-
-              <section class="text-block">
-                <h3>Rolle</h3>
-                <p class="text-role">Strategi · Merkevare · Innhold · Nettside · Analyse</p>
-              </section>
-            </div>
-          </div>
-        </div>
-      </article>
-
-      <!-- ---- 03: Knytt ---- -->
-      <article class="panel panel--pages" id="knytt" data-i="2">
+      <!-- ---- 01: Knytt ---- -->
+      <article class="panel panel--pages" id="knytt" data-i="0">
         <div class="card" role="button" tabindex="0" aria-label="Knytt">
           <div class="card-art art--knytt" aria-hidden="true"></div>
           <div class="case-reel" tabindex="-1">
@@ -396,13 +320,12 @@
                       <div class="reel-gallery reel-gallery--naken reel-gallery--tap" data-tid="5100">
                         <div class="gal-slide is-on" data-tittel="Nøkkeltall"><img class="gal-bilde" src="assets/knytt/page_4/tiktok1.PNG" alt="TikTok-statistikk: 11 000 visninger, 553 profilbesøk, 319 likerklikk og 72 delinger." loading="lazy"></div>
                         <div class="gal-slide" data-tittel="Trafikk"><img class="gal-bilde" src="assets/knytt/page_4/tiktok2.PNG" alt="TikTok-statistikk: 91,5 % av trafikken kom fra For You, og 75,5 % av søkene var på «Knytt»." loading="lazy"></div>
-                        <div class="gal-slide" data-tittel="Følgere"><img class="gal-bilde" src="assets/knytt/page_4/tiktok3.PNG" alt="TikTok-statistikk: 55 følgere totalt, 36 nye i perioden." loading="lazy"></div>
                         <div class="gal-slide" data-tittel="Alder"><img class="gal-bilde" src="assets/knytt/page_4/tiktok4.PNG" alt="TikTok-statistikk: 62,8 % av seerne var mellom 18 og 24 år." loading="lazy"></div>
                       </div>
                     </div>
                     <span class="tlf-oy" aria-hidden="true"></span>
                   </div>
-                    <span class="gal-dots"><button class="gal-dot is-on" type="button" data-g="0" aria-label="Nøkkeltall"></button><button class="gal-dot" type="button" data-g="1" aria-label="Trafikk"></button><button class="gal-dot" type="button" data-g="2" aria-label="Følgere"></button><button class="gal-dot" type="button" data-g="3" aria-label="Alder"></button></span>
+                    <span class="gal-dots"><button class="gal-dot is-on" type="button" data-g="0" aria-label="Nøkkeltall"></button><button class="gal-dot" type="button" data-g="1" aria-label="Trafikk"></button><button class="gal-dot" type="button" data-g="2" aria-label="Alder"></button></span>
                     <span class="gal-label">Nøkkeltall</span>
                   </div>
 
@@ -427,20 +350,39 @@
           <div class="card-text" tabindex="-1">
             <div class="card-text-inner">
               <header class="text-head">
-                <p class="text-kicker">Utvalgt arbeid — 03</p>
+                <p class="text-kicker">Utvalgt arbeid — 01</p>
                 <h2>Knytt</h2>
                 <p class="text-sub">Studentdrevet initiativ som gjør det lettere å finne tilhørighet i en ny by.</p>
               </header>
 
               <section class="text-block">
-                <p>Knytt begynte som et studentprosjekt og endte med å bli ekte. Utgangspunktet var ensomhet blant nye studenter i Oslo: mange flytter til en ny by og finner aldri helt inn i et miljø. Vi ville lage mindre møteplasser der det er lettere å bli kjent enn på et stort arrangement, og gjøre terskelen for å komme alene så lav som mulig.</p>
-                <p>Som daglig leder hadde jeg ansvar for retning, koordinering og markedsføring på tvers av teamet. Innholdsstrategien bygget på personlige, dokumentariske videoer som skulle føles som noe en venn sendte deg, ikke som en annonse. Gjennom høsten kom 71,8 % av visningene på Instagram fra folk som ikke fulgte oss fra før. Det var nettopp dem vi trengte å nå. TikTok traff målgruppen best, med 62,8 % av seerne mellom 18 og 24 år. Instagram nådde overraskende mange i 25 til 34, noe som tyder på at de to kanalene bør ha ulike roller.</p>
-                <p>Underveis gikk prosjektet fra skoleoppgave til noe med ordentlige samarbeidspartnere i ryggen, og arrangementene ble holdt på steder studentene allerede brukte.</p>
+                <h3>Problem</h3>
+                <p>Mange nye studenter i Oslo finner aldri inn i et miljø. Store arrangementer er lettest for dem som allerede kjenner noen.</p>
               </section>
 
               <section class="text-block">
-                <h3>Samarbeidspartnere</h3>
-                <p class="text-role">NoHo Norway · Anker Studentbolig · Mesh Oslo · Punkt Oslo · SiO</p>
+                <h3>Hypotese</h3>
+                <p>Vi trodde terskelen lå i å møte opp alene, mer enn i mangel på tilbud. Små møteplasser på steder studentene allerede brukte skulle senke den. Innholdet skulle føles som noe en venn sendte deg.</p>
+              </section>
+
+              <section class="text-block">
+                <h3>Tiltak</h3>
+                <p>Som daglig leder hadde jeg ansvar for retning, koordinering og markedsføring. Vi holdt tre gratis arrangementer høsten 2025. Vi lagde personlige, dokumentariske videoer for Instagram og TikTok, og bygget en nettside som samlet hvem vi er og veien inn.</p>
+              </section>
+
+              <section class="text-block">
+                <h3>Utfall</h3>
+                <ul class="text-liste">
+                  <li>40 deltok på tre arrangementer. Fem av dem kom alene.</li>
+                  <li>71,8&nbsp;% av visningene på Instagram kom fra folk som ikke fulgte oss.</li>
+                  <li>62,8&nbsp;% av TikTok-seerne var 18 til 24 år. På Instagram var den største gruppen 25 til 34 år.</li>
+                  <li>Fem samarbeidspartnere hentet inn på egen hånd: NoHo Norway, Anker Studentbolig, Mesh Oslo, Punkt Oslo og SiO.</li>
+                </ul>
+              </section>
+
+              <section class="text-block">
+                <h3>Lærdom</h3>
+                <p>Innholdet nådde ut av boblen, men bare fem av førti kom alene. De vi laget Knytt for, var de vanskeligste å få fra skjerm til rom. Neste gang ville jeg brukt mer tid på vinkling og analyse før vi publiserte. Det gjelder særlig når målgruppen er sårbar. Jeg ville også gitt kanalene ulike roller fra start: TikTok for å nå nye i målgruppen, Instagram for dem som allerede hadde vært med.</p>
               </section>
 
               <section class="text-block">
@@ -452,8 +394,79 @@
         </div>
       </article>
 
-      <!-- ---- 04: Norges Badstulaug ---- -->
-      <article class="panel panel--pages" id="badstulaug" data-i="3">
+      <!-- ---- 02: OsloLut ---- -->
+      <article class="panel panel--pages" id="oslolut" data-i="1">
+        <div class="card" role="button" tabindex="0" aria-label="OsloLut">
+          <div class="card-art art--oslolut" aria-hidden="true"></div>
+          <div class="case-reel" tabindex="-1">
+            <figure class="reel-item" data-r="0">
+              <div class="card-art art--oslolut" aria-hidden="true"></div>
+              <!-- Ingen «autoplay» her. Vi prøvde det, og der nettleseren
+                   nekter, tegner den en play-knapp oppå opptaket i stedet
+                   — og den knappen hører ikke hjemme i kortet. Avspilling
+                   startes fra script.js; se «Knytt møter deg først» der
+                   for hva som skjer når nettleseren likevel sier nei. -->
+              <video poster="assets/oslolut/page_1/oslolut_page1.jpg" src="assets/oslolut/page_1/oslolut_page1.mp4#t=0.1" muted loop playsinline preload="none"></video>
+              <figcaption>Forsiden — filmisk anslag og én tydelig oppfordring, så poenget sitter med en gang.</figcaption>
+              <span class="reel-hint" aria-hidden="true"><span class="reel-hint-label">Les om prosjektet</span><svg class="hint-klikk" width="17" height="17" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.25" stroke-linecap="round" stroke-linejoin="round"><path d="M9.2 11.3V6.2a1.1 1.1 0 0 1 2.2 0v4.3"/><path d="M11.4 10.5V9.3a1.1 1.1 0 0 1 2.2 0v1.3"/><path d="M13.6 10.7V9.9a1.1 1.1 0 0 1 2.2 0v3.3a4 4 0 0 1-4 4h-1.3c-1.1 0-1.9-.35-2.6-1.05l-2.2-2.2a1.1 1.1 0 0 1 1.55-1.55l1.35 1.3"/><path d="M6.1 4.5 4.8 3.2M4.9 7.4 3.1 6.9M7.6 3.3 7.2 1.6"/></svg></span>
+            </figure>
+            <figure class="reel-item" data-r="1">
+              <div class="card-art art--oslolut" aria-hidden="true"></div>
+              <video poster="assets/oslolut/pag_2/page_2.jpg" src="assets/oslolut/pag_2/page_2.mp4#t=0.1" muted loop playsinline preload="none"></video>
+              <figcaption>LUT-en i aksjon — graden lagt på S-Log 3 i DaVinci Resolve.</figcaption>
+              <span class="reel-hint" aria-hidden="true"><span class="reel-hint-label">Les om prosjektet</span><svg class="hint-klikk" width="17" height="17" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.25" stroke-linecap="round" stroke-linejoin="round"><path d="M9.2 11.3V6.2a1.1 1.1 0 0 1 2.2 0v4.3"/><path d="M11.4 10.5V9.3a1.1 1.1 0 0 1 2.2 0v1.3"/><path d="M13.6 10.7V9.9a1.1 1.1 0 0 1 2.2 0v3.3a4 4 0 0 1-4 4h-1.3c-1.1 0-1.9-.35-2.6-1.05l-2.2-2.2a1.1 1.1 0 0 1 1.55-1.55l1.35 1.3"/><path d="M6.1 4.5 4.8 3.2M4.9 7.4 3.1 6.9M7.6 3.3 7.2 1.6"/></svg></span>
+            </figure>
+            <figure class="reel-item" data-r="2">
+              <div class="card-art art--oslolut" aria-hidden="true"></div>
+              <video poster="assets/oslolut/page_3/page_3.jpg" src="assets/oslolut/page_3/page_3.mp4#t=0.1" muted loop playsinline preload="none"></video>
+              <figcaption>Kjøpsreisen — fra produktseksjon til kasse, med sporing hele veien.</figcaption>
+              <span class="reel-hint" aria-hidden="true"><span class="reel-hint-label">Les om prosjektet</span><svg class="hint-klikk" width="17" height="17" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.25" stroke-linecap="round" stroke-linejoin="round"><path d="M9.2 11.3V6.2a1.1 1.1 0 0 1 2.2 0v4.3"/><path d="M11.4 10.5V9.3a1.1 1.1 0 0 1 2.2 0v1.3"/><path d="M13.6 10.7V9.9a1.1 1.1 0 0 1 2.2 0v3.3a4 4 0 0 1-4 4h-1.3c-1.1 0-1.9-.35-2.6-1.05l-2.2-2.2a1.1 1.1 0 0 1 1.55-1.55l1.35 1.3"/><path d="M6.1 4.5 4.8 3.2M4.9 7.4 3.1 6.9M7.6 3.3 7.2 1.6"/></svg></span>
+            </figure>
+          </div>
+
+          <span class="reel-count" aria-hidden="true"><b>1</b>&thinsp;/&thinsp;3</span>
+
+          <span class="card-label">OsloLut</span>
+
+          <div class="card-text" tabindex="-1">
+            <div class="card-text-inner">
+              <header class="text-head">
+                <p class="text-kicker">Utvalgt arbeid — 02</p>
+                <h2>OsloLut</h2>
+                <p class="text-sub">One LUT. One identity.</p>
+              </header>
+
+              <section class="text-block">
+                <h3>Problem</h3>
+                <p>Sony-brukere filmer i S-Log 3 for å få mest mulig ut av kameraet. Rett fra kortet ser opptakene flate og grå ut. Gapet mellom det de ser for seg og det de får, krever fargearbeid mange verken har tid eller erfaring til.</p>
+              </section>
+
+              <section class="text-block">
+                <h3>Hypotese</h3>
+                <p>Friksjonen ligger i valg og usikkerhet. Én LUT med én tydelig look er lettere å ta i bruk enn en pakke med femti, så lenge kjøpsløpet viser resultatet før det ber om et kjøp.</p>
+              </section>
+
+              <section class="text-block">
+                <h3>Tiltak</h3>
+                <p>Jeg utviklet en LUT og en PowerGrade for DaVinci Resolve, og formet en merkevare inspirert av nordisk lys. Nettsiden har demonstrasjoner, veiledning og sporing fra produktseksjon til kasse. Jeg sto for merkevare, produkt, nettside, foto og video.</p>
+              </section>
+
+              <section class="text-block">
+                <h3>Status</h3>
+                <p>Under arbeid. Produkt, nettside og sporing er på plass. Neste steg er å markedsføre OsloLut og bruke sporingen til å se hvor Sony-brukere faller av.</p>
+              </section>
+
+              <section class="text-block">
+                <h3>Rolle</h3>
+                <p class="text-role">Strategi · Merkevare · Innhold · Nettside · Analyse</p>
+              </section>
+            </div>
+          </div>
+        </div>
+      </article>
+
+      <!-- ---- 03: Norges Badstulaug ---- -->
+      <article class="panel panel--pages" id="badstulaug" data-i="2">
         <div class="card" role="button" tabindex="0" aria-label="Norges Badstulaug">
           <div class="card-art art--badstulaug" aria-hidden="true"></div>
           <div class="case-reel" tabindex="-1">
@@ -518,14 +531,33 @@
           <div class="card-text" tabindex="-1">
             <div class="card-text-inner">
               <header class="text-head">
-                <p class="text-kicker">Utvalgt arbeid — 04</p>
+                <p class="text-kicker">Utvalgt arbeid — 03</p>
                 <h2>Norges Badstulaug</h2>
                 <p class="text-sub">Kom inn i varmen.</p>
               </header>
 
               <section class="text-block">
-                <p>For Norges Badstulaug utviklet vi en kampanje som løftet badstuen frem som et sted for ro, fellesskap og et avbrekk fra en travel hverdag. Konseptet bygget på innsikt om stress og ensomhet, og skulle gi målgruppen en følelse av å senke skuldrene før de leste et eneste ord.</p>
-                <p>Jeg bidro i innsiktsarbeidet og konseptutviklingen, og hadde ansvar for innholdsproduksjon og kampanjevideo. Konseptet ble utviklet for sosiale medier, utendørsflater, landingsside og CRM, med en tydelig rød tråd gjennom hele opplevelsen.</p>
+                <p>Fiktiv kampanje utviklet for Norges Badstulaug, som skoleprosjekt ved Høyskolen Kristiania.</p>
+              </section>
+
+              <section class="text-block">
+                <h3>Problem</h3>
+                <p>Innsiktsarbeidet pekte på stress, utbrenthet og ensomhet blant unge voksne.</p>
+              </section>
+
+              <section class="text-block">
+                <h3>Idé</h3>
+                <p>Badstuen som et sted for ro og fellesskap, et avbrekk fra en travel hverdag. Målgruppen skulle kjenne skuldrene senke seg før de leste et eneste ord.</p>
+              </section>
+
+              <section class="text-block">
+                <h3>Tiltak</h3>
+                <p>Jeg bidro i innsikt og konseptutvikling, og hadde ansvar for innholdsproduksjon og kampanjefilm. Storyboardet går fra stress til ro i åtte scener, der det kjølige blå møter det varme badstulyset. Konseptet dekker sosiale medier, utendørsflater, landingsside og CRM. Alle flatene leder mot landingssiden og medlemskapet.</p>
+              </section>
+
+              <section class="text-block">
+                <h3>Slik ville jeg målt den</h3>
+                <p>Kampanjen har ingen resultater, fordi den aldri gikk live. Hovedmålet ville vært nye medlemskap via landingssiden. Seertid på filmen ville vist om anslaget holdt. Klikk fra hver flate ville vist hvilke kanaler som førte folk inn.</p>
               </section>
 
               <section class="text-block">
@@ -537,14 +569,34 @@
         </div>
       </article>
 
-      <!-- ---- 05: Kryp ---- -->
-      <article class="panel" id="kryp" data-i="4">
-        <div class="card card--snart" role="button" tabindex="0" aria-label="Kryp — nytt prosjekt">
-          <div class="card-art art--snart" aria-hidden="true"></div>
-          <img class="card-cover" src="assets/kryp/cover/kryp_cover.jpg" alt="" aria-hidden="true">
+      <!-- ---- 04: Kryp, Foto og Utstyr ----
+           Tre ting som hver for seg var for tynne til et eget kort, men
+           som hører sammen: et hørespill, bildene, og det de er laget
+           med. De deler ett kort og bytter på det. Tittelen i navbaren
+           er bryteren mellom dem, og den som står fremme, står i
+           data-fane på kortet. CSS-en viser bare det ene laget, og
+           script.js lar bare det ene spille, svare på hjulet og hente
+           bilder.
 
-          <!-- Avspilleren. Ligger i kortet hele tiden, men er usynlig
-               (og utenfor tabbing) til kortet er forstørret. -->
+           I stokken er kortet tre ting lagt på samme bord: plakaten, en
+           papirkopi fra bordet i Foto, og kompaktkameraet som tok den.
+           Et klikk på en av dem åpner kortet rett på den delen; et klikk
+           ved siden av åpner det på Kryp.
+
+           Tekstarket har én tekst per del, og viser den som er valgt. -->
+      <article class="panel" id="kryp-foto-utstyr" data-i="3">
+        <div class="card card--samlet" role="button" tabindex="0" aria-label="Kryp, foto og utstyr" data-fane="kryp">
+          <div class="card-art art--foto" aria-hidden="true"></div>
+
+          <div class="samlet-forside" aria-hidden="true">
+            <img class="samlet-ting samlet-plakat" data-fane="kryp" src="assets/kryp/cover/kryp_cover.jpg" alt="" fetchpriority="low" decoding="async">
+            <img class="samlet-ting samlet-kopi" data-fane="foto" src="assets/bilder/web/IMG_1529-liten.jpg" alt="" fetchpriority="low" decoding="async">
+            <span class="samlet-ting samlet-utstyr" data-fane="utstyr"><img src="assets/verktoy/11.png" alt="" fetchpriority="low" decoding="async"></span>
+          </div>
+
+          <!-- Kryp: avspilleren. Ligger i kortet hele tiden, men er
+               usynlig (og utenfor tabbing) til kortet er forstørret og
+               Kryp er valgt. -->
           <div class="spot">
             <div class="spot-glo" aria-hidden="true"></div>
 
@@ -597,185 +649,39 @@
             </audio>
           </div>
 
-          <div class="card-text" tabindex="-1">
-            <div class="card-text-inner">
-              <header class="text-head">
-                <p class="text-kicker">Utvalgt arbeid — 05</p>
-                <h2>Kryp</h2>
-                <p class="text-sub">Hørespill — lyddesign.</p>
-              </header>
+          <!-- Foto: to sett bilder i to formater, og formatet er det som
+               skiller dem: løse kopier og innrammet arbeid. Lysbordet er
+               derfor to rom.
 
-              <section class="text-block">
-                <p>Kryp er et hørespill på knappe tretten minutter. Uten bilde er det lyden som må bygge rommet: hvor stort det er, hvor langt unna noe beveger seg, og når det kommer for nært.</p>
-                <p>Jeg hadde ansvaret for lyddesignet sammen med Torje Johannessen.</p>
-              </section>
+               Bordet: sju bilder, alle tatt med kompaktkameraet som står i
+               ringen under Utstyr — utstyret og det utstyret har laget
+               ligger i samme kort. 9:16, kornete, rett fra lomma. De
+               ligger løst, som papirkopier.
 
-              <section class="text-block">
-                <h3>Rolle</h3>
-                <p class="text-role">Lyddesign</p>
-              </section>
+               Veggen: seks bilder, tatt med speilrefleks og fastobjektiv
+               og ferdigbehandlet i Lightroom. 4:5 og 2:3. De henger
+               innrammet, i et salongoppheng — der er det nettopp de ulike
+               formatene som gjør veggen levende.
 
-              <section class="text-block">
-                <h3>Medvirkende</h3>
-                <p class="text-role">Manus og regi: Daniel Jørgensen · Jens Jonsen · Helle Eia<br>Skuespillere: Ida Nilsen · Filip Fedøy · Tuva Holen · Aurora Ovanger</p>
-              </section>
-            </div>
-          </div>
-        </div>
-      </article>
+               Veggen henger over bordet. Bryteren øverst bytter rom, og
+               rullehjulet gjør det samme: ruller man opp fra bordet, ser
+               man opp på veggen.
 
-      <!-- ---- 06: Nettbutikk ----
-           Kortet er med i stokken, men kan ikke åpnes: det finnes ingen
-           tekstbeskrivelse å vise ennå. Derfor står det uten role og
-           tabindex — det er ikke en knapp, og skal ikke annonseres som
-           en. Lastelinjen er den eneste beskjeden kortet gir. -->
-      <article class="panel" id="nettbutikk" data-i="5">
-        <div class="card card--laast">
-          <div class="card-art art--silke" aria-hidden="true"><span></span><span></span><span></span><span></span><span></span></div>
-          <div class="type-face">
-            <span class="type-big">nettbutikk.</span>
-            <div class="laste" aria-hidden="true"><span class="laste-fyll"></span></div>
-          </div>
-          <span class="card-label">Under arbeid</span>
-        </div>
-      </article>
+               Velger du Foto, spres kopiene utover bordet som en vifte.
+               Holder du pekeren over en, løfter den seg og forteller hva
+               kameraet sto på. Klikker du, kommer den opp i stort format,
+               med resten skjøvet til side i to bunker: de du har sett, og
+               de du har igjen. På veggen tas rammen ned i stedet, lyset i
+               rommet dempes, og en lapp ved siden av forteller det samme
+               som på et museum.
 
-      <!-- ---- 07: Verktøy ---- -->
-      <article class="panel" id="verktoy" data-i="6">
-        <div class="card" role="button" tabindex="0" aria-label="Verktøy">
+               På smal skjerm er det ikke plass til vifta. Der er det
+               alltid ett bilde oppe på bordet, og sveip blar.
 
-          <!-- Det fysiske utstyret, i ring rundt midten. Ringen ER
-               kortforsiden — den går allerede i kortstokken, og fortsetter
-               i samme runde når kortet åpnes. Navn og hjelpetekst kommer
-               først fram i forstørret visning, der det er plass til dem.
-               Selve ringen er dekorativ; lista like under bærer det samme
-               innholdet i tekst, så utstyret ikke bare finnes som bilder
-               som beveger seg. -->
-          <div class="orbit" aria-hidden="true">
-            <div class="orbit-flate"></div>
-            <div class="orbit-ring">
-              <div class="orbit-ting" data-navn="Kamera" data-modell="Sony ZV-E1"><img src="assets/verktoy/1.png" alt="" loading="lazy"></div>
-              <div class="orbit-ting" data-navn="Objektiv" data-modell="Thypoch 24–50 mm f/2.8"><img src="assets/verktoy/2.png" alt="" loading="lazy"></div>
-              <div class="orbit-ting" data-navn="Objektiv" data-modell="AF 14 mm f/4"><img src="assets/verktoy/3.png" alt="" loading="lazy"></div>
-              <div class="orbit-ting" data-navn="Objektiv" data-modell="Sony FE 50 mm f/1.8"><img src="assets/verktoy/4.png" alt="" loading="lazy"></div>
-              <div class="orbit-ting" data-navn="Objektiv" data-modell="Sony FE 20 mm f/1.8 G"><img src="assets/verktoy/13.png" alt="" loading="lazy"></div>
-              <div class="orbit-ting" data-navn="Filter" data-modell="K&amp;F Concept Black Diffusion 1/8"><img src="assets/verktoy/5.png" alt="" loading="lazy"></div>
-              <div class="orbit-ting" data-navn="Filter" data-modell="Variabelt ND-filter"><img src="assets/verktoy/6.png" alt="" loading="lazy"></div>
-              <div class="orbit-ting" data-navn="Maskin" data-modell="MacBook Pro"><img src="assets/verktoy/7.png" alt="" loading="lazy"></div>
-              <div class="orbit-ting" data-navn="Lagring" data-modell="Samsung T7"><img src="assets/verktoy/8.png" alt="" loading="lazy"></div>
-              <div class="orbit-ting" data-navn="Mikrofon" data-modell="DJI Mic"><img src="assets/verktoy/9.png" alt="" loading="lazy"></div>
-              <div class="orbit-ting" data-navn="Telefon" data-modell="iPhone 15 Pro"><img src="assets/verktoy/10.png" alt="" loading="lazy"></div>
-              <div class="orbit-ting" data-navn="Kompaktkamera" data-modell="Canon PowerShot G7 X Mark II"><img src="assets/verktoy/11.png" alt="" loading="lazy"></div>
-              <div class="orbit-ting" data-navn="Hodetelefoner" data-modell="AirPods Max"><img src="assets/verktoy/12.png" alt="" loading="lazy"></div>
-            </div>
-            <div class="orbit-tekst">
-              <p class="orbit-navn"></p>
-              <p class="orbit-modell"></p>
-              <button class="orbit-mer" type="button">Se stacken</button>
-            </div>
-          </div>
-
-          <ul class="sr-only">
-            <li>Kamera — Sony ZV-E1</li>
-            <li>Objektiv — Thypoch 24–50 mm f/2.8</li>
-            <li>Objektiv — AF 14 mm f/4</li>
-            <li>Objektiv — Sony FE 50 mm f/1.8</li>
-            <li>Objektiv — Sony FE 20 mm f/1.8 G</li>
-            <li>Filter — K&amp;F Concept Black Diffusion 1/8</li>
-            <li>Filter — Variabelt ND-filter</li>
-            <li>Maskin — MacBook Pro</li>
-            <li>Lagring — Samsung T7</li>
-            <li>Mikrofon — DJI Mic</li>
-            <li>Telefon — iPhone 15 Pro</li>
-            <li>Kompaktkamera — Canon PowerShot G7 X Mark II</li>
-            <li>Hodetelefoner — AirPods Max</li>
-          </ul>
-
-          <span class="card-label card-label--ink">Verktøy</span>
-
-          <div class="card-text" tabindex="-1">
-            <div class="card-text-inner">
-              <header class="text-head">
-                <p class="text-kicker">Verktøy — 07</p>
-                <h2>Stacken min</h2>
-              </header>
-
-              <section class="text-block">
-                <ul class="tool-chips">
-                  <li>Claude</li>
-                  <li>GPT</li>
-                  <li>Notion</li>
-                  <li>DaVinci Resolve</li>
-                  <li>Premiere Pro</li>
-                  <li>Audition</li>
-                  <li>Soundly</li>
-                  <li>Lightroom</li>
-                  <li>Canva</li>
-                  <li>Higgsfield</li>
-                  <li>Figma</li>
-                  <li>VS Code</li>
-                  <li>GitHub</li>
-                  <li>Vercel</li>
-                  <li>WordPress</li>
-                  <li>Gumroad</li>
-                  <li>Google Analytics</li>
-                  <li>Meta Ads</li>
-                  <li>Instagram Insights</li>
-                  <li>TikTok Analytics</li>
-                  <li>Meta Business Suite <span class="chip-merk">&mdash; under arbeid</span></li>
-                </ul>
-              </section>
-            </div>
-          </div>
-        </div>
-      </article>
-
-      <!-- ---- 08: Foto ----
-           To sett bilder i to formater, og formatet er det som skiller
-           dem: løse kopier og innrammet arbeid. Kortet er derfor to rom.
-
-           Bordet: sju bilder, alle tatt med kompaktkameraet som
-           står i ringen i kortet før — utstyret og det utstyret har laget
-           står ved siden av hverandre. 9:16, kornete, rett fra lomma. De
-           ligger løst, som papirkopier.
-
-           Veggen: seks bilder, tatt med speilrefleks og
-           fastobjektiv og ferdigbehandlet i Lightroom. 4:5 og 2:3. De
-           henger innrammet, i et salongoppheng — der er det nettopp de
-           ulike formatene som gjør veggen levende.
-
-           Veggen henger over bordet. Bryteren øverst bytter rom, og
-           rullehjulet gjør det samme: ruller man opp fra bordet, ser man
-           opp på veggen.
-
-           I stokken er kortet en bunke papirkopier oppå en innrammet kopi
-           som er tatt ned fra veggen. Åpner du det, spres kopiene utover
-           bordet som en vifte. Holder du pekeren over en, løfter den seg
-           og forteller hva kameraet sto på. Klikker du, kommer den opp i
-           stort format, med resten skjøvet til side i to bunker: de du
-           har sett, og de du har igjen. På veggen tas rammen ned i
-           stedet, lyset i rommet dempes, og en lapp ved siden av forteller
-           det samme som på et museum.
-
-           På smal skjerm er det ikke plass til vifta. Der er det alltid
-           ett bilde oppe på bordet, og sveip blar.
-
-           Kopiene og rammene har ingen src i markupen. De ligger skjult
-           til kortet åpnes, og skulle ikke hentes ned for alle som aldri
-           gjør det — script.js legger inn den lille versjonen først og
-           bytter til den store når den er klar. -->
-      <article class="panel panel--bunnlinje" id="foto" data-i="7">
-        <div class="card card--foto" role="button" tabindex="0" aria-label="Foto">
-          <div class="card-art art--foto" aria-hidden="true"></div>
-
-          <div class="foto-bunke" aria-hidden="true">
-            <!-- nederst i bunken: en ramme tatt ned fra veggen -->
-            <span class="bunke-ramme"><img src="assets/bilder/web/Elvina-02av10-liten.jpg" alt="" fetchpriority="low" decoding="async"></span>
-            <img src="assets/bilder/web/IMG_1677-liten.jpg" alt="" fetchpriority="low" decoding="async">
-            <img src="assets/bilder/web/IMG_1720-liten.jpg" alt="" fetchpriority="low" decoding="async">
-            <img src="assets/bilder/web/IMG_1529-liten.jpg" alt="" fetchpriority="low" decoding="async">
-          </div>
-
+               Kopiene og rammene har ingen src i markupen. De ligger
+               skjult til Foto velges, og skal ikke hentes ned for alle som
+               aldri gjør det — script.js legger inn den lille versjonen
+               først og bytter til den store når den er klar. -->
           <div class="lysbord">
 
             <!-- To knapper, ikke en bryter av/på: det er to steder, og
@@ -875,18 +781,86 @@
             </div>
           </div>
 
-          <span class="card-label">Foto</span>
+          <!-- Utstyr: det fysiske utstyret, i ring rundt midten. Navn og
+               modell kommer fram når pekeren står på noe. Selve ringen er
+               dekorativ; lista like under bærer det samme innholdet i
+               tekst, så utstyret ikke bare finnes som bilder som beveger
+               seg. -->
+          <div class="orbit" aria-hidden="true">
+            <div class="orbit-flate"></div>
+            <div class="orbit-ring">
+              <div class="orbit-ting" data-navn="Kamera" data-modell="Sony ZV-E1"><img src="assets/verktoy/1.png" alt="" loading="lazy"></div>
+              <div class="orbit-ting" data-navn="Objektiv" data-modell="Thypoch 24–50 mm f/2.8"><img src="assets/verktoy/2.png" alt="" loading="lazy"></div>
+              <div class="orbit-ting" data-navn="Objektiv" data-modell="AF 14 mm f/4"><img src="assets/verktoy/3.png" alt="" loading="lazy"></div>
+              <div class="orbit-ting" data-navn="Objektiv" data-modell="Sony FE 50 mm f/1.8"><img src="assets/verktoy/4.png" alt="" loading="lazy"></div>
+              <div class="orbit-ting" data-navn="Objektiv" data-modell="Sony FE 20 mm f/1.8 G"><img src="assets/verktoy/13.png" alt="" loading="lazy"></div>
+              <div class="orbit-ting" data-navn="Filter" data-modell="K&amp;F Concept Black Diffusion 1/8"><img src="assets/verktoy/5.png" alt="" loading="lazy"></div>
+              <div class="orbit-ting" data-navn="Filter" data-modell="Variabelt ND-filter"><img src="assets/verktoy/6.png" alt="" loading="lazy"></div>
+              <div class="orbit-ting" data-navn="Maskin" data-modell="MacBook Pro"><img src="assets/verktoy/7.png" alt="" loading="lazy"></div>
+              <div class="orbit-ting" data-navn="Lagring" data-modell="Samsung T7"><img src="assets/verktoy/8.png" alt="" loading="lazy"></div>
+              <div class="orbit-ting" data-navn="Mikrofon" data-modell="DJI Mic"><img src="assets/verktoy/9.png" alt="" loading="lazy"></div>
+              <div class="orbit-ting" data-navn="Telefon" data-modell="iPhone 15 Pro"><img src="assets/verktoy/10.png" alt="" loading="lazy"></div>
+              <div class="orbit-ting" data-navn="Kompaktkamera" data-modell="Canon PowerShot G7 X Mark II"><img src="assets/verktoy/11.png" alt="" loading="lazy"></div>
+              <div class="orbit-ting" data-navn="Hodetelefoner" data-modell="AirPods Max"><img src="assets/verktoy/12.png" alt="" loading="lazy"></div>
+            </div>
+            <div class="orbit-tekst">
+              <p class="orbit-navn"></p>
+              <p class="orbit-modell"></p>
+              <button class="orbit-mer" type="button">Se stacken</button>
+            </div>
+          </div>
+
+          <ul class="sr-only">
+            <li>Kamera — Sony ZV-E1</li>
+            <li>Objektiv — Thypoch 24–50 mm f/2.8</li>
+            <li>Objektiv — AF 14 mm f/4</li>
+            <li>Objektiv — Sony FE 50 mm f/1.8</li>
+            <li>Objektiv — Sony FE 20 mm f/1.8 G</li>
+            <li>Filter — K&amp;F Concept Black Diffusion 1/8</li>
+            <li>Filter — Variabelt ND-filter</li>
+            <li>Maskin — MacBook Pro</li>
+            <li>Lagring — Samsung T7</li>
+            <li>Mikrofon — DJI Mic</li>
+            <li>Telefon — iPhone 15 Pro</li>
+            <li>Kompaktkamera — Canon PowerShot G7 X Mark II</li>
+            <li>Hodetelefoner — AirPods Max</li>
+          </ul>
+
+          <span class="card-label">Kryp · Foto · Utstyr</span>
 
           <div class="card-text" tabindex="-1">
-            <div class="card-text-inner">
+            <div class="card-text-inner" data-fane="kryp">
               <header class="text-head">
-                <p class="text-kicker">Foto — 08</p>
+                <p class="text-kicker">Utvalgt arbeid — 04</p>
+                <h2>Kryp</h2>
+                <p class="text-sub">Hørespill — lyddesign.</p>
+              </header>
+
+              <section class="text-block">
+                <p>Kryp er et hørespill på knappe tretten minutter. Uten bilde er det lyden som må bygge rommet: hvor stort det er, hvor langt unna noe beveger seg, og når det kommer for nært.</p>
+                <p>Jeg hadde ansvaret for lyddesignet sammen med Torje Johannessen.</p>
+              </section>
+
+              <section class="text-block">
+                <h3>Rolle</h3>
+                <p class="text-role">Lyddesign</p>
+              </section>
+
+              <section class="text-block">
+                <h3>Medvirkende</h3>
+                <p class="text-role">Manus og regi: Daniel Jørgensen · Jens Jonsen · Helle Eia<br>Skuespillere: Ida Nilsen · Filip Fedøy · Tuva Holen · Aurora Ovanger</p>
+              </section>
+            </div>
+
+            <div class="card-text-inner" data-fane="foto">
+              <header class="text-head">
+                <p class="text-kicker">Foto — 04</p>
                 <h2>Foto</h2>
                 <p class="text-sub">Bordet og veggen.</p>
               </header>
 
               <section class="text-block">
-                <p>På bordet ligger sju bilder, alle tatt med en Canon PowerShot G7&nbsp;X Mark&nbsp;II — det samme kompaktkameraet som står i ringen under Verktøy.</p>
+                <p>På bordet ligger sju bilder, alle tatt med en Canon PowerShot G7&nbsp;X Mark&nbsp;II — det samme kompaktkameraet som står i ringen under Utstyr.</p>
                 <p>På veggen henger seks, tatt med Canon EOS&nbsp;80D og Sony A7&nbsp;III.</p>
               </section>
 
@@ -900,7 +874,73 @@
                 <p class="text-role">Canon PowerShot G7 X Mark II · Canon EOS 80D · Sony A7 III</p>
               </section>
             </div>
+
+            <div class="card-text-inner" data-fane="utstyr">
+              <header class="text-head">
+                <p class="text-kicker">Utstyr — 04</p>
+                <h2>Stacken min</h2>
+              </header>
+
+              <section class="text-block">
+                <ul class="tool-chips">
+                  <li>Claude</li>
+                  <li>GPT</li>
+                  <li>Notion</li>
+                  <li>DaVinci Resolve</li>
+                  <li>Premiere Pro</li>
+                  <li>Audition</li>
+                  <li>Soundly</li>
+                  <li>Lightroom</li>
+                  <li>Canva</li>
+                  <li>Higgsfield</li>
+                  <li>Figma</li>
+                  <li>VS Code</li>
+                  <li>GitHub</li>
+                  <li>Vercel</li>
+                  <li>WordPress</li>
+                  <li>Gumroad</li>
+                  <li>Google Analytics</li>
+                  <li>Meta Ads</li>
+                  <li>Instagram Insights</li>
+                  <li>TikTok Analytics</li>
+                  <li>Meta Business Suite <span class="chip-merk">&mdash; under arbeid</span></li>
+                </ul>
+              </section>
+            </div>
           </div>
+        </div>
+      </article>
+
+      <!-- ---- 05: Om meg ----
+           Om-siden lå bare bak en knapp i navbaren, og den er lett å gå
+           forbi: det er stokken man ser, og i stokken fantes det ingen.
+           Nå ligger den der som et kort blant de andre, etter arbeidene.
+
+           Kortet har ingen forstørret visning. Om-siden ER den visningen,
+           så klikket går rett dit, og figuren glir fra kortet over til
+           plassen sin der. Det er samme bilde i samme størrelse — se
+           «flyFiguren» i script.js. -->
+      <article class="panel" id="meg" data-i="4">
+        <div class="card card--om" role="button" tabindex="0" aria-label="Om meg">
+          <img class="om-figur" src="assets/figur/kai-figur.jpg" alt="" aria-hidden="true">
+          <span class="om-hei" aria-hidden="true">Hei, jeg er Kai</span>
+          <span class="card-label card-label--ink">Om meg</span>
+        </div>
+      </article>
+
+      <!-- ---- 06: Under arbeid ----
+           Kortet er med i stokken, men kan ikke åpnes: det finnes ingen
+           tekstbeskrivelse å vise ennå. Derfor står det uten role og
+           tabindex — det er ikke en knapp, og skal ikke annonseres som
+           en. Etiketten og lastelinjen er den eneste beskjeden kortet
+           gir; hva som kommer, sier det ikke før det er klart. -->
+      <article class="panel" id="under-arbeid" data-i="5">
+        <div class="card card--laast">
+          <div class="card-art art--silke" aria-hidden="true"><span></span><span></span><span></span><span></span><span></span></div>
+          <div class="type-face">
+            <div class="laste" aria-hidden="true"><span class="laste-fyll"></span></div>
+          </div>
+          <span class="card-label">Under arbeid</span>
         </div>
       </article>
 
@@ -919,7 +959,7 @@
       <div class="about-inner">
 
         <div class="about-copy">
-          <p class="text-kicker">Om meg — 01</p>
+          <p class="text-kicker">Om meg — 05</p>
           <p class="about-p"><strong>Jeg liker å finne problemet bak problemet.</strong> Det går igjen i alt jeg har jobbet med: ensomhet blant nye studenter i Oslo, utbrenthet blant unge voksne og gapet mellom det en Sony-bruker ser for seg og det kameraet faktisk leverer. Samme mekanisme, tre ulike sammenhenger.</p>
           <p class="about-p">Jeg studerer <strong>digital markedsføring</strong>, men det jeg liker aller best er skjæringspunktet mellom strategi og kreativ utførelse. Jeg trives med hele reisen fra innsikt og idé til innhold, nettside og måling. To år med <strong>lyddesign</strong> ligger også under videoarbeidet mitt, fordi lyd bærer like mye av følelsen som bildet gjør.</p>
           <p class="about-p">Jeg bygger det jeg vil presentere selv, i stedet for å vente på at noen andre skal gjøre idéen virkelig.</p>
@@ -1002,14 +1042,12 @@
 
     <!-- ======== NAVIGASJON / KONTROLLER ======== -->
     <div class="deck-dots" role="tablist" aria-label="Bla i sider">
-      <button class="dot" data-goto="0" role="tab" aria-label="Om meg"></button>
+      <button class="dot" data-goto="0" role="tab" aria-label="Knytt"></button>
       <button class="dot" data-goto="1" role="tab" aria-label="OsloLut"></button>
-      <button class="dot" data-goto="2" role="tab" aria-label="Knytt"></button>
-      <button class="dot" data-goto="3" role="tab" aria-label="Norges Badstulaug"></button>
-      <button class="dot" data-goto="4" role="tab" aria-label="Kryp"></button>
-      <button class="dot" data-goto="5" role="tab" aria-label="Nettbutikk"></button>
-      <button class="dot" data-goto="6" role="tab" aria-label="Verktøy"></button>
-      <button class="dot" data-goto="7" role="tab" aria-label="Foto"></button>
+      <button class="dot" data-goto="2" role="tab" aria-label="Norges Badstulaug"></button>
+      <button class="dot" data-goto="3" role="tab" aria-label="Kryp, foto og utstyr"></button>
+      <button class="dot" data-goto="4" role="tab" aria-label="Om meg"></button>
+      <button class="dot" data-goto="5" role="tab" aria-label="Under arbeid"></button>
     </div>
 
     <button class="close-btn" type="button" aria-label="Lukk">
